@@ -47,7 +47,7 @@ L:
 			if result != "" {
 				err := send(conn, result)
 				if err != nil {
-					break
+					break L
 				}
 			}
 
@@ -61,7 +61,7 @@ L:
 			if result != "" {
 				err := send(conn, result)
 				if err != nil {
-					break
+					break L
 				}
 			}
 		}
