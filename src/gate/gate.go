@@ -1,7 +1,7 @@
 package main
 
 import "net"
-import "player"
+import . "player"
 import "io"
 import "os"
 import "fmt"
@@ -9,8 +9,8 @@ import "fmt"
 func main() {
 	println("Starting the server")
 
-	player.DBStart(8)
-	player.InitNames()
+	StartDB(8)
+	InitNames()
 
 	service := ":8888"
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", service)
@@ -35,7 +35,7 @@ func handleClient(conn net.Conn) {
 	header := make([]byte, 2)
 	ch := make(chan string, 100)
 
-	go player.Start(ch, conn)
+	go NewPlayer(ch, conn)
 
 	for {
 		// header

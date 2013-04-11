@@ -22,7 +22,7 @@ func (ud *UserData) C_login(p string) string {
 	params:= strings.SplitN(p, " ", 2)
 
 	if len(params) == 2 {
-		go DBLogin(ch, params[0], params[1], ud)
+		go DB.Login(ch, params[0], params[1], ud)
 		ret := <-ch
 
 		if (ret == "true") {

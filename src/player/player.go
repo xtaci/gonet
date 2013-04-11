@@ -68,15 +68,15 @@ func send(conn net.Conn, p string) error {
 
 func (user *UserData) flush_timer() {
 	for {
-		time.Sleep(1*time.Minute)
+		time.Sleep(10*time.Second)
 		if user.id != 0 {
-			DBFlush(user)
+			DB.Flush(user)
 		}
 		time.Sleep(4*time.Second)
 	}
 }
 
-func Start(in chan string, conn net.Conn) {
+func NewPlayer(in chan string, conn net.Conn) {
 	var user UserData
 	user.mq = make(chan string, 100)
 

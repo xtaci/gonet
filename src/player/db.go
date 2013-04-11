@@ -6,12 +6,18 @@ import "reflect"
 import "github.com/ziutek/mymysql/mysql"
 import _ "github.com/ziutek/mymysql/native" // Native engine
 
-var dbch chan mysql.Conn
 
-func DBLogin(out chan string, name string, password string, ud * UserData) {
+type DBConn struct {
+	dbch chan mysql.Conn;
+}
+
+func (conn * DBConn) Login(out chan string, name string, password string, ud * UserData) {
 	stmt := "select id, name, password from users where name = '%s' AND password = MD5('%s')"
-	db := <-dbch
+
+	db := <-conn.dbch
 	rows,_, err := db.Query(stmt, name, password)
+	conn.dbch <- db
+
 	if err  != nil {
 		panic(err.Error())
 	}
@@ -23,13 +29,11 @@ func DBLogin(out chan string, name string, password string, ud * UserData) {
 	} else  {
 		out <- "false"
 	}
-
-	dbch <- db
 }
 
-func DBFlush(ud *UserData) {
-	key := reflect.TypeOf(ud).Elem()
+func (conn * DBConn) Flush(ud *UserData) {
 	v := reflect.ValueOf(ud).Elem()
+	key := v.Type()
 	count := key.NumField()
 
 	fields := make([]string, count)
@@ -56,20 +60,22 @@ func DBFlush(ud *UserData) {
 	stmt := []string{"REPLACE INTO cities(", strings.Join(fields[:slice_idx],","),
 			 ") VALUES (", strings.Join(values[:slice_idx],","), ")"}
 
-	db := <-dbch
+	db := <-conn.dbch
 	_,_, err := db.Query(strings.Join(stmt, " "))
+	conn.dbch <-db
 	if err  != nil {
 		println(err.Error())
 	}
-	dbch <- db
 }
 
-func DBStart(max int)  {
+var DB DBConn
+
+func StartDB(max int) {
 	user := "root"
 	pass := "qwer1234"
 	dbname := "game"
 
-	dbch = make(chan mysql.Conn, max)
+	DB.dbch = make(chan mysql.Conn, max)
 
 	for i:=0;i<max;i++ {
 		db := mysql.New("tcp", "", "127.0.0.1:3306", user, pass, dbname)
@@ -79,6 +85,6 @@ func DBStart(max int)  {
 			panic(err)
 		}
 
-		dbch <-db
+		DB.dbch <-db
 	}
 }
