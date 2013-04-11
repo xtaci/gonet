@@ -4,7 +4,15 @@ import "strings"
 import "net"
 import "encoding/binary"
 
+// commands
+func login(p string) string {
+}
+
 func echo(p string) string{
+	return p
+}
+
+func attack(p string) string {
 	return p
 }
 
