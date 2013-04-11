@@ -2,25 +2,25 @@ package player
 
 import "sync"
 
-var names map[string]chan string
+var names map[int]chan string
 var _lock sync.RWMutex
 
-func RegisterChannel(ch chan string, name string) {
+func RegisterChannel(ch chan string, id int) {
 	_lock.Lock()
-	names[name] = ch
+	names[id] = ch
 	_lock.Unlock()
 }
 
-func QueryChannel(name string) chan string {
+func QueryChannel(id int) chan string {
 	var ch chan string
 
 	_lock.RLock()
-	ch = names[name]
+	ch = names[id]
 	_lock.RUnlock()
 
 	return ch
 }
 
 func InitNames() {
-	names = make(map[string]chan string)
+	names = make(map[int]chan string)
 }

@@ -5,12 +5,11 @@ import "player"
 import "io"
 import "os"
 import "fmt"
-import "db"
 
 func main() {
 	println("Starting the server")
 
-	db.Start(8)
+	player.DBStart(8)
 	player.InitNames()
 
 	service := ":8888"
