@@ -11,7 +11,7 @@ type DBConn struct {
 	dbch chan mysql.Conn;
 }
 
-func (conn * DBConn) Login(out chan string, name string, password string, ud * UserData) {
+func (conn * DBConn) Login(out chan string, name string, password string, ud * User) {
 	stmt := "select id, name, password from users where name = '%s' AND password = MD5('%s')"
 
 	db := <-conn.dbch
@@ -31,7 +31,7 @@ func (conn * DBConn) Login(out chan string, name string, password string, ud * U
 	}
 }
 
-func (conn * DBConn) Flush(ud *UserData) {
+func (conn * DBConn) Flush(ud *User) {
 	v := reflect.ValueOf(ud).Elem()
 	key := v.Type()
 	count := key.NumField()

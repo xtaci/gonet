@@ -3,7 +3,7 @@ package player
 import "strings"
 import "math/rand"
 
-func (ud *UserData) exec_srv(msg string) string {
+func (ud *User) exec_srv(msg string) string {
 	params:= strings.SplitN(msg, " ", 2)
 	switch params[0] {
 	case "MESG": return ud.S_mesg(params[1]);
@@ -13,12 +13,12 @@ func (ud *UserData) exec_srv(msg string) string {
 	return ""
 }
 
-func (ud *UserData) S_mesg(p string) string {
+func (ud *User) S_mesg(p string) string {
 	msg := []string{"mesg",p}
 	return strings.Join(msg, " ")
 }
 
-func (ud *UserData) S_attacked(p string) string {
+func (ud *User) S_attacked(p string) string {
 	msg := []string{"attacked",p}
 
 	//

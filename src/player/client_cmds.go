@@ -3,7 +3,7 @@ package player
 import "strings"
 import "strconv"
 
-func (ud *UserData) exec_cli(msg string) string {
+func (ud *User) exec_cli(msg string) string {
 	params:= strings.SplitN(msg, " ", 2)
 
 	switch params[0] {
@@ -17,7 +17,7 @@ func (ud *UserData) exec_cli(msg string) string {
 }
 
 // commands from client
-func (ud *UserData) C_login(p string) string {
+func (ud *User) C_login(p string) string {
 	ch := make(chan string)
 	params:= strings.SplitN(p, " ", 2)
 
@@ -34,11 +34,11 @@ func (ud *UserData) C_login(p string) string {
 	return "false"
 }
 
-func (ud *UserData) C_echo(p string) string {
+func (ud *User) C_echo(p string) string {
 	return p
 }
 
-func (ud *UserData) C_talk(p string) string {
+func (ud *User) C_talk(p string) string {
 	params:= strings.SplitN(p, " ", 2)
 
 	if len(params) >= 2 {
@@ -53,7 +53,7 @@ func (ud *UserData) C_talk(p string) string {
 	return "MSG SENT"
 }
 
-func (ud *UserData) C_attack(p string) string {
+func (ud *User) C_attack(p string) string {
 	params:= strings.SplitN(p, " ", 2)
 
 	if len(params) >= 2 {
