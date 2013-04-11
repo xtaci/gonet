@@ -34,33 +34,35 @@ func Start(in chan string, conn net.Conn) {
 	if send(conn, "Welcome") != nil {
 		return
 	}
-
-	select {
-	case msg := <-in:
-		if msg == "" {
-			break
-		}
-
-		result := user.exec_cli(msg)
-
-		if result != "" {
-			err := send(conn, result)
-			if err != nil {
-				break
+L:
+	for {
+		select {
+		case msg := <-in:
+			if msg == "" {
+				break L
 			}
-		}
 
-	case msg := <-user.mq:
-		if msg == "" {
-			break
-		}
+			result := user.exec_cli(msg)
 
-		result := user.exec_srv(msg)
+			if result != "" {
+				err := send(conn, result)
+				if err != nil {
+					break
+				}
+			}
 
-		if result != "" {
-			err := send(conn, result)
-			if err != nil {
-				break
+		case msg := <-user.mq:
+			if msg == "" {
+				break L
+			}
+
+			result := user.exec_srv(msg)
+
+			if result != "" {
+				err := send(conn, result)
+				if err != nil {
+					break
+				}
 			}
 		}
 	}

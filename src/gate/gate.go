@@ -34,7 +34,7 @@ func handleClient(conn net.Conn) {
 	defer conn.Close()
 
 	header := make([]byte, 2)
-	ch := make(chan string)
+	ch := make(chan string, 100)
 
 	go player.Start(ch, conn)
 
@@ -57,7 +57,6 @@ func handleClient(conn net.Conn) {
 			println("error receving msg:", err)
 			break
 		}
-
 		ch <- string(data)
 	}
 

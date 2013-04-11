@@ -18,5 +18,6 @@ func (user *UserData) S_mesg(p string) string {
 }
 
 func (user *UserData) S_attacked(p string) string {
-	return "attacked by" +  p
+	msg := []string{"attacked",p}
+	return strings.Join(msg, " ")
 }

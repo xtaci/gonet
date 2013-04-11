@@ -54,11 +54,14 @@ func (user *UserData ) C_talk(p string) string {
 }
 
 func (user *UserData) C_attack(p string) string {
-	ch := QueryChannel(p)
+	params:= strings.SplitN(p, " ", 2)
 
-	if ch != nil {
-		msg := []string{"ATTACKED", user.name}
-		ch <- strings.Join(msg, " ")
+	if len(params) >= 2 {
+		ch := QueryChannel(params[0])
+		if ch != nil {
+			msg := []string{"ATTACKED", user.name, params[1]}
+			ch <- strings.Join(msg, " ")
+		}
 	}
 
 	return ""
