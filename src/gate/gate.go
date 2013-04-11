@@ -3,6 +3,7 @@ package main
 import "net"
 import "player"
 import "io"
+import "db"
 
 func main() {
 	println("Starting the server")
@@ -14,6 +15,8 @@ func main() {
 		return
 	}
 
+	db.Start(8)
+	player.InitNames()	
 
 	for {
 		conn, err := listener.Accept()
@@ -43,7 +46,6 @@ func HandleClient(conn net.Conn) {
 
 		// data
 		size := int(header[0] <<8 | header[1])
-		println(size)
 		data := make([]byte, size)
 		n, err = io.ReadFull(conn, data)
 

@@ -35,12 +35,12 @@ func _push_db(db *sql.DB)  {
 func Login(out chan string, name string, password string) {
 	db := _get_db()
 	stmt := "select id, name, password from users where name = ? AND password = MD5(?)"
-	r, err := db.Query(stmt, name, password)
+	rows, err := db.Query(stmt, name, password)
 	if err  != nil {
 		panic(err.Error())
 	}
 
-	if r != nil {
+	if rows.Next() {
 		out <- "true"
 	} else  {
 		out <- "false"
@@ -53,7 +53,7 @@ func Start(num_inst int)  {
 	db_list = list.New()
 
 	for i:=0;i<num_inst;i++ {
-		db, err := sql.Open("mysql", "root:qwer1234@/game?charset=utf8")
+		db, err := sql.Open("mysql", "root:qwer1234@/game?charset=latin1")
 		if  err != nil  {
 			print("Cannoe connect to db %s", err)
 			return
