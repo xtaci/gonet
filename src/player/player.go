@@ -1,10 +1,7 @@
 package player
 
-import "strings"
 import "net"
 import "encoding/binary"
-
-var mq chan string
 
 type UserData struct {
 	id int;
@@ -12,12 +9,8 @@ type UserData struct {
 	mq chan string;
 }
 
-var user UserData
-
-// commands from server
-var header []byte
-
 func send(conn net.Conn, p string) error {
+	header := make([]byte,2)
 	binary.BigEndian.PutUint16(header, uint16(len(p)));
 	_, err := conn.Write(header)
 	if err != nil {
@@ -35,59 +28,38 @@ func send(conn net.Conn, p string) error {
 }
 
 func Start(in chan string, conn net.Conn) {
-	header = make([]byte,2)
-	user.mq = make(chan string)
+	var user UserData
+	user.mq = make(chan string, 100)
 
-	client_cmds := map[string]func(string) string  {
-		"echo":Client_echo,
-		"login":Client_login,
-		"talk":Client_talk,
-		"attack":Client_attack,
+	if send(conn, "Welcome") != nil {
+		return
 	}
 
-	server_cmds := map[string]func(string) string  {
-		"mesg":Server_mesg,
-		"attackedby": Server_attackedby,
-	}
+	select {
+	case msg := <-in:
+		if msg == "" {
+			break
+		}
 
-	for {
-		select {
-		case msg := <-in:
-			if msg == "CLIENTCLOSE" || msg == "" {
-				break
-			}
+		result := user.exec_cli(msg)
 
-			params:= strings.SplitN(msg, " ", 2)
-
-			cmd := client_cmds[params[0]]
-
-			if cmd == nil {
-				send(conn, "invalid command")
-				continue;
-			}
-
-			result := cmd(params[1])
+		if result != "" {
 			err := send(conn, result)
 			if err != nil {
-				conn.Close()
 				break
 			}
+		}
 
-		case msg := <-mq:
-			if msg == "" {
-				break
-			}
+	case msg := <-user.mq:
+		if msg == "" {
+			break
+		}
 
-			params:= strings.SplitN(msg, " ", 2)
+		result := user.exec_srv(msg)
 
-			cmd := server_cmds[params[0]]
-
-			if cmd == nil { continue; }
-
-			result := cmd(params[1])
+		if result != "" {
 			err := send(conn, result)
 			if err != nil {
-				conn.Close()
 				break
 			}
 		}

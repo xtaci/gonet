@@ -3,32 +3,36 @@ package main
 import "net"
 import "player"
 import "io"
+import "os"
+import "fmt"
 import "db"
 
 func main() {
 	println("Starting the server")
 
-	listener, err := net.Listen("tcp", "0.0.0.0:8888")
-
-	if err != nil {
-		println("error listening:", err.Error())
-		return
-	}
-
 	db.Start(8)
-	player.InitNames()	
+	player.InitNames()
+
+	service := ":8888"
+	tcpAddr, err := net.ResolveTCPAddr("tcp4", service)
+	checkError(err)
+
+	listener, err := net.ListenTCP("tcp", tcpAddr)
+	checkError(err)
 
 	for {
 		conn, err := listener.Accept()
+
 		if err != nil {
-			println("error accept::", err.Error())
-			return
+			continue
 		}
-		go HandleClient(conn)
+		go handleClient(conn)
 	}
 }
 
-func HandleClient(conn net.Conn) {
+func handleClient(conn net.Conn) {
+	defer conn.Close()
+
 	header := make([]byte, 2)
 	ch := make(chan string)
 
@@ -57,7 +61,12 @@ func HandleClient(conn net.Conn) {
 		ch <- string(data)
 	}
 
-	ch <- "CLIENTCLOSE"
-	conn.Close()
 	close(ch)
+}
+
+func checkError(err error) {
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Fatal error: %s", err.Error())
+		os.Exit(1)
+	}
 }

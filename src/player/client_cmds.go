@@ -3,9 +3,21 @@ package player
 import "strings"
 import "db"
 
+func (user *UserData) exec_cli(msg string) string {
+	params:= strings.SplitN(msg, " ", 2)
+
+	switch params[0] {
+	case "echo":  return user.C_echo(params[1])
+	case "login": return user.C_login(params[1])
+	case "attack": return user.C_attack(params[1])
+	case "talk": return user.C_talk(params[1])
+	}
+
+	return "Invalid Command"
+}
 
 // commands from client
-func Client_login(p string) string {
+func (user *UserData) C_login(p string) string {
 	ch := make(chan string)
 	params:= strings.SplitN(p, " ", 2)
 
@@ -15,7 +27,7 @@ func Client_login(p string) string {
 
 		if (ret == "true") {
 			user.name = params[0]
-			RegisterChannel(mq, params[0])
+			RegisterChannel(user.mq, params[0])
 		}
 		return ret
 	}
@@ -23,18 +35,17 @@ func Client_login(p string) string {
 	return "false"
 }
 
-func Client_echo(p string) string {
+func (user *UserData) C_echo(p string) string {
 	return p
 }
 
-func Client_talk(p string) string {
+func (user *UserData ) C_talk(p string) string {
 	params:= strings.SplitN(p, " ", 2)
 
 	if len(params) >= 2 {
 		ch := QueryChannel(params[0])
 		if ch != nil {
-			print(params[1])
-			msg := []string{"mesg", params[1]}
+			msg := []string{"MESG", user.name, params[1]}
 			ch <- strings.Join(msg, " ")
 		}
 	}
@@ -42,11 +53,11 @@ func Client_talk(p string) string {
 	return ""
 }
 
-func Client_attack(p string) string {
+func (user *UserData) C_attack(p string) string {
 	ch := QueryChannel(p)
 
 	if ch != nil {
-		msg := []string{"attackedby", user.name}
+		msg := []string{"ATTACKED", user.name}
 		ch <- strings.Join(msg, " ")
 	}
 
