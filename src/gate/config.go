@@ -14,7 +14,7 @@ func read_config(path string)(ret map[string]string) {
 		os.Exit(1)
 	}
 
-	re := regexp.MustCompile(`[\t ]*([0-9A-Za-z_]+)[\t ]*=[\t ]*([0-9A-Za-z_:?]+)[\t ]*`)
+	re := regexp.MustCompile(`[\t ]*([0-9A-Za-z_]+)[\t ]*=[\t ]*([^\t\n\f\r ]+)[\t ]*`)
 
 	r := bufio.NewReader(f)
 

@@ -2,6 +2,7 @@ package db
 
 import . "types"
 import "strings"
+import "strconv"
 import "github.com/ziutek/mymysql/mysql"
 import _ "github.com/ziutek/mymysql/native" // Native engine
 
@@ -42,16 +43,19 @@ func (conn *DBConn) Flush(ud *User) {
 }
 
 var DB DBConn
+func StartDB(config map[string]string) {
+	// instance
+	num := 1
+	if config["max_db_conn"] != "" {
+		num,_ = strconv.Atoi(config["max_db_conn"])
+	}
 
-func StartDB(max int) {
-	user := "root"
-	pass := "qwer1234"
-	dbname := "game"
+	println("DB instance:", num)
+	DB.dbch = make(chan mysql.Conn, num)
 
-	DB.dbch = make(chan mysql.Conn, max)
-
-	for i := 0; i < max; i++ {
-		db := mysql.New("tcp", "", "127.0.0.1:3306", user, pass, dbname)
+	for i := 0; i < num; i++ {
+		db := mysql.New("tcp", "", config["mysql_host"], config["mysql_username"],
+						config["mysql_password"], config["mysql_dbname"])
 		err := db.Connect()
 
 		if err != nil {
