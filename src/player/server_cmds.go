@@ -7,19 +7,19 @@ import . "types"
 func exec_srv(ud *User, msg string) string {
 	params:= strings.SplitN(msg, " ", 2)
 	switch params[0] {
-	case "MESG": return S_mesg(ud, params[1]);
-	case "ATTACKED": return S_attacked(ud, params[1]);
+	case "MESG": return s_mesg(ud, params[1]);
+	case "ATTACKED": return s_attacked(ud, params[1]);
 	}
 
 	return ""
 }
 
-func S_mesg(ud *User, p string) string {
+func s_mesg(ud *User, p string) string {
 	msg := []string{"mesg",p}
 	return strings.Join(msg, " ")
 }
 
-func S_attacked(ud *User, p string) string {
+func s_attacked(ud *User, p string) string {
 	msg := []string{"attacked",p}
 
 	//

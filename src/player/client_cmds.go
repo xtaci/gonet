@@ -9,17 +9,17 @@ func exec_cli(ud *User, msg string) string {
 	params:= strings.SplitN(msg, " ", 2)
 
 	switch params[0] {
-	case "echo":  return C_echo(ud, params[1])
-	case "login": return C_login(ud, params[1])
-	case "attack": return C_attack(ud, params[1])
-	case "talk": return C_talk(ud, params[1])
+	case "echo":  return c_echo(ud, params[1])
+	case "login": return c_login(ud, params[1])
+	case "attack": return c_attack(ud, params[1])
+	case "talk": return c_talk(ud, params[1])
 	}
 
 	return "Invalid Command"
 }
 
 // commands from client
-func C_login(ud *User, p string) string {
+func c_login(ud *User, p string) string {
 	ch := make(chan string)
 	params:= strings.SplitN(p, " ", 2)
 
@@ -36,11 +36,11 @@ func C_login(ud *User, p string) string {
 	return "false"
 }
 
-func C_echo(ud *User, p string) string {
+func c_echo(ud *User, p string) string {
 	return p
 }
 
-func C_talk(ud *User, p string) string {
+func c_talk(ud *User, p string) string {
 	params:= strings.SplitN(p, " ", 2)
 
 	if len(params) >= 2 {
@@ -55,7 +55,7 @@ func C_talk(ud *User, p string) string {
 	return "MSG SENT"
 }
 
-func C_attack(ud *User, p string) string {
+func c_attack(ud *User, p string) string {
 	params:= strings.SplitN(p, " ", 2)
 
 	if len(params) >= 2 {
