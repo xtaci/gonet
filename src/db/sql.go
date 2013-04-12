@@ -27,7 +27,7 @@ func sql_dump(tbl interface{}) (fields []string, values []string) {
 		case "float32", "float64":
 			values[slice_idx] = fmt.Sprintf("'%f'", v.Field(i).Interface())
 		case "string":
-			tmpstr := re.ReplaceAllString(v.Field(i).String(), `\${1}`)
+			tmpstr := re.ReplaceAllString(v.Field(i).Interface().(string), `\${1}`)
 			values[slice_idx] = fmt.Sprintf("'%s'", tmpstr)
 		case "time.Time":
 			values[slice_idx] = fmt.Sprintf("'%s'", v.Field(i).Interface().(time.Time).Format("2006-01-02 15:04:05"))
@@ -53,15 +53,19 @@ func sql_load(tbl interface{}, row *mysql.Row, res mysql.Result) {
 		f := v.FieldByName(camelcase(field.Name))
 		if f.IsValid() {
 			if f.CanSet() {
-				switch f.Kind() {
-				case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+				switch f.Type().String() {
+				case "int", "int8", "int16","int32","int64":
 					f.SetInt(int64(row.Int(i)))
-				case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+				case "uint", "uint8", "uint16","uint32","uint64":
 					f.SetUint(uint64(row.Uint(i)))
-				case reflect.Float32, reflect.Float64:
+				case "float32", "float64":
 					f.SetFloat(row.Float(i))
-				case reflect.String:
+				case "string":
 					f.SetString(row.Str(i))
+				case "time.Time":
+					t,_ := time.Parse("2006-01-02 15:04:05", row.Str(i))
+					gob,_ := t.GobEncode()
+					f.Interface().(*time.Time).GobDecode(gob)
 				}
 			}
 		}
