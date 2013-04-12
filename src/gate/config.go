@@ -21,6 +21,9 @@ func read_config(path string)(ret map[string]string) {
 	for {
 		line,e := r.ReadString('\n')
 
+		if line == "" || []byte(line)[0] == '#' {
+			continue
+		}
 		// maping
 		slice := re.FindStringSubmatch(line)
 
