@@ -41,19 +41,19 @@ func handleClient(conn net.Conn) {
 	for {
 		// header
 		n, err := io.ReadFull(conn, header)
-		if n==0 && err == io.EOF {
-			break;
+		if n == 0 && err == io.EOF {
+			break
 		} else if err != nil {
 			println("error receving header:", err)
-			break;
+			break
 		}
 
 		// data
-		size := int(header[0] <<8 | header[1])
+		size := int(header[0]<<8 | header[1])
 		data := make([]byte, size)
 		n, err = io.ReadFull(conn, data)
 
-		if err  != nil {
+		if err != nil {
 			println("error receving msg:", err)
 			break
 		}

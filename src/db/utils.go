@@ -8,7 +8,7 @@ func underscore(str string) string {
 	re := regexp.MustCompile(`([A-Z]+)([A-Z][a-z])`)
 	ret := re.ReplaceAllString(str, `${1}_${2}`)
 
-	re =  regexp.MustCompile(`([a-z])([A-Z])`)
+	re = regexp.MustCompile(`([a-z])([A-Z])`)
 	ret = re.ReplaceAllString(ret, `${1}_${2}`)
 
 	return strings.ToLower(strings.Replace(string(ret), "-", "_", -1))
@@ -20,10 +20,10 @@ func camelcase(str string) string {
 	re := regexp.MustCompile(`^[a-z]|_[a-z]`)
 
 	ret := re.ReplaceAllFunc([]byte(str), func(match []byte) []byte {
-				v := strings.TrimLeft(string(match), "_" )
-				v = strings.ToUpper(v)
-				return []byte(v)
-			})
+		v := strings.TrimLeft(string(match), "_")
+		v = strings.ToUpper(v)
+		return []byte(v)
+	})
 
 	return string(ret)
 }

@@ -7,8 +7,8 @@ import . "types"
 import . "db"
 
 func send(conn net.Conn, p string) error {
-	header := make([]byte,2)
-	binary.BigEndian.PutUint16(header, uint16(len(p)));
+	header := make([]byte, 2)
+	binary.BigEndian.PutUint16(header, uint16(len(p)))
 	_, err := conn.Write(header)
 	if err != nil {
 		println("Error send reply header:", err.Error())
@@ -32,7 +32,7 @@ func timer_work(ud *User) {
 
 func _timer(ch chan string) {
 	for {
-		time.Sleep(60*time.Second)
+		time.Sleep(60 * time.Second)
 		ch <- "timer"
 	}
 }

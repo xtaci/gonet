@@ -5,12 +5,11 @@ import "strings"
 import "github.com/ziutek/mymysql/mysql"
 import _ "github.com/ziutek/mymysql/native" // Native engine
 
-
 type DBConn struct {
-	dbch chan mysql.Conn;
+	dbch chan mysql.Conn
 }
 
-func (conn * DBConn) Login(out chan string, name string, password string, ud * User) {
+func (conn *DBConn) Login(out chan string, name string, password string, ud *User) {
 	stmt := "select id, name, password from users where name = '%s' AND password = MD5('%s')"
 
 	db := <-conn.dbch
@@ -21,23 +20,23 @@ func (conn * DBConn) Login(out chan string, name string, password string, ud * U
 		panic(err.Error())
 	}
 
-	if len(rows) >  0 {
-		sql_load(ud,&rows[0],res)
+	if len(rows) > 0 {
+		sql_load(ud, &rows[0], res)
 		out <- "true"
-	} else  {
+	} else {
 		out <- "false"
 	}
 }
 
-func (conn * DBConn) Flush(ud * User) {
+func (conn *DBConn) Flush(ud *User) {
 	fields, values := sql_dump(ud)
-	stmt := []string{"REPLACE INTO cities(", strings.Join(fields,","),
-			 ") VALUES (", strings.Join(values,","), ")"}
+	stmt := []string{"REPLACE INTO cities(", strings.Join(fields, ","),
+		") VALUES (", strings.Join(values, ","), ")"}
 
 	db := <-conn.dbch
-	_,_, err := db.Query(strings.Join(stmt, " "))
-	conn.dbch <-db
-	if err  != nil {
+	_, _, err := db.Query(strings.Join(stmt, " "))
+	conn.dbch <- db
+	if err != nil {
 		println(err.Error())
 	}
 }
@@ -51,14 +50,14 @@ func StartDB(max int) {
 
 	DB.dbch = make(chan mysql.Conn, max)
 
-	for i:=0;i<max;i++ {
+	for i := 0; i < max; i++ {
 		db := mysql.New("tcp", "", "127.0.0.1:3306", user, pass, dbname)
 		err := db.Connect()
 
-		if err!= nil {
+		if err != nil {
 			panic(err)
 		}
 
-		DB.dbch <-db
+		DB.dbch <- db
 	}
 }
