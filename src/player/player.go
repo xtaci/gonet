@@ -26,8 +26,7 @@ func send(conn net.Conn, p string) error {
 
 func timer_work(ud *User) {
 	if ud.Id != 0 {
-		_tmp_ud := *ud
-		go DB.Flush(&_tmp_ud)
+		DB.Flush(ud)
 	}
 }
 
@@ -36,14 +35,12 @@ func _timer(ch chan string) {
 		recover()
 	}()
 
-	__timer := func(ch chan string) {
+	func(ch chan string) {
 		for {
-			time.Sleep(300 * time.Second)
+			time.Sleep(3 * time.Second)
 			ch <- "timer"
 		}
-	}
-
-	__timer(ch)
+	}(ch)
 }
 
 func NewPlayer(in chan string, conn net.Conn) {
