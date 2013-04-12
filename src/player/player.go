@@ -3,6 +3,8 @@ package player
 import "net"
 import "time"
 import "encoding/binary"
+import . "types"
+import . "db"
 
 func send(conn net.Conn, p string) error {
 	header := make([]byte,2)
@@ -22,11 +24,11 @@ func send(conn net.Conn, p string) error {
 	return nil
 }
 
-func (user *User) flush_timer() {
+func flush_timer(ud *User) {
 	for {
 		time.Sleep(10*time.Second)
-		if user.id != 0 {
-			DB.Flush(user)
+		if ud.Id != 0 {
+			DB.Flush(ud)
 		}
 		time.Sleep(4*time.Second)
 	}
@@ -34,13 +36,13 @@ func (user *User) flush_timer() {
 
 func NewPlayer(in chan string, conn net.Conn) {
 	var user User
-	user.mq = make(chan string, 100)
+	user.MQ = make(chan string, 100)
 
 	if send(conn, "Welcome") != nil {
 		return
 	}
 
-	go user.flush_timer()
+	go flush_timer(&user)
 L:
 	for {
 		select {
@@ -49,7 +51,7 @@ L:
 				break L
 			}
 
-			result := user.exec_cli(msg)
+			result := exec_cli(&user, msg)
 
 			if result != "" {
 				err := send(conn, result)
@@ -58,12 +60,12 @@ L:
 				}
 			}
 
-		case msg := <-user.mq:
+		case msg := <-user.MQ:
 			if msg == "" {
 				break L
 			}
 
-			result := user.exec_srv(msg)
+			result := exec_srv(&user, msg)
 
 			if result != "" {
 				err := send(conn, result)

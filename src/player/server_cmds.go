@@ -2,23 +2,24 @@ package player
 
 import "strings"
 import "math/rand"
+import . "types"
 
-func (ud *User) exec_srv(msg string) string {
+func exec_srv(ud *User, msg string) string {
 	params:= strings.SplitN(msg, " ", 2)
 	switch params[0] {
-	case "MESG": return ud.S_mesg(params[1]);
-	case "ATTACKED": return ud.S_attacked(params[1]);
+	case "MESG": return S_mesg(ud, params[1]);
+	case "ATTACKED": return S_attacked(ud, params[1]);
 	}
 
 	return ""
 }
 
-func (ud *User) S_mesg(p string) string {
+func S_mesg(ud *User, p string) string {
 	msg := []string{"mesg",p}
 	return strings.Join(msg, " ")
 }
 
-func (ud *User) S_attacked(p string) string {
+func S_attacked(ud *User, p string) string {
 	msg := []string{"attacked",p}
 
 	//

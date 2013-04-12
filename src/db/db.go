@@ -1,5 +1,6 @@
-package player
+package db
 
+import . "types"
 import "fmt"
 import "strings"
 import "reflect"
@@ -23,15 +24,15 @@ func (conn * DBConn) Login(out chan string, name string, password string, ud * U
 	}
 
 	if len(rows) >  0 {
-		ud.id = rows[0].Int(0)
-		ud.name = rows[0].Str(1)
+		ud.Id = rows[0].Int(0)
+		ud.Name = rows[0].Str(1)
 		out <- "true"
 	} else  {
 		out <- "false"
 	}
 }
 
-func (conn * DBConn) Flush(ud *User) {
+func (conn * DBConn) Flush(ud * User) {
 	v := reflect.ValueOf(ud).Elem()
 	key := v.Type()
 	count := key.NumField()
@@ -52,7 +53,7 @@ func (conn * DBConn) Flush(ud *User) {
 		}
 
 		if (typeok) {
-			fields[slice_idx] = key.Field(i).Name
+			fields[slice_idx] = underscore(key.Field(i).Name)
 			slice_idx++
 		}
 	}

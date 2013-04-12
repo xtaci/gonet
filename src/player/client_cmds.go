@@ -2,22 +2,24 @@ package player
 
 import "strings"
 import "strconv"
+import . "db"
+import . "types"
 
-func (ud *User) exec_cli(msg string) string {
+func exec_cli(ud *User, msg string) string {
 	params:= strings.SplitN(msg, " ", 2)
 
 	switch params[0] {
-	case "echo":  return ud.C_echo(params[1])
-	case "login": return ud.C_login(params[1])
-	case "attack": return ud.C_attack(params[1])
-	case "talk": return ud.C_talk(params[1])
+	case "echo":  return C_echo(ud, params[1])
+	case "login": return C_login(ud, params[1])
+	case "attack": return C_attack(ud, params[1])
+	case "talk": return C_talk(ud, params[1])
 	}
 
 	return "Invalid Command"
 }
 
 // commands from client
-func (ud *User) C_login(p string) string {
+func C_login(ud *User, p string) string {
 	ch := make(chan string)
 	params:= strings.SplitN(p, " ", 2)
 
@@ -26,7 +28,7 @@ func (ud *User) C_login(p string) string {
 		ret := <-ch
 
 		if (ret == "true") {
-			RegisterChannel(ud.mq, ud.id)
+			RegisterChannel(ud.MQ, ud.Id)
 		}
 		return ret
 	}
@@ -34,18 +36,18 @@ func (ud *User) C_login(p string) string {
 	return "false"
 }
 
-func (ud *User) C_echo(p string) string {
+func C_echo(ud *User, p string) string {
 	return p
 }
 
-func (ud *User) C_talk(p string) string {
+func C_talk(ud *User, p string) string {
 	params:= strings.SplitN(p, " ", 2)
 
 	if len(params) >= 2 {
 		id,_ := strconv.Atoi(params[0])
 		ch := QueryChannel(id)
 		if ch != nil {
-			msg := []string{"MESG", string(ud.id), params[1]}
+			msg := []string{"MESG", string(ud.Id), params[1]}
 			ch <- strings.Join(msg, " ")
 		}
 	}
@@ -53,14 +55,14 @@ func (ud *User) C_talk(p string) string {
 	return "MSG SENT"
 }
 
-func (ud *User) C_attack(p string) string {
+func C_attack(ud *User, p string) string {
 	params:= strings.SplitN(p, " ", 2)
 
 	if len(params) >= 2 {
 		id,_ := strconv.Atoi(params[0])
 		ch := QueryChannel(id)
 		if ch != nil {
-			msg := []string{"ATTACKED", string(ud.id), params[1]}
+			msg := []string{"ATTACKED", string(ud.Id), params[1]}
 			ch <- strings.Join(msg, " ")
 		}
 	}
