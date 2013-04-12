@@ -31,10 +31,18 @@ func timer_work(ud *User) {
 }
 
 func _timer(ch chan string) {
-	for {
-		time.Sleep(60 * time.Second)
-		ch <- "timer"
+	defer func() {
+		recover()
+	}()
+
+	__timer := func(ch chan string) {
+		for {
+			time.Sleep(3 * time.Second)
+			ch <- "timer"
+		}
 	}
+
+	__timer(ch)
 }
 
 func NewPlayer(in chan string, conn net.Conn) {
@@ -82,4 +90,6 @@ L:
 			timer_work(&user)
 		}
 	}
+
+	close(timer_ch)
 }
