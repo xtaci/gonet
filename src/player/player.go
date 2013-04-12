@@ -24,13 +24,16 @@ func send(conn net.Conn, p string) error {
 	return nil
 }
 
-func flush_timer(ud *User) {
+func timer_work(ud *User) {
+	if ud.Id != 0 {
+		DB.Flush(ud)
+	}
+}
+
+func _timer(ch chan string) {
 	for {
-		time.Sleep(10*time.Second)
-		if ud.Id != 0 {
-			DB.Flush(ud)
-		}
-		time.Sleep(4*time.Second)
+		time.Sleep(60*time.Second)
+		ch <- "timer"
 	}
 }
 
@@ -42,7 +45,9 @@ func NewPlayer(in chan string, conn net.Conn) {
 		return
 	}
 
-	go flush_timer(&user)
+	timer_ch := make(chan string, 10)
+
+	go _timer(timer_ch)
 L:
 	for {
 		select {
@@ -73,6 +78,8 @@ L:
 					break L
 				}
 			}
+		case _ = <-timer_ch:
+			timer_work(&user)
 		}
 	}
 }
