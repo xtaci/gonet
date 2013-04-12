@@ -4,6 +4,7 @@ import "fmt"
 import "reflect"
 import "regexp"
 import "github.com/ziutek/mymysql/mysql"
+import "time"
 
 func sql_dump(tbl interface{}) (fields []string, values []string) {
 	re := regexp.MustCompile(`(\'|\"|\.|\*|\/|\-|\\)`)
@@ -18,16 +19,18 @@ func sql_dump(tbl interface{}) (fields []string, values []string) {
 	slice_idx := 0
 	for i := 0; i < count; i++ {
 		typeok := true
-		switch v.Field(i).Kind() {
-		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-			values[slice_idx] = fmt.Sprintf("'%d'", v.Field(i).Int())
-		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-			values[slice_idx] = fmt.Sprintf("'%d'", v.Field(i).Uint())
-		case reflect.Float32, reflect.Float64:
-			values[slice_idx] = fmt.Sprintf("'%f'", v.Field(i).Float())
-		case reflect.String:
+		switch v.Field(i).Type().String() {
+		case "int", "int8", "int16","int32","int64":
+			values[slice_idx] = fmt.Sprintf("'%d'", v.Field(i).Interface())
+		case "uint", "uint8", "uint16","uint32","uint64":
+			values[slice_idx] = fmt.Sprintf("'%d'", v.Field(i).Interface())
+		case "float32", "float64":
+			values[slice_idx] = fmt.Sprintf("'%f'", v.Field(i).Interface())
+		case "string":
 			tmpstr := re.ReplaceAllString(v.Field(i).String(), `\${1}`)
 			values[slice_idx] = fmt.Sprintf("'%s'", tmpstr)
+		case "time.Time":
+			values[slice_idx] = fmt.Sprintf("'%s'", v.Field(i).Interface().(time.Time).Format("2006-01-02 15:04:05"))
 		default:
 			typeok = false
 		}
