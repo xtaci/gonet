@@ -14,16 +14,15 @@ func (conn * DBConn) Login(out chan string, name string, password string, ud * U
 	stmt := "select id, name, password from users where name = '%s' AND password = MD5('%s')"
 
 	db := <-conn.dbch
-	rows,_, err := db.Query(stmt, name, password)
+	rows, res, err := db.Query(stmt, name, password)
 	conn.dbch <- db
 
-	if err  != nil {
+	if err != nil {
 		panic(err.Error())
 	}
 
 	if len(rows) >  0 {
-		ud.Id = rows[0].Int(0)
-		ud.Name = rows[0].Str(1)
+		sql_load(ud,&rows[0],res)
 		out <- "true"
 	} else  {
 		out <- "false"

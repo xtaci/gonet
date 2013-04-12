@@ -16,9 +16,10 @@ func underscore(str string) string {
 
 // "foo_bar" -> "FooBar"
 func camelcase(str string) string {
+	str = strings.ToLower(str)
 	re := regexp.MustCompile(`^[a-z]|_[a-z]`)
 
-	ret := re.ReplaceAllFunc([]byte("camel_case"), func(match []byte) []byte {
+	ret := re.ReplaceAllFunc([]byte(str), func(match []byte) []byte {
 				v := strings.TrimLeft(string(match), "_" )
 				v = strings.ToUpper(v)
 				return []byte(v)
