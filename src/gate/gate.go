@@ -28,7 +28,6 @@ func main() {
 	listener, err := net.ListenTCP("tcp", tcpAddr)
 	checkError(err)
 
-	InitNames()
 	for {
 		conn, err := listener.Accept()
 

@@ -1,27 +1,31 @@
-package player
+package cmd
 
 import "strings"
 import "math/rand"
 import . "types"
 
-func exec_srv(ud *User, msg string) string {
+type ServerCmds struct {
+}
+
+func ExecSrv(ud *User, msg string) string {
+	var cmds ServerCmds
 	params := strings.SplitN(msg, " ", 2)
 	switch params[0] {
 	case "MESG":
-		return s_mesg(ud, params[1])
+		return cmds.mesg(ud, params[1])
 	case "ATTACKED":
-		return s_attacked(ud, params[1])
+		return cmds.attacked(ud, params[1])
 	}
 
 	return ""
 }
 
-func s_mesg(ud *User, p string) string {
+func (ServerCmds) mesg(ud *User, p string) string {
 	msg := []string{"mesg", p}
 	return strings.Join(msg, " ")
 }
 
-func s_attacked(ud *User, p string) string {
+func (ServerCmds) attacked(ud *User, p string) string {
 	msg := []string{"attacked", p}
 
 	//

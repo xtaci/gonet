@@ -6,6 +6,7 @@ import "encoding/binary"
 import . "types"
 import . "db"
 import "strconv"
+import "cmd"
 
 func send(conn net.Conn, p string) error {
 	header := make([]byte, 2)
@@ -68,7 +69,7 @@ L:
 				break L
 			}
 
-			result := exec_cli(&user, msg)
+			result := cmd.ExecCli(&user, msg)
 
 			if result != "" {
 				err := send(conn, result)
@@ -82,7 +83,7 @@ L:
 				break L
 			}
 
-			result := exec_srv(&user, msg)
+			result := cmd.ExecSrv(&user, msg)
 
 			if result != "" {
 				err := send(conn, result)

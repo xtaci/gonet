@@ -1,29 +1,35 @@
-package player
+package cmd
 
 import "strings"
 import "strconv"
 import . "db"
 import . "types"
+import "names"
 
-func exec_cli(ud *User, msg string) string {
+type ClientCmds struct {
+}
+
+func ExecCli(ud *User, msg string) string {
+	var cmd ClientCmds;
+
 	params := strings.SplitN(msg, " ", 2)
 
 	switch params[0] {
 	case "echo":
-		return c_echo(ud, params[1])
+		return cmd.echo(ud, params[1])
 	case "login":
-		return c_login(ud, params[1])
+		return cmd.login(ud, params[1])
 	case "attack":
-		return c_attack(ud, params[1])
+		return cmd.attack(ud, params[1])
 	case "talk":
-		return c_talk(ud, params[1])
+		return cmd.talk(ud, params[1])
 	}
 
 	return "Invalid Command"
 }
 
 // commands from client
-func c_login(ud *User, p string) string {
+func (ClientCmds) login(ud *User, p string) string {
 	ch := make(chan string)
 	params := strings.SplitN(p, " ", 2)
 
@@ -32,7 +38,7 @@ func c_login(ud *User, p string) string {
 		ret := <-ch
 
 		if ret == "true" {
-			RegisterChannel(ud.MQ, ud.Id)
+			names.RegisterChannel(ud.MQ, ud.Id)
 		}
 		return ret
 	}
@@ -40,16 +46,16 @@ func c_login(ud *User, p string) string {
 	return "false"
 }
 
-func c_echo(ud *User, p string) string {
+func (ClientCmds) echo(ud *User, p string) string {
 	return p
 }
 
-func c_talk(ud *User, p string) string {
+func (ClientCmds) talk(ud *User, p string) string {
 	params := strings.SplitN(p, " ", 2)
 
 	if len(params) >= 2 {
 		id, _ := strconv.Atoi(params[0])
-		ch := QueryChannel(id)
+		ch := names.QueryChannel(id)
 		if ch != nil {
 			msg := []string{"MESG", string(ud.Id), params[1]}
 			ch <- strings.Join(msg, " ")
@@ -59,12 +65,12 @@ func c_talk(ud *User, p string) string {
 	return "MSG SENT"
 }
 
-func c_attack(ud *User, p string) string {
+func (ClientCmds) attack(ud *User, p string) string {
 	params := strings.SplitN(p, " ", 2)
 
 	if len(params) >= 2 {
 		id, _ := strconv.Atoi(params[0])
-		ch := QueryChannel(id)
+		ch := names.QueryChannel(id)
 		if ch != nil {
 			msg := []string{"ATTACKED", string(ud.Id), params[1]}
 			ch <- strings.Join(msg, " ")

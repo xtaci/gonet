@@ -1,4 +1,4 @@
-package player
+package names
 
 import "sync"
 
@@ -21,6 +21,6 @@ func QueryChannel(id int) chan string {
 	return ch
 }
 
-func InitNames() {
+func init() {
 	names = make(map[int]chan string)
 }
