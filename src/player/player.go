@@ -5,6 +5,7 @@ import "time"
 import "encoding/binary"
 import . "types"
 import . "db"
+import "strconv"
 
 func send(conn net.Conn, p string) error {
 	header := make([]byte, 2)
@@ -30,20 +31,20 @@ func timer_work(ud *User) {
 	}
 }
 
-func _timer(ch chan string) {
+func _timer(interval int, ch chan string) {
 	defer func() {
 		recover()
 	}()
 
 	func(ch chan string) {
 		for {
-			time.Sleep(3 * time.Second)
+			time.Sleep(time.Duration(interval) * time.Second)
 			ch <- "timer"
 		}
 	}(ch)
 }
 
-func NewPlayer(in chan string, conn net.Conn) {
+func NewPlayer(in chan string, conn net.Conn, config map[string]string) {
 	var user User
 	user.MQ = make(chan string, 100)
 
@@ -53,7 +54,12 @@ func NewPlayer(in chan string, conn net.Conn) {
 
 	timer_ch := make(chan string, 10)
 
-	go _timer(timer_ch)
+	flush_interval := 300 // sec
+	if config["flush_interval"] != "" {
+		flush_interval,_ = strconv.Atoi(config["flush_interval"])
+	}
+
+	go _timer(flush_interval, timer_ch)
 L:
 	for {
 		select {

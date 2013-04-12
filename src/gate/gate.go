@@ -40,17 +40,17 @@ func main() {
 		if err != nil {
 			continue
 		}
-		go handleClient(conn)
+		go handleClient(conn, config)
 	}
 }
 
-func handleClient(conn net.Conn) {
+func handleClient(conn net.Conn, config map[string]string) {
 	defer conn.Close()
 
 	header := make([]byte, 2)
 	ch := make(chan string, 100)
 
-	go NewPlayer(ch, conn)
+	go NewPlayer(ch, conn, config)
 
 	for {
 		// header
