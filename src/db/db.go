@@ -1,9 +1,7 @@
 package db
 
 import . "types"
-import "fmt"
 import "strings"
-import "reflect"
 import "github.com/ziutek/mymysql/mysql"
 import _ "github.com/ziutek/mymysql/native" // Native engine
 
@@ -33,33 +31,9 @@ func (conn * DBConn) Login(out chan string, name string, password string, ud * U
 }
 
 func (conn * DBConn) Flush(ud * User) {
-	v := reflect.ValueOf(ud).Elem()
-	key := v.Type()
-	count := key.NumField()
-
-	fields := make([]string, count)
-	values := make([]string, count)
-
-	slice_idx := 0
-	for i := 0; i < count; i++ {
-		typeok := true
-		switch v.Field(i).Kind() {
-		case reflect.Int:
-			values[slice_idx] = fmt.Sprintf("'%d'",v.Field(i).Int())
-		case reflect.String:
-			values[slice_idx] = fmt.Sprintf("'%s'",v.Field(i).String())
-		default:
-			typeok = false
-		}
-
-		if (typeok) {
-			fields[slice_idx] = underscore(key.Field(i).Name)
-			slice_idx++
-		}
-	}
-
-	stmt := []string{"REPLACE INTO cities(", strings.Join(fields[:slice_idx],","),
-			 ") VALUES (", strings.Join(values[:slice_idx],","), ")"}
+	fields, values := sql_dump(ud)
+	stmt := []string{"REPLACE INTO cities(", strings.Join(fields,","),
+			 ") VALUES (", strings.Join(values,","), ")"}
 
 	db := <-conn.dbch
 	_,_, err := db.Query(strings.Join(stmt, " "))
