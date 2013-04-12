@@ -11,7 +11,7 @@ import "strconv"
 func main() {
 	println("Starting the server")
 
-	config := read_config("config.ini")
+	config := read_config("./config.ini")
 
 	num := 1
 	if config["max_db_conn"] != "" {
