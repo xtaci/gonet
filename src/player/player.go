@@ -31,10 +31,14 @@ func send(conn net.Conn, p string) error {
 
 func timer_work(ud *User) {
 	if ud.Id != 0 {
-		user.Flush(ud)
-		for i := range ud.Cities {
-			city.Flush(&ud.Cities[i])
-		}
+		FlushAll(ud)
+	}
+}
+
+func FlushAll(ud *User) {
+	user.Flush(ud)
+	for i := range ud.Cities {
+		city.Flush(&ud.Cities[i])
 	}
 }
 

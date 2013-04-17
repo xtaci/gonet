@@ -33,3 +33,5 @@ func StartDB(config map[string]string) {
 		DBCH <- db
 	}
 }
+
+
