@@ -4,10 +4,10 @@ import "testing"
 
 func TestPacketWriter(t *testing.T) {
 	p := PacketWriter()
-	a := byte(240)
-	b := uint16(61680)
-	c := uint32(15790320)
-	d := uint32(4042322160)
+	a := byte(0xFF)
+	b := uint16(0xFF00)
+	c := uint32(0xFF0000)
+	d := uint32(0xFF000000)
 
 	p.WriteByte(a)
 	p.WriteU16(b)
@@ -15,7 +15,7 @@ func TestPacketWriter(t *testing.T) {
 	p.WriteU32(d)
 
 	data := p.Data()
-	result := []byte{0xF0,0xF0,0xF0,0xF0,0xF0,0xF0,0xF0, 0xF0, 0xF0, 0xF0}
+	result := []byte{255,0,255,0,0,255,0,0,0,255}
 
 	for i := range data {
 		if result[i] != data[i] {
