@@ -9,6 +9,19 @@ import "log"
 
 func main() {
 	config := read_config("./config.ini")
+	if config["logfile"] != "" {
+		f, err := os.OpenFile(config["logfile"], os.O_RDWR|os.O_CREATE, 0644)
+
+		if err != nil {
+			log.Println("cannot open logfile %v\n", err)
+			os.Exit(1)
+		}
+		var r Repeater
+		r.Out1 = os.Stdout
+		r.Out2 = f
+		log.SetOutput(&r)
+	}
+
 	log.Println("Starting the server")
 	StartDB(config)
 
