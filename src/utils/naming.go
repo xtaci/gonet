@@ -1,10 +1,10 @@
-package db
+package utils
 
 import "regexp"
 import "strings"
 
 // "FooBar" => "foo_bar"
-func underscore(str string) string {
+func UnderScore(str string) string {
 	re := regexp.MustCompile(`([A-Z]+)([A-Z][a-z])`)
 	ret := re.ReplaceAllString(str, `${1}_${2}`)
 
@@ -15,7 +15,7 @@ func underscore(str string) string {
 }
 
 // "foo_bar" -> "FooBar"
-func camelcase(str string) string {
+func CamelCase(str string) string {
 	str = strings.ToLower(str)
 	re := regexp.MustCompile(`^[a-z]|_[a-z]`)
 

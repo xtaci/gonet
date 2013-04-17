@@ -5,6 +5,7 @@ import "reflect"
 import "regexp"
 import "github.com/ziutek/mymysql/mysql"
 import "time"
+import "utils"
 
 func sql_dump(tbl interface{}) (fields []string, values []string) {
 	re := regexp.MustCompile(`(\'|\"|\.|\*|\/|\-|\\)`)
@@ -36,7 +37,7 @@ func sql_dump(tbl interface{}) (fields []string, values []string) {
 		}
 
 		if typeok {
-			fields[slice_idx] = underscore(key.Field(i).Name)
+			fields[slice_idx] = utils.UnderScore(key.Field(i).Name)
 			slice_idx++
 		}
 	}
@@ -50,7 +51,7 @@ func sql_dump(tbl interface{}) (fields []string, values []string) {
 func sql_load(tbl interface{}, row *mysql.Row, res mysql.Result) {
 	v := reflect.ValueOf(tbl).Elem()
 	for i, field := range res.Fields() {
-		f := v.FieldByName(camelcase(field.Name))
+		f := v.FieldByName(utils.CamelCase(field.Name))
 		if f.IsValid() {
 			if f.CanSet() {
 				switch f.Type().String() {
