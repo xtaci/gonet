@@ -8,6 +8,6 @@ mysql>call gen_users(10000);
 
 mysql>select count(*) from users;
 
-sh$./build.sh
+sh$go install gate
 
 sh$gate
