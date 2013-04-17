@@ -80,3 +80,12 @@ func sql_load(tbl interface{}, row *mysql.Row, res mysql.Result) {
 		}
 	}
 }
+
+func to_set_clause(fields []string, values []string) []string{
+	changes := make([]string, len(fields))
+	for i:= range fields {
+		changes[i] = fields[i] + "=" + values[i]
+	}
+
+	return changes
+}

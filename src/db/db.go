@@ -41,11 +41,7 @@ func (conn *DBConn) Login(out chan string, name string, password string, ud *Use
 
 func (conn *DBConn) FlushUser(ud *User) {
 	fields, values := sql_dump(ud)
-
-	changes := make([]string, len(fields))
-	for i:= range fields {
-		changes[i] = fields[i] + "=" + values[i]
-	}
+	changes := to_set_clause(fields,values)
 
 	stmt := []string{"UPDATE users SET ", strings.Join(changes, ","), " WHERE id=", fmt.Sprint(ud.Id)}
 
