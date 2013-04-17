@@ -30,7 +30,10 @@ func send(conn net.Conn, p string) error {
 
 func timer_work(ud *User) {
 	if ud.Id != 0 {
-		DB.Flush(ud)
+		DB.FlushUser(ud)
+		for i := range ud.Cities {
+			DB.FlushCity(&ud.Cities[i])
+		}
 	}
 }
 

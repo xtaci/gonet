@@ -3,6 +3,7 @@ package db
 import . "types"
 import "strings"
 import "strconv"
+import "fmt"
 import "github.com/ziutek/mymysql/mysql"
 import _ "github.com/ziutek/mymysql/native" // Native engine
 import "log"
@@ -29,13 +30,35 @@ func (conn *DBConn) Login(out chan string, name string, password string, ud *Use
 	if len(rows) > 0 {
 		sql_load(ud, &rows[0], res)
 		out <- "true"
+		// fake cities
+		ud.Cities = make([]City, 1)
+		ud.Cities[0].Name = "city of" + ud.Name
+		ud.Cities[0].OwnerId = ud.Id
 	} else {
 		out <- "false"
 	}
 }
 
-func (conn *DBConn) Flush(ud *User) {
+func (conn *DBConn) FlushUser(ud *User) {
 	fields, values := sql_dump(ud)
+
+	changes := make([]string, len(fields))
+	for i:= range fields {
+		changes[i] = fields[i] + "=" + values[i]
+	}
+
+	stmt := []string{"UPDATE users SET ", strings.Join(changes, ","), " WHERE id=", fmt.Sprint(ud.Id)}
+
+	db := <-conn.dbch
+	_, _, err := db.Query(strings.Join(stmt, " "))
+	conn.dbch <- db
+	if err != nil {
+		log.Println(err.Error())
+	}
+}
+
+func (conn *DBConn) FlushCity(city *City) {
+	fields, values := sql_dump(city)
 	stmt := []string{"REPLACE INTO cities(", strings.Join(fields, ","),
 		") VALUES (", strings.Join(values, ","), ")"}
 
