@@ -32,6 +32,9 @@ func main() {
 		service = config["service"]
 	}
 
+	//
+	go SignalProc()
+
 	log.Println("Service:", service)
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", service)
 	checkError(err)
