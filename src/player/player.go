@@ -7,6 +7,7 @@ import . "types"
 import . "db"
 import "strconv"
 import "cmd"
+import "names"
 
 func send(conn net.Conn, p string) error {
 	header := make([]byte, 2)
@@ -40,7 +41,7 @@ func _timer(interval int, ch chan string) {
 	func(ch chan string) {
 		for {
 			time.Sleep(time.Duration(interval) * time.Second)
-			ch <- "timer"
+			ch <- "ding!dong!"
 		}
 	}(ch)
 }
@@ -96,5 +97,7 @@ L:
 		}
 	}
 
+	// cleanup
+	names.Unregister(user.Id)
 	close(timer_ch)
 }

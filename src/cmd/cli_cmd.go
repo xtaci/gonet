@@ -38,7 +38,7 @@ func (ClientCmds) login(ud *User, p string) string {
 		ret := <-ch
 
 		if ret == "true" {
-			names.RegisterChannel(ud.MQ, ud.Id)
+			names.Register(ud.MQ, ud.Id)
 		}
 		return ret
 	}
@@ -55,7 +55,7 @@ func (ClientCmds) talk(ud *User, p string) string {
 
 	if len(params) >= 2 {
 		id, _ := strconv.Atoi(params[0])
-		ch := names.QueryChannel(id)
+		ch := names.Query(id)
 		if ch != nil {
 			msg := []string{"MESG", string(ud.Id), params[1]}
 			ch <- strings.Join(msg, " ")
@@ -70,7 +70,7 @@ func (ClientCmds) attack(ud *User, p string) string {
 
 	if len(params) >= 2 {
 		id, _ := strconv.Atoi(params[0])
-		ch := names.QueryChannel(id)
+		ch := names.Query(id)
 		if ch != nil {
 			msg := []string{"ATTACKED", string(ud.Id), params[1]}
 			ch <- strings.Join(msg, " ")
