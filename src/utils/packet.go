@@ -1,7 +1,7 @@
 package utils
 
 type Packet struct {
-	pos uint16
+	pos uint
 	data []byte
 }
 
@@ -9,9 +9,17 @@ func (p *Packet) Data() []byte {
 	return p.data
 }
 
+func (p *Packet) Length() int {
+	return len(p.data)
+}
+
+func (p *Packet) Pos() uint {
+	return p.pos
+}
+
 //---------------------------------------------------------Reader
-func (p *Packet) SkipN(n int) {
-	p.pos+=uint16(n)
+func (p *Packet) SkipN(n uint) {
+	p.pos+=n
 }
 
 func (p *Packet) ReadByte() (ret byte) {
@@ -29,14 +37,14 @@ func (p *Packet) ReadU16() (ret uint16){
 
 func (p *Packet) ReadU24() (ret uint32) {
 	buf := p.data[p.pos:p.pos+3]
-	ret = uint32(buf[2])<<8 | uint32(buf[1])<<8 | uint32(buf[0])
+	ret = uint32(buf[2])<<16 | uint32(buf[1])<<8 | uint32(buf[0])
 	p.pos+=3
 	return
 }
 
 func (p *Packet) ReadU32() (ret uint32) {
 	buf := p.data[p.pos:p.pos+4]
-	ret = uint32(buf[3])<<8 | uint32(buf[2])<<8 | uint32(buf[1])<<8 | uint32(buf[0])
+	ret = uint32(buf[3])<<24 | uint32(buf[2])<<16 | uint32(buf[1])<<8 | uint32(buf[0])
 	p.pos+=4
 	return
 }
@@ -66,23 +74,37 @@ func (p *Packet) WriteBytes(v []byte) {
 }
 
 func (p *Packet) WriteU16(v uint16) {
-	p.data = append(p.data, byte(v))
-	p.data = append(p.data, byte(v>>8))
+	buf := make([]byte, 2)
+	buf[0] = byte(v)
+	buf[1] = byte(v>>8)
+	p.data = append(p.data, buf...)
 }
 
 func (p *Packet) WriteU24(v uint32) {
-	p.data = append(p.data, byte(v))
-	p.data = append(p.data, byte(v>>8))
-	p.data = append(p.data, byte(v>>16))
+	buf := make([]byte, 3)
+	buf[0] = byte(v)
+	buf[1] = byte(v>>8)
+	buf[2] = byte(v>>16)
+	p.data = append(p.data, buf...)
 }
 
 func (p *Packet) WriteU32(v uint32) {
-	p.data = append(p.data, byte(v))
-	p.data = append(p.data, byte(v>>8))
-	p.data = append(p.data, byte(v>>16))
-	p.data = append(p.data, byte(v>>24))
+	buf := make([]byte, 4)
+	buf[0] = byte(v)
+	buf[1] = byte(v>>8)
+	buf[2] = byte(v>>16)
+	buf[3] = byte(v>>24)
+	p.data = append(p.data, buf...)
 }
 
+func (p *Packet) WriteU64(v uint64) {
+	buf := make([]byte, 8)
+	for i := range buf {
+		buf[i] = byte(v>>uint(i*8))
+	}
+
+	p.data = append(p.data, buf...)
+}
 
 func PacketReader(data []byte) *Packet{
 	return &Packet{pos:0, data:data}

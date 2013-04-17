@@ -8,18 +8,33 @@ func TestPacketWriter(t *testing.T) {
 	b := uint16(0xFF00)
 	c := uint32(0xFF0000)
 	d := uint32(0xFF000000)
+	e := uint64(0xFF00000000000000)
 
 	p.WriteByte(a)
 	p.WriteU16(b)
 	p.WriteU24(c)
 	p.WriteU32(d)
+	p.WriteU64(e)
 
-	data := p.Data()
-	result := []byte{255,0,255,0,0,255,0,0,0,255}
+	reader := PacketReader(p.Data())
 
-	for i := range data {
-		if result[i] != data[i] {
-			t.Error("packet writer failed")
-		}
+	if a != reader.ReadByte() {
+			t.Error("packet readbyte mismatch")
+	}
+
+	if b != reader.ReadU16() {
+			t.Error("packet readu16 mismatch")
+	}
+
+	if c != reader.ReadU24() {
+			t.Error("packet readu24 mismatch")
+	}
+
+	if d != reader.ReadU32() {
+			t.Error("packet readu32 mismatch")
+	}
+
+	if e != reader.ReadU64() {
+			t.Error("packet readu64 mismatch")
 	}
 }
