@@ -39,7 +39,7 @@ func (ServerCmds) attacked(ud *User, p string) string {
 		cur := nums[i]
 		j := i - 1
 
-		for j >= 1 && nums[j] > cur {
+		for j >= 0 && nums[j] > cur {
 			nums[j+1] = nums[j]
 			j = j - 1
 		}
