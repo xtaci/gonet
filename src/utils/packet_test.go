@@ -16,6 +16,8 @@ func TestPacketWriter(t *testing.T) {
 	p.WriteU32(d)
 	p.WriteU64(e)
 
+	p.WriteString("hello world")
+
 	reader := PacketReader(p.Data())
 
 	if a != reader.ReadByte() {
@@ -35,6 +37,12 @@ func TestPacketWriter(t *testing.T) {
 	}
 
 	if e != reader.ReadU64() {
-			t.Error("packet readu64 mismatch")
+		t.Error("packet readu64 mismatch")
+	}
+
+	str := reader.ReadString()
+	t.Log(str)
+	if "hello world" != str {
+		t.Error("packet read string mistmatch")
 	}
 }

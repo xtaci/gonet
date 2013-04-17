@@ -18,7 +18,7 @@ func (p *Packet) Pos() uint {
 }
 
 //---------------------------------------------------------Reader
-func (p *Packet) SkipN(n uint) {
+func (p *Packet) Seek(n uint) {
 	p.pos+=n
 }
 
@@ -26,6 +26,12 @@ func (p *Packet) ReadByte() (ret byte) {
 	ret = p.data[p.pos]
 	p.pos++
 	return
+}
+
+func (p *Packet) ReadString() (ret string) {
+	size := uint(p.ReadU16())
+	bytes := p.data[p.pos:p.pos+size]
+	return string(bytes)
 }
 
 func (p *Packet) ReadU16() (ret uint16){
@@ -69,8 +75,10 @@ func (p *Packet) WriteByte(v byte) {
 	p.data = append(p.data, v)
 }
 
-func (p *Packet) WriteBytes(v []byte) {
-	p.data = append(p.data, v...)
+func (p *Packet) WriteString(v string) {
+	bytes := []byte(v)
+	p.WriteU16(uint16(len(bytes)))
+	p.data = append(p.data, bytes...)
 }
 
 func (p *Packet) WriteU16(v uint16) {
