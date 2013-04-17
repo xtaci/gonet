@@ -4,28 +4,12 @@ import "strings"
 import "math/rand"
 import . "types"
 
-type ServerCmds struct {
-}
-
-func ExecSrv(ud *User, msg string) string {
-	var cmds ServerCmds
-	params := strings.SplitN(msg, " ", 2)
-	switch params[0] {
-	case "MESG":
-		return cmds.mesg(ud, params[1])
-	case "ATTACKED":
-		return cmds.attacked(ud, params[1])
-	}
-
-	return ""
-}
-
-func (ServerCmds) mesg(ud *User, p string) string {
+func Mesg(ud *User, p string) string {
 	msg := []string{"mesg", p}
 	return strings.Join(msg, " ")
 }
 
-func (ServerCmds) attacked(ud *User, p string) string {
+func Attacked(ud *User, p string) string {
 	msg := []string{"attacked", p}
 
 	//
