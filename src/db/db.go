@@ -17,7 +17,7 @@ type DBConn struct {
 }
 
 func (conn *DBConn) Login(out chan string, name string, password string, ud *User) {
-	stmt := "select id, name, password from users where name = '%s' AND password = MD5('%s')"
+	stmt := "select * from users where name = '%s' AND password = MD5('%s')"
 
 	db := <-conn.dbch
 	defer func(){conn.dbch <- db}()

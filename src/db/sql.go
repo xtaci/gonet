@@ -74,8 +74,7 @@ func sql_load(tbl interface{}, row *mysql.Row, res mysql.Result) {
 					f.SetString(row.Str(i))
 				case "time.Time":
 					t,_ := time.Parse("2006-01-02 15:04:05", row.Str(i))
-					gob,_ := t.GobEncode()
-					f.Interface().(*time.Time).GobDecode(gob)
+					f.Set(reflect.ValueOf(t))
 				}
 			}
 		}
