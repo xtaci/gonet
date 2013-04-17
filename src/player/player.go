@@ -42,12 +42,10 @@ func _timer(interval int, ch chan string) {
 		recover()
 	}()
 
-	func(ch chan string) {
-		for {
-			time.Sleep(time.Duration(interval) * time.Second)
-			ch <- "ding!dong!"
-		}
-	}(ch)
+	for {
+		time.Sleep(time.Duration(interval) * time.Second)
+		ch <- "ding!dong!"
+	}
 }
 
 func NewPlayer(in chan string, conn net.Conn, config map[string]string) {
