@@ -1,9 +1,7 @@
 package db
 
 import . "types"
-import "strings"
 import "strconv"
-import "fmt"
 import "github.com/ziutek/mymysql/mysql"
 import _ "github.com/ziutek/mymysql/native" // Native engine
 import "log"
@@ -12,15 +10,13 @@ const (
 	DEFAULT_INSTANCE = 4
 )
 
-type DBConn struct {
-	dbch chan mysql.Conn
-}
+var DBCH chan mysql.Conn
 
-func (conn *DBConn) Login(out chan string, name string, password string, ud *User) {
+func Login(out chan string, name string, password string, ud *User) {
 	stmt := "select * from users where name = '%s' AND password = MD5('%s')"
 
-	db := <-conn.dbch
-	defer func(){conn.dbch <- db}()
+	db := <-DBCH
+	defer func(){DBCH <- db}()
 	rows, res, err := db.Query(stmt, sql_escape(name), sql_escape(password))
 
 	if err != nil {
@@ -39,34 +35,8 @@ func (conn *DBConn) Login(out chan string, name string, password string, ud *Use
 	}
 }
 
-func (conn *DBConn) FlushUser(ud *User) {
-	fields, values := sql_dump(ud)
-	changes := to_set_clause(fields,values)
 
-	stmt := []string{"UPDATE users SET ", strings.Join(changes, ","), " WHERE id=", fmt.Sprint(ud.Id)}
 
-	db := <-conn.dbch
-	defer func(){conn.dbch <- db}()
-	_, _, err := db.Query(strings.Join(stmt, " "))
-	if err != nil {
-		log.Println(err.Error())
-	}
-}
-
-func (conn *DBConn) FlushCity(city *City) {
-	fields, values := sql_dump(city)
-	stmt := []string{"REPLACE INTO cities(", strings.Join(fields, ","),
-		") VALUES (", strings.Join(values, ","), ")"}
-
-	db := <-conn.dbch
-	defer func(){conn.dbch <- db}()
-	_, _, err := db.Query(strings.Join(stmt, " "))
-	if err != nil {
-		log.Println(err.Error())
-	}
-}
-
-var DB DBConn
 func StartDB(config map[string]string) {
 	// instance
 	num := DEFAULT_INSTANCE
@@ -74,7 +44,7 @@ func StartDB(config map[string]string) {
 		num,_ = strconv.Atoi(config["max_db_conn"])
 	}
 
-	DB.dbch = make(chan mysql.Conn, num)
+	DBCH = make(chan mysql.Conn, num)
 	log.Println("DB instance:", num)
 
 	for i := 0; i < num; i++ {
@@ -86,6 +56,6 @@ func StartDB(config map[string]string) {
 			log.Panic(err)
 		}
 
-		DB.dbch <- db
+		DBCH <- db
 	}
 }

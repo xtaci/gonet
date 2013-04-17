@@ -2,7 +2,7 @@ package cmd
 
 import "strings"
 import "strconv"
-import . "db"
+import "db"
 import . "types"
 import "names"
 
@@ -34,7 +34,7 @@ func (ClientCmds) login(ud *User, p string) string {
 	params := strings.SplitN(p, " ", 2)
 
 	if len(params) == 2 {
-		go DB.Login(ch, params[0], params[1], ud)
+		go db.Login(ch, params[0], params[1], ud)
 		ret := <-ch
 
 		if ret == "true" {

@@ -4,7 +4,7 @@ import "net"
 import "time"
 import "encoding/binary"
 import . "types"
-import . "db"
+import "db"
 import "strconv"
 import "cmd"
 import "names"
@@ -30,9 +30,9 @@ func send(conn net.Conn, p string) error {
 
 func timer_work(ud *User) {
 	if ud.Id != 0 {
-		DB.FlushUser(ud)
+		db.UserFlush(ud)
 		for i := range ud.Cities {
-			DB.FlushCity(&ud.Cities[i])
+			db.CityFlush(&ud.Cities[i])
 		}
 	}
 }
