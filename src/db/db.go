@@ -6,6 +6,10 @@ import "strconv"
 import "github.com/ziutek/mymysql/mysql"
 import _ "github.com/ziutek/mymysql/native" // Native engine
 
+const (
+	DEFAULT_INSTANCE = 4
+)
+
 type DBConn struct {
 	dbch chan mysql.Conn
 }
@@ -43,15 +47,19 @@ func (conn *DBConn) Flush(ud *User) {
 }
 
 var DB DBConn
+func init() {
+	DB.dbch = make(chan mysql.Conn, DEFAULT_INSTANCE)
+}
+
 func StartDB(config map[string]string) {
 	// instance
-	num := 1
+	num := DEFAULT_INSTANCE
 	if config["max_db_conn"] != "" {
 		num,_ = strconv.Atoi(config["max_db_conn"])
+		DB.dbch = make(chan mysql.Conn, num)
 	}
 
 	println("DB instance:", num)
-	DB.dbch = make(chan mysql.Conn, num)
 
 	for i := 0; i < num; i++ {
 		db := mysql.New("tcp", "", config["mysql_host"], config["mysql_username"],
