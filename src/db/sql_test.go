@@ -18,7 +18,7 @@ func TestSqlDump(t *testing.T) {
 	ti := time.Date(2013, time.April, 16, 10, 22, 0, 0, time.UTC)
 	test.T = ti
 	test.D = "test"
-	_, values := sql_dump(&test)
+	_, values := SQL_dump(&test)
 
 	if values[0] != "'2013-04-16 10:22:00'" {
 		t.Error("time dump failed")
