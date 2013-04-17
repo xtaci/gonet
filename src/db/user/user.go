@@ -34,10 +34,6 @@ func Login(out chan string, name string, password string, ud *User) {
 	if len(rows) > 0 {
 		SQL_load(ud, &rows[0], res)
 		out <- "true"
-		// fake cities
-		ud.Cities = make([]City, 1)
-		ud.Cities[0].Name = "city of" + ud.Name
-		ud.Cities[0].OwnerId = ud.Id
 	} else {
 		out <- "false"
 	}

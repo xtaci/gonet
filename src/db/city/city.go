@@ -3,7 +3,6 @@ package city
 import . "db"
 import . "types"
 import "strings"
-import "log"
 
 func Flush(city *City) {
 	fields, values := SQL_dump(city)
@@ -12,11 +11,18 @@ func Flush(city *City) {
 
 	db := <-DBCH
 	defer func(){DBCH <- db}()
-	_, _, err := db.Query(strings.Join(stmt, " "))
-	if err != nil {
-		log.Println(err.Error())
-	}
+	_,_, err := db.Query(strings.Join(stmt, " "))
+	CheckErr(err)
 }
 
-func New(city *City) {
+func Create(city *City) {
+	fields, values := SQL_dump(city, "id")
+	stmt := []string{"INSERT INTO cities(", strings.Join(fields, ","),
+		") VALUES (", strings.Join(values, ","), ")"}
+
+	db := <-DBCH
+	defer func(){DBCH <- db}()
+	_,res, err := db.Query(strings.Join(stmt, " "))
+	CheckErr(err)
+	city.Id = res.InsertId()
 }

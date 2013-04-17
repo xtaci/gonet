@@ -34,4 +34,8 @@ func StartDB(config map[string]string) {
 	}
 }
 
-
+func CheckErr(err error) {
+	if err != nil {
+		log.Panic(err)
+	}
+}

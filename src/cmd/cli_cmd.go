@@ -3,6 +3,7 @@ package cmd
 import "strings"
 import "strconv"
 import "db/user"
+import "db/city"
 import . "types"
 import "names"
 
@@ -23,6 +24,8 @@ func ExecCli(ud *User, msg string) string {
 		return cmd.attack(ud, params[1])
 	case "talk":
 		return cmd.talk(ud, params[1])
+	case "newcity":
+		return cmd.newcity(ud, params[1])
 	}
 
 	return "Invalid Command"
@@ -78,4 +81,11 @@ func (ClientCmds) attack(ud *User, p string) string {
 	}
 
 	return "ATTACK SENT"
+}
+
+func (ClientCmds) newcity(ud *User, p string) string {
+	newcity := City { Name:p, OwnerId:ud.Id }
+	ud.Cities = append(ud.Cities, newcity)
+	city.Create(&ud.Cities[len(ud.Cities)-1])
+	return "CITY CREATED"
 }

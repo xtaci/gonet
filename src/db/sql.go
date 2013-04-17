@@ -17,7 +17,7 @@ func SQL_escape(v string) string {
 	return escape_regexp.ReplaceAllString(v, `\${1}`)
 }
 
-func SQL_dump(tbl interface{}) (fields []string, values []string) {
+func SQL_dump(tbl interface{}, excludes ...string) (fields []string, values []string) {
 
 	v := reflect.ValueOf(tbl).Elem()
 	key := v.Type()
@@ -46,9 +46,17 @@ func SQL_dump(tbl interface{}) (fields []string, values []string) {
 		}
 
 		if typeok {
-			fields[slice_idx] = utils.UnderScore(key.Field(i).Name)
+			// kickout excluded fields
+			fieldname := utils.UnderScore(key.Field(i).Name)
+			for ei := range excludes {
+				if excludes[ei] == fieldname {
+					goto L
+				}
+			}
+			fields[slice_idx] = fieldname
 			slice_idx++
 		}
+	L:
 	}
 
 	fields = fields[:slice_idx]

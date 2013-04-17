@@ -1,7 +1,7 @@
 package types
 
 type City struct {
-	Id                 int
+	Id                 uint64
 	Name               string
 	OwnerId            int
 	IsCapital          int
