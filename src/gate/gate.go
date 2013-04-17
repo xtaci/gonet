@@ -5,14 +5,11 @@ import . "player"
 import . "db"
 import "io"
 import "os"
-import "fmt"
+import "log"
 
 func main() {
-	println("Starting the server")
-
 	config := read_config("./config.ini")
-
-
+	log.Println("Starting the server")
 	StartDB(config)
 
 	//	
@@ -21,7 +18,7 @@ func main() {
 		service = config["service"]
 	}
 
-	println("Service:", service)
+	log.Println("Service:", service)
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", service)
 	checkError(err)
 
@@ -52,7 +49,7 @@ func handleClient(conn net.Conn, config map[string]string) {
 		if n == 0 && err == io.EOF {
 			break
 		} else if err != nil {
-			println("error receving header:", err)
+			log.Println("error receving header:", err)
 			break
 		}
 
@@ -62,7 +59,7 @@ func handleClient(conn net.Conn, config map[string]string) {
 		n, err = io.ReadFull(conn, data)
 
 		if err != nil {
-			println("error receving msg:", err)
+			log.Println("error receving msg:", err)
 			break
 		}
 		ch <- string(data)
@@ -73,7 +70,7 @@ func handleClient(conn net.Conn, config map[string]string) {
 
 func checkError(err error) {
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Fatal error: %s", err.Error())
+		log.Println("Fatal error: %s", err.Error())
 		os.Exit(1)
 	}
 }

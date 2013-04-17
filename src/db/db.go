@@ -5,6 +5,7 @@ import "strings"
 import "strconv"
 import "github.com/ziutek/mymysql/mysql"
 import _ "github.com/ziutek/mymysql/native" // Native engine
+import "log"
 
 const (
 	DEFAULT_INSTANCE = 4
@@ -22,7 +23,7 @@ func (conn *DBConn) Login(out chan string, name string, password string, ud *Use
 	conn.dbch <- db
 
 	if err != nil {
-		panic(err.Error())
+		log.Println(err.Error())
 	}
 
 	if len(rows) > 0 {
@@ -42,24 +43,20 @@ func (conn *DBConn) Flush(ud *User) {
 	_, _, err := db.Query(strings.Join(stmt, " "))
 	conn.dbch <- db
 	if err != nil {
-		println(err.Error())
+		log.Println(err.Error())
 	}
 }
 
 var DB DBConn
-func init() {
-	DB.dbch = make(chan mysql.Conn, DEFAULT_INSTANCE)
-}
-
 func StartDB(config map[string]string) {
 	// instance
 	num := DEFAULT_INSTANCE
 	if config["max_db_conn"] != "" {
 		num,_ = strconv.Atoi(config["max_db_conn"])
-		DB.dbch = make(chan mysql.Conn, num)
 	}
 
-	println("DB instance:", num)
+	DB.dbch = make(chan mysql.Conn, num)
+	log.Println("DB instance:", num)
 
 	for i := 0; i < num; i++ {
 		db := mysql.New("tcp", "", config["mysql_host"], config["mysql_username"],
@@ -67,7 +64,7 @@ func StartDB(config map[string]string) {
 		err := db.Connect()
 
 		if err != nil {
-			panic(err)
+			log.Panic(err)
 		}
 
 		DB.dbch <- db

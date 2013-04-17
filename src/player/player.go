@@ -8,19 +8,20 @@ import . "db"
 import "strconv"
 import "cmd"
 import "names"
+import "log"
 
 func send(conn net.Conn, p string) error {
 	header := make([]byte, 2)
 	binary.BigEndian.PutUint16(header, uint16(len(p)))
 	_, err := conn.Write(header)
 	if err != nil {
-		println("Error send reply header:", err.Error())
+		log.Println("Error send reply header:", err.Error())
 		return err
 	}
 
 	_, err = conn.Write([]byte(p))
 	if err != nil {
-		println("Error send reply msg:", err.Error())
+		log.Println("Error send reply msg:", err.Error())
 		return err
 	}
 
