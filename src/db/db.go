@@ -20,8 +20,8 @@ func (conn *DBConn) Login(out chan string, name string, password string, ud *Use
 	stmt := "select id, name, password from users where name = '%s' AND password = MD5('%s')"
 
 	db := <-conn.dbch
+	defer func(){conn.dbch <- db}()
 	rows, res, err := db.Query(stmt, sql_escape(name), sql_escape(password))
-	conn.dbch <- db
 
 	if err != nil {
 		log.Println(err.Error())
@@ -50,8 +50,8 @@ func (conn *DBConn) FlushUser(ud *User) {
 	stmt := []string{"UPDATE users SET ", strings.Join(changes, ","), " WHERE id=", fmt.Sprint(ud.Id)}
 
 	db := <-conn.dbch
+	defer func(){conn.dbch <- db}()
 	_, _, err := db.Query(strings.Join(stmt, " "))
-	conn.dbch <- db
 	if err != nil {
 		log.Println(err.Error())
 	}
@@ -63,8 +63,8 @@ func (conn *DBConn) FlushCity(city *City) {
 		") VALUES (", strings.Join(values, ","), ")"}
 
 	db := <-conn.dbch
+	defer func(){conn.dbch <- db}()
 	_, _, err := db.Query(strings.Join(stmt, " "))
-	conn.dbch <- db
 	if err != nil {
 		log.Println(err.Error())
 	}
