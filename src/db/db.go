@@ -19,7 +19,7 @@ func (conn *DBConn) Login(out chan string, name string, password string, ud *Use
 	stmt := "select id, name, password from users where name = '%s' AND password = MD5('%s')"
 
 	db := <-conn.dbch
-	rows, res, err := db.Query(stmt, name, password)
+	rows, res, err := db.Query(stmt, sql_escape(name), sql_escape(password))
 	conn.dbch <- db
 
 	if err != nil {

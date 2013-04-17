@@ -7,8 +7,17 @@ import "github.com/ziutek/mymysql/mysql"
 import "time"
 import "utils"
 
+var escape_regexp * regexp.Regexp
+
+func init() {
+	escape_regexp = regexp.MustCompile(`(\'|\"|\.|\*|\/|\-|\\)`)
+}
+
+func sql_escape(v string) string {
+	return escape_regexp.ReplaceAllString(v, `\${1}`)
+}
+
 func sql_dump(tbl interface{}) (fields []string, values []string) {
-	re := regexp.MustCompile(`(\'|\"|\.|\*|\/|\-|\\)`)
 
 	v := reflect.ValueOf(tbl).Elem()
 	key := v.Type()
@@ -28,7 +37,7 @@ func sql_dump(tbl interface{}) (fields []string, values []string) {
 		case "float32", "float64":
 			values[slice_idx] = fmt.Sprintf("'%f'", v.Field(i).Interface())
 		case "string":
-			tmpstr := re.ReplaceAllString(v.Field(i).Interface().(string), `\${1}`)
+			tmpstr := sql_escape(v.Field(i).Interface().(string))
 			values[slice_idx] = fmt.Sprintf("'%s'", tmpstr)
 		case "time.Time":
 			values[slice_idx] = fmt.Sprintf("'%s'", v.Field(i).Interface().(time.Time).Format("2006-01-02 15:04:05"))

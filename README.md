@@ -8,6 +8,6 @@ mysql>call gen_users(10000);
 
 mysql>select count(*) from users;
 
-sh$go install cmd player types gate names
+sh$./build.sh
 
 sh$gate
