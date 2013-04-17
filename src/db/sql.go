@@ -13,11 +13,11 @@ func init() {
 	escape_regexp = regexp.MustCompile(`(\'|\"|\.|\*|\/|\-|\\)`)
 }
 
-func sql_escape(v string) string {
+func SQL_escape(v string) string {
 	return escape_regexp.ReplaceAllString(v, `\${1}`)
 }
 
-func sql_dump(tbl interface{}) (fields []string, values []string) {
+func SQL_dump(tbl interface{}) (fields []string, values []string) {
 
 	v := reflect.ValueOf(tbl).Elem()
 	key := v.Type()
@@ -37,7 +37,7 @@ func sql_dump(tbl interface{}) (fields []string, values []string) {
 		case "float32", "float64":
 			values[slice_idx] = fmt.Sprintf("'%f'", v.Field(i).Interface())
 		case "string":
-			tmpstr := sql_escape(v.Field(i).Interface().(string))
+			tmpstr := SQL_escape(v.Field(i).Interface().(string))
 			values[slice_idx] = fmt.Sprintf("'%s'", tmpstr)
 		case "time.Time":
 			values[slice_idx] = fmt.Sprintf("'%s'", v.Field(i).Interface().(time.Time).Format("2006-01-02 15:04:05"))
@@ -57,7 +57,7 @@ func sql_dump(tbl interface{}) (fields []string, values []string) {
 	return
 }
 
-func sql_load(tbl interface{}, row *mysql.Row, res mysql.Result) {
+func SQL_load(tbl interface{}, row *mysql.Row, res mysql.Result) {
 	v := reflect.ValueOf(tbl).Elem()
 	for i, field := range res.Fields() {
 		f := v.FieldByName(utils.CamelCase(field.Name))
@@ -81,7 +81,7 @@ func sql_load(tbl interface{}, row *mysql.Row, res mysql.Result) {
 	}
 }
 
-func to_set_clause(fields []string, values []string) []string{
+func SQL_set_clause(fields []string, values []string) []string{
 	changes := make([]string, len(fields))
 	for i:= range fields {
 		changes[i] = fields[i] + "=" + values[i]

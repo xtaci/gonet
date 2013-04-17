@@ -1,11 +1,12 @@
-package db
+package city
 
+import . "db"
 import . "types"
 import "strings"
 import "log"
 
-func CityFlush(city *City) {
-	fields, values := sql_dump(city)
+func Flush(city *City) {
+	fields, values := SQL_dump(city)
 	stmt := []string{"REPLACE INTO cities(", strings.Join(fields, ","),
 		") VALUES (", strings.Join(values, ","), ")"}
 
@@ -17,5 +18,5 @@ func CityFlush(city *City) {
 	}
 }
 
-func CityNew(city *City) {
+func New(city *City) {
 }
