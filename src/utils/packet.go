@@ -61,6 +61,10 @@ func (p *Packet) WriteByte(v byte) {
 	p.data = append(p.data, v)
 }
 
+func (p *Packet) WriteBytes(v []byte) {
+	p.data = append(p.data, v...)
+}
+
 func (p *Packet) WriteU16(v uint16) {
 	p.data = append(p.data, byte(v))
 	p.data = append(p.data, byte(v>>8))
