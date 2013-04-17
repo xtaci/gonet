@@ -1,4 +1,4 @@
-package player
+package utils
 
 type Packet struct {
 	pos uint16
