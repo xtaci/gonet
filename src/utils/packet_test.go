@@ -20,29 +20,40 @@ func TestPacketWriter(t *testing.T) {
 
 	reader := PacketReader(p.Data())
 
-	if a != reader.ReadByte() {
+	tmp, _ := reader.ReadByte()
+	if a != tmp {
 			t.Error("packet readbyte mismatch")
 	}
 
-	if b != reader.ReadU16() {
+	tmp1, _ := reader.ReadU16()
+	if b != tmp1 {
 			t.Error("packet readu16 mismatch")
 	}
 
-	if c != reader.ReadU24() {
+	tmp2, _ := reader.ReadU24()
+	if c != tmp2 {
 			t.Error("packet readu24 mismatch")
 	}
 
-	if d != reader.ReadU32() {
+	tmp3, _ := reader.ReadU32()
+	if d != tmp3 {
 			t.Error("packet readu32 mismatch")
 	}
 
-	if e != reader.ReadU64() {
+	tmp4, _ := reader.ReadU64()
+	if e != tmp4 {
 		t.Error("packet readu64 mismatch")
 	}
 
-	str := reader.ReadString()
-	t.Log(str)
-	if "hello world" != str {
+	tmp5, _ := reader.ReadString()
+
+	if "hello world" != tmp5 {
 		t.Error("packet read string mistmatch")
+	}
+
+	_, err := reader.ReadByte()
+
+	if err == nil {
+		t.Error("overflow check failed")
 	}
 }

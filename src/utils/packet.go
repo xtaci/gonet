@@ -1,5 +1,7 @@
 package utils
 
+import "errors"
+
 type Packet struct {
 	pos uint
 	data []byte
@@ -22,40 +24,77 @@ func (p *Packet) Seek(n uint) {
 	p.pos+=n
 }
 
-func (p *Packet) ReadByte() (ret byte) {
+func (p *Packet) ReadByte() (ret byte, err error) {
+	if (p.pos >= uint(len(p.data))) {
+		err = errors.New("read byte failed")
+		return
+	}
+
 	ret = p.data[p.pos]
 	p.pos++
 	return
 }
 
-func (p *Packet) ReadString() (ret string) {
-	size := uint(p.ReadU16())
-	bytes := p.data[p.pos:p.pos+size]
-	return string(bytes)
+func (p *Packet) ReadString() (ret string, err error) {
+	if (p.pos+2 > uint(len(p.data))) {
+		err = errors.New("read string header failed")
+		return
+	}
+
+	size,_ := p.ReadU16()
+	if p.pos+uint(size) > uint(len(p.data)) {
+		err = errors.New("read string data failed")
+		return
+	}
+
+	bytes := p.data[p.pos:p.pos+uint(size)]
+	p.pos+=uint(size)
+	ret = string(bytes)
+	return
 }
 
-func (p *Packet) ReadU16() (ret uint16){
+func (p *Packet) ReadU16() (ret uint16, err error){
+	if (p.pos+2 > uint(len(p.data))) {
+		err = errors.New("read uint16 failed")
+		return
+	}
+
 	buf := p.data[p.pos:p.pos+2]
 	ret = uint16(buf[1])<<8|uint16(buf[0])
 	p.pos+=2
 	return
 }
 
-func (p *Packet) ReadU24() (ret uint32) {
+func (p *Packet) ReadU24() (ret uint32, err error) {
+	if (p.pos+3 > uint(len(p.data))) {
+		err = errors.New("read uint24 failed")
+		return
+	}
+
 	buf := p.data[p.pos:p.pos+3]
 	ret = uint32(buf[2])<<16 | uint32(buf[1])<<8 | uint32(buf[0])
 	p.pos+=3
 	return
 }
 
-func (p *Packet) ReadU32() (ret uint32) {
+func (p *Packet) ReadU32() (ret uint32, err error) {
+	if (p.pos+4 > uint(len(p.data))) {
+		err = errors.New("read uint32 failed")
+		return
+	}
+
 	buf := p.data[p.pos:p.pos+4]
 	ret = uint32(buf[3])<<24 | uint32(buf[2])<<16 | uint32(buf[1])<<8 | uint32(buf[0])
 	p.pos+=4
 	return
 }
 
-func (p *Packet) ReadU64() (ret uint64) {
+func (p *Packet) ReadU64() (ret uint64, err error) {
+	if (p.pos+8 > uint(len(p.data))) {
+		err = errors.New("read uint32 failed")
+		return
+	}
+
 	ret=0
 	buf := p.data[p.pos:p.pos+8]
 	for i, v := range buf {
