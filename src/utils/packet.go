@@ -91,7 +91,7 @@ func (p *Packet) ReadU32() (ret uint32, err error) {
 
 func (p *Packet) ReadU64() (ret uint64, err error) {
 	if (p.pos+8 > uint(len(p.data))) {
-		err = errors.New("read uint32 failed")
+		err = errors.New("read uint64 failed")
 		return
 	}
 
