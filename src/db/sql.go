@@ -28,35 +28,38 @@ func SQL_dump(tbl interface{}, excludes ...string) (fields []string, values []st
 
 	slice_idx := 0
 	for i := 0; i < count; i++ {
-		typeok := true
-		switch v.Field(i).Type().String() {
-		case "int", "int8", "int16","int32","int64":
-			values[slice_idx] = fmt.Sprintf("'%d'", v.Field(i).Interface())
-		case "uint", "uint8", "uint16","uint32","uint64":
-			values[slice_idx] = fmt.Sprintf("'%d'", v.Field(i).Interface())
-		case "float32", "float64":
-			values[slice_idx] = fmt.Sprintf("'%f'", v.Field(i).Interface())
-		case "string":
-			tmpstr := SQL_escape(v.Field(i).Interface().(string))
-			values[slice_idx] = fmt.Sprintf("'%s'", tmpstr)
-		case "time.Time":
-			values[slice_idx] = fmt.Sprintf("'%s'", v.Field(i).Interface().(time.Time).Format("2006-01-02 15:04:05"))
-		default:
-			typeok = false
-		}
-
-		if typeok {
-			// kickout excluded fields
-			fieldname := utils.UnderScore(key.Field(i).Name)
-			for ei := range excludes {
-				if excludes[ei] == fieldname {
-					goto L
-				}
+		f := v.Field(i)
+		if f.CanSet() {
+			typeok := true
+			switch f.Type().String() {
+			case "int", "int8", "int16","int32","int64":
+				values[slice_idx] = fmt.Sprintf("'%d'", f.Interface())
+			case "uint", "uint8", "uint16","uint32","uint64":
+				values[slice_idx] = fmt.Sprintf("'%d'", f.Interface())
+			case "float32", "float64":
+				values[slice_idx] = fmt.Sprintf("'%f'", f.Interface())
+			case "string":
+				tmpstr := SQL_escape(f.Interface().(string))
+				values[slice_idx] = fmt.Sprintf("'%s'", tmpstr)
+			case "time.Time":
+				values[slice_idx] = fmt.Sprintf("'%s'", f.Interface().(time.Time).Format("2006-01-02 15:04:05"))
+			default:
+				typeok = false
 			}
-			fields[slice_idx] = fieldname
-			slice_idx++
+
+			if typeok {
+				// kickout excluded fields
+				fieldname := utils.UnderScore(key.Field(i).Name)
+				for ei := range excludes {
+					if excludes[ei] == fieldname {
+						goto L
+					}
+				}
+				fields[slice_idx] = fieldname
+				slice_idx++
+			}
 		}
-	L:
+L:
 	}
 
 	fields = fields[:slice_idx]

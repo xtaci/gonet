@@ -127,6 +127,10 @@ func (p *Packet) WriteU16(v uint16) {
 	p.data = append(p.data, buf...)
 }
 
+func (p *Packet) WriteS16(v int16) {
+	p.WriteU16(uint16(v))
+}
+
 func (p *Packet) WriteU24(v uint32) {
 	buf := make([]byte, 3)
 	buf[0] = byte(v)
