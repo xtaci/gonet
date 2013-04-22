@@ -13,13 +13,13 @@ import "log"
 func Login(ud *User, reader *utils.Packet) (ret []byte, err error) {
 	name, err := reader.ReadString()
 	if err !=nil {
-		log.Println(err)
+		log.Println("Login", "read name failed.")
 		return nil, err
 	}
 
 	pass, err := reader.ReadString()
 	if err !=nil {
-		log.Println(err)
+		log.Println("Login","read pass failed.")
 		return nil, err
 	}
 
@@ -38,7 +38,7 @@ func Login(ud *User, reader *utils.Packet) (ret []byte, err error) {
 func Echo(ud *User, reader *utils.Packet) (ret []byte, err error) {
 	msg, err := reader.ReadString()
 	if err !=nil {
-		log.Println(err)
+		log.Println("Echo","read message failed.")
 		return nil, err
 	}
 
@@ -50,13 +50,13 @@ func Echo(ud *User, reader *utils.Packet) (ret []byte, err error) {
 func Talk(ud *User, reader *utils.Packet) (ret []byte, err error) {
 	user_id, err := reader.ReadString()
 	if err !=nil {
-		log.Println(err)
+		log.Println("Talk","read user_id failed.")
 		return nil, err
 	}
 
 	msg, err := reader.ReadString()
 	if err !=nil {
-		log.Println(err)
+		log.Println("Talk","read msg failed.")
 		return nil, err
 	}
 

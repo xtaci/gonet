@@ -28,6 +28,7 @@ func ExecCli(ud *User, p []byte) []byte {
 		}
 	}
 
+	log.Printf("no such protocol '%v'\n", b)
 	return []byte{0}
 }
 
