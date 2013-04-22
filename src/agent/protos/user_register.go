@@ -3,7 +3,7 @@ package protos
 import . "types"
 import "packet"
 
-func UserRegister(ud *User, reader *packet.Packet) (ret []byte, err error) {
+func UserRegister(sess *Session, reader *packet.Packet) (ret []byte, err error) {
 	udid, err := reader.ReadString()
 	checkErr(err)
 	name, err := reader.ReadString()

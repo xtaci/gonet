@@ -28,22 +28,18 @@ func send(conn net.Conn, p []byte) error {
 	return nil
 }
 
-func timer_work(ud *User) {
+func timer_work(sess *Session) {
 	defer func() {
 		if x := recover(); x != nil {
 			log.Printf("run time panic when flushing database: %v", x)
 		}
 	}()
 
-	if ud.Id != 0 {
-		_flush_all(ud)
-	}
-}
-
-func _flush_all(ud *User) {
-	user.Flush(ud)
-	for i := range ud.Cities {
-		city.Flush(&ud.Cities[i])
+	if sess.User.Id!= 0 {
+		user.Flush(&sess.User)
+		for i := range sess.Cities {
+			city.Flush(&sess.Cities[i])
+		}
 	}
 }
 
@@ -59,8 +55,8 @@ func _timer(interval int, ch chan string) {
 }
 
 func StartAgent(in chan []byte, conn net.Conn, config map[string]string) {
-	var user User
-	user.MQ = make(chan string, 100)
+	var sess Session
+	sess.MQ = make(chan string, 100)
 
 	if send(conn, []byte("Welcome")) != nil {
 		return
@@ -82,19 +78,19 @@ L:
 				break L
 			}
 
-			if result := ExecCli(&user, msg); result != nil {
+			if result := ExecCli(&sess, msg); result != nil {
 				err := send(conn, result)
 				if err != nil {
 					break L
 				}
 			}
 
-		case msg,ok := <-user.MQ:
+		case msg,ok := <-sess.MQ:
 			if !ok {
 				break L
 			}
 
-			result := ExecSrv(&user, msg)
+			result := ExecSrv(&sess, msg)
 
 			if result != "" {
 				err := send(conn, []byte(result))
@@ -103,11 +99,11 @@ L:
 				}
 			}
 		case _ = <-timer_ch:
-			timer_work(&user)
+			timer_work(&sess)
 		}
 	}
 
 	// cleanup
-	names.Unregister(user.Id)
+	names.Unregister(sess.User.Id)
 	close(timer_ch)
 }

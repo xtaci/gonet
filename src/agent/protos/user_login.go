@@ -6,16 +6,16 @@ import "names"
 import "db/user"
 import "db/city"
 
-func UserLogin(ud *User, reader *packet.Packet) (ret []byte, err error) {
+func UserLogin(sess *Session, reader *packet.Packet) (ret []byte, err error) {
 	name, err := reader.ReadString()
 	checkErr(err)
 	pass, err := reader.ReadString()
 	checkErr(err)
 
-	if user.Login(name, pass, ud) {
-		names.Register(ud.MQ, ud.Id)
+	if user.Login(name, pass, &sess.User) {
+		names.Register(sess.MQ, sess.User.Id)
 		// load cities
-		ud.Cities = city.LoadCities(ud.Id)
+		sess.Cities = city.LoadCities(sess.User.Id)
 	}
 
 	writer := packet.PacketWriter()
