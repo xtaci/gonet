@@ -57,7 +57,7 @@ func handleClient(conn net.Conn, config map[string]string) {
 	header := make([]byte, 2)
 	ch := make(chan []byte, 100)
 
-	go NewPlayer(ch, conn, config)
+	go StartAgent(ch, conn, config)
 
 	for {
 		// header

@@ -52,7 +52,7 @@ func _timer(interval int, ch chan string) {
 	}
 }
 
-func NewPlayer(in chan []byte, conn net.Conn, config map[string]string) {
+func StartAgent(in chan []byte, conn net.Conn, config map[string]string) {
 	var user User
 	user.MQ = make(chan string, 100)
 
