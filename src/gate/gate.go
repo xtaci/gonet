@@ -1,7 +1,7 @@
 package main
 
 import "net"
-import . "player"
+import . "agent"
 import . "db"
 import "io"
 import "os"

@@ -1,9 +1,9 @@
-package player
+package agent
 
 import "strings"
 import . "types"
-import srv "player/srv"
-import "player/protos"
+import srv "agent/srv"
+import "agent/protos"
 import "log"
 import "packet"
 

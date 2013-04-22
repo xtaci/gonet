@@ -1,4 +1,4 @@
-package player
+package agent
 
 import "net"
 import "time"
