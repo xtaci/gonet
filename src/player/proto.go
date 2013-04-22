@@ -3,7 +3,7 @@ package player
 import "strings"
 import . "types"
 import srv "player/srv"
-import cli "player/cli"
+import "player/protos"
 import "log"
 import "packet"
 
@@ -46,8 +46,8 @@ func ExecSrv(ud *User, msg string) string {
 var ProtoHandler map[uint16]func(*User, *packet.Packet)([]byte, error)
 func init() {
 	ProtoHandler = make(map[uint16]func(*User, *packet.Packet)([]byte, error))
-	ProtoHandler[1] = cli.UserRegister
-	ProtoHandler[3] = cli.UserLogin
-	ProtoHandler[9] = cli.Chat
-	ProtoHandler[11] = cli.UserLogout
+	ProtoHandler[1] = protos.UserRegister
+	ProtoHandler[3] = protos.UserLogin
+	ProtoHandler[9] = protos.Chat
+	ProtoHandler[11] = protos.UserLogout
 }
