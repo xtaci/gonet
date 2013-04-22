@@ -9,6 +9,7 @@ import "db/city"
 import "strconv"
 import "names"
 import "log"
+import "fmt"
 
 func send(conn net.Conn, p []byte) error {
 	header := make([]byte, 2)
@@ -57,11 +58,6 @@ func _timer(interval int, ch chan string) {
 func StartAgent(in chan []byte, conn net.Conn, config map[string]string) {
 	var sess Session
 	sess.MQ = make(chan string, 100)
-
-	if send(conn, []byte("Welcome")) != nil {
-		return
-	}
-
 	timer_ch := make(chan string, 10)
 
 	flush_interval := 300 // sec
@@ -79,6 +75,7 @@ L:
 			}
 
 			if result := ExecCli(&sess, msg); result != nil {
+				fmt.Println(result)
 				err := send(conn, result)
 				if err != nil {
 					break L
