@@ -10,7 +10,7 @@ import "strconv"
 import "names"
 import "log"
 
-func send(conn net.Conn, p string) error {
+func send(conn net.Conn, p []byte) error {
 	header := make([]byte, 2)
 	binary.BigEndian.PutUint16(header, uint16(len(p)))
 	_, err := conn.Write(header)
@@ -19,7 +19,7 @@ func send(conn net.Conn, p string) error {
 		return err
 	}
 
-	_, err = conn.Write([]byte(p))
+	_, err = conn.Write(p)
 	if err != nil {
 		log.Println("Error send reply msg:", err.Error())
 		return err
@@ -56,7 +56,7 @@ func NewPlayer(in chan []byte, conn net.Conn, config map[string]string) {
 	var user User
 	user.MQ = make(chan string, 100)
 
-	if send(conn, "Welcome") != nil {
+	if send(conn, []byte("Welcome")) != nil {
 		return
 	}
 
@@ -78,11 +78,9 @@ L:
 
 			result := ExecCli(&user, msg)
 
-			if result != "" {
-				err := send(conn, result)
-				if err != nil {
-					break L
-				}
+			err := send(conn, result)
+			if err != nil {
+				break L
 			}
 
 		case msg := <-user.MQ:
@@ -93,7 +91,7 @@ L:
 			result := ExecSrv(&user, msg)
 
 			if result != "" {
-				err := send(conn, result)
+				err := send(conn, []byte(result))
 				if err != nil {
 					break L
 				}

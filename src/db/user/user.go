@@ -18,7 +18,7 @@ func Flush(ud *User) {
 	CheckErr(err)
 }
 
-func Login(out chan string, name string, password string, ud *User) {
+func Login(name string, password string, ud *User) bool {
 	stmt := "select * from users where name = '%v' AND password = MD5('%v')"
 
 	db := <-DBCH
@@ -29,8 +29,8 @@ func Login(out chan string, name string, password string, ud *User) {
 
 	if len(rows) > 0 {
 		SQL_load(ud, &rows[0], res)
-		out <- "true"
-	} else {
-		out <- "false"
+		return true
 	}
+
+	return false
 }

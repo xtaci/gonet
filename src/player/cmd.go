@@ -2,12 +2,15 @@ package player
 
 import "strings"
 import . "types"
-import cli "player/cli"
 import srv "player/srv"
+import cli "player/cli"
 import "utils"
 import "log"
 
-func ExecCli(ud *User, p []byte) string {
+// bindings
+var ProtoHandler map[byte]func(*User, *utils.Packet)([]byte, error)
+
+func ExecCli(ud *User, p []byte) []byte {
 	reader := utils.PacketReader(p)
 
 	b, err := reader.ReadByte()
@@ -16,22 +19,16 @@ func ExecCli(ud *User, p []byte) string {
 		log.Println("read protocol error")
 	}
 
-	subp := string(reader.Data()[reader.Pos():])
+	handle := ProtoHandler[b]
+	if handle != nil {
+		ret, err := handle(ud, reader)
 
-	switch b {
-	case 'E':
-		return cli.Echo(ud, subp)
-	case 'L':
-		return cli.Login(ud, subp)
-	case 'A':
-		return cli.Attack(ud, subp)
-	case 'T':
-		return cli.Talk(ud, subp)
-	case 'N':
-		return cli.Newcity(ud, subp)
+		if err == nil {
+			return ret
+		}
 	}
 
-	return "Invalid Command"
+	return []byte{0}
 }
 
 func ExecSrv(ud *User, msg string) string {
@@ -44,4 +41,12 @@ func ExecSrv(ud *User, msg string) string {
 	}
 
 	return ""
+}
+
+func init() {
+	ProtoHandler = make(map[byte]func(*User, *utils.Packet)([]byte, error))
+	//mapping
+
+	ProtoHandler['E'] = cli.Echo
+	ProtoHandler['L'] = cli.Login
 }
