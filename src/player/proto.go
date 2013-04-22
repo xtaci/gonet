@@ -7,9 +7,6 @@ import cli "player/cli"
 import "log"
 import "packet"
 
-// bindings
-var ProtoHandler map[uint16]func(*User, *packet.Packet)([]byte, error)
-
 func ExecCli(ud *User, p []byte) []byte {
 	reader := packet.PacketReader(p)
 
@@ -45,10 +42,12 @@ func ExecSrv(ud *User, msg string) string {
 	return ""
 }
 
+//---------------------------------------------------------Handler Binding
+var ProtoHandler map[uint16]func(*User, *packet.Packet)([]byte, error)
 func init() {
 	ProtoHandler = make(map[uint16]func(*User, *packet.Packet)([]byte, error))
-	//mapping
-
-	ProtoHandler['E'] = cli.Echo
-	ProtoHandler['L'] = cli.Login
+	ProtoHandler[1] = cli.UserRegister
+	ProtoHandler[3] = cli.UserLogin
+	ProtoHandler[9] = cli.Chat
+	ProtoHandler[11] = cli.UserLogout
 }

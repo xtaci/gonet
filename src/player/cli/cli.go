@@ -9,8 +9,11 @@ import "names"
 import "log"
 import "packet"
 
-// commands from client
-func Login(ud *User, reader *packet.Packet) (ret []byte, err error) {
+func UserRegister(ud *User, reader *packet.Packet) (ret []byte, err error) {
+	return nil, nil
+}
+
+func UserLogin(ud *User, reader *packet.Packet) (ret []byte, err error) {
 	name, err := reader.ReadString()
 	if err !=nil {
 		log.Println("Login", "read name failed.")
@@ -35,19 +38,15 @@ func Login(ud *User, reader *packet.Packet) (ret []byte, err error) {
 	return writer.Data(), err
 }
 
-func Echo(ud *User, reader *packet.Packet) (ret []byte, err error) {
-	msg, err := reader.ReadString()
-	if err !=nil {
-		log.Println("Echo","read message failed.")
-		return nil, err
-	}
-
-	writer := packet.PacketWriter()
-	writer.WriteString(msg)
-	return writer.Data(), err
+func UserLogout(ud *User, reader *packet.Packet) (ret []byte, err error) {
+	return nil, nil
 }
 
-func Talk(ud *User, reader *packet.Packet) (ret []byte, err error) {
+func BuildingUpgrade(ud *User, reader *packet.Packet) (ret []byte, err error) {
+	return nil, nil
+}
+
+func Chat(ud *User, reader *packet.Packet) (ret []byte, err error) {
 	user_id, err := reader.ReadString()
 	if err !=nil {
 		log.Println("Talk","read user_id failed.")
@@ -73,6 +72,20 @@ func Talk(ud *User, reader *packet.Packet) (ret []byte, err error) {
 }
 
 /*
+func Echo(ud *User, reader *packet.Packet) (ret []byte, err error) {
+	msg, err := reader.ReadString()
+	if err !=nil {
+		log.Println("Echo","read message failed.")
+		return nil, err
+	}
+
+	writer := packet.PacketWriter()
+	writer.WriteString(msg)
+	return writer.Data(), err
+}
+
+
+
 func Newcity(ud *User, reader *Packet) (ret []byte, err error) {
 	newcity := City { Name:p, OwnerId:ud.Id }
 	ud.Cities = append(ud.Cities, newcity)
