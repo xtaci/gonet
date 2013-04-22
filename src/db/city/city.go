@@ -4,7 +4,6 @@ import . "db"
 import . "types"
 import "strings"
 import "fmt"
-//import "log"
 
 func Flush(city *City) {
 	fields, values := SQL_dump(city, "id")
