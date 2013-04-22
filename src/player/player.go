@@ -7,7 +7,6 @@ import . "types"
 import "db/user"
 import "db/city"
 import "strconv"
-import "cmd"
 import "names"
 import "log"
 
@@ -77,7 +76,7 @@ L:
 				break L
 			}
 
-			result := cmd.ExecCli(&user, msg)
+			result := ExecCli(&user, msg)
 
 			if result != "" {
 				err := send(conn, result)
@@ -91,7 +90,7 @@ L:
 				break L
 			}
 
-			result := cmd.ExecSrv(&user, msg)
+			result := ExecSrv(&user, msg)
 
 			if result != "" {
 				err := send(conn, result)

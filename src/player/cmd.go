@@ -1,9 +1,9 @@
-package cmd
+package player
 
 import "strings"
 import . "types"
-import cli "cmd/cli"
-import srv "cmd/srv"
+import cli "player/cli"
+import srv "player/srv"
 import "utils"
 import "log"
 
