@@ -4,20 +4,31 @@ import "strings"
 import . "types"
 import cli "cmd/cli"
 import srv "cmd/srv"
-//import "log"
+import "utils"
+import "log"
 
 func ExecCli(ud *User, p []byte) string {
-	switch p[0] {
+	reader := utils.PacketReader(p)
+
+	b, err := reader.ReadByte()
+
+	if err!=nil {
+		log.Println("read protocol error")
+	}
+
+	subp := string(reader.Data()[reader.Pos():])
+
+	switch b {
 	case 'E':
-		return cli.Echo(ud, string(p[1:]))
+		return cli.Echo(ud, subp)
 	case 'L':
-		return cli.Login(ud, string(p[1:]))
+		return cli.Login(ud, subp)
 	case 'A':
-		return cli.Attack(ud, string(p[1:]))
+		return cli.Attack(ud, subp)
 	case 'T':
-		return cli.Talk(ud, string(p[1:]))
+		return cli.Talk(ud, subp)
 	case 'N':
-		return cli.Newcity(ud, string(p[1:]))
+		return cli.Newcity(ud, subp)
 	}
 
 	return "Invalid Command"
