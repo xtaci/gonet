@@ -4,14 +4,14 @@ import "strings"
 import . "types"
 import srv "player/srv"
 import cli "player/cli"
-import "utils"
 import "log"
+import "packet"
 
 // bindings
-var ProtoHandler map[uint16]func(*User, *utils.Packet)([]byte, error)
+var ProtoHandler map[uint16]func(*User, *packet.Packet)([]byte, error)
 
 func ExecCli(ud *User, p []byte) []byte {
-	reader := utils.PacketReader(p)
+	reader := packet.PacketReader(p)
 
 	b, err := reader.ReadByte()
 
@@ -46,7 +46,7 @@ func ExecSrv(ud *User, msg string) string {
 }
 
 func init() {
-	ProtoHandler = make(map[uint16]func(*User, *utils.Packet)([]byte, error))
+	ProtoHandler = make(map[uint16]func(*User, *packet.Packet)([]byte, error))
 	//mapping
 
 	ProtoHandler['E'] = cli.Echo

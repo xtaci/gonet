@@ -5,7 +5,6 @@ import "reflect"
 import "regexp"
 import "github.com/ziutek/mymysql/mysql"
 import "time"
-import "utils"
 
 var escape_regexp * regexp.Regexp
 
@@ -49,7 +48,7 @@ func SQL_dump(tbl interface{}, excludes ...string) (fields []string, values []st
 
 			if typeok {
 				// kickout excluded fields
-				fieldname := utils.UnderScore(key.Field(i).Name)
+				fieldname := UnderScore(key.Field(i).Name)
 				for ei := range excludes {
 					if excludes[ei] == fieldname {
 						goto L
@@ -71,7 +70,7 @@ L:
 func SQL_load(tbl interface{}, row *mysql.Row, res mysql.Result) {
 	v := reflect.ValueOf(tbl).Elem()
 	for i, field := range res.Fields() {
-		f := v.FieldByName(utils.CamelCase(field.Name))
+		f := v.FieldByName(CamelCase(field.Name))
 		if f.IsValid() {
 			if f.CanSet() {
 				switch f.Type().String() {

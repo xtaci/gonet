@@ -6,7 +6,6 @@ import . "db"
 import "io"
 import "os"
 import "log"
-import "utils"
 
 func main() {
 	config := read_config("./config.ini")
@@ -17,7 +16,7 @@ func main() {
 			log.Println("cannot open logfile %v\n", err)
 			os.Exit(1)
 		}
-		var r utils.Repeater
+		var r Repeater
 		r.Out1 = os.Stdout
 		r.Out2 = f
 		log.SetOutput(&r)

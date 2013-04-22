@@ -1,4 +1,4 @@
-package cmd
+package cli
 
 import "strings"
 import "strconv"
@@ -6,11 +6,11 @@ import "db/user"
 import "db/city"
 import . "types"
 import "names"
-import "utils"
 import "log"
+import "packet"
 
 // commands from client
-func Login(ud *User, reader *utils.Packet) (ret []byte, err error) {
+func Login(ud *User, reader *packet.Packet) (ret []byte, err error) {
 	name, err := reader.ReadString()
 	if err !=nil {
 		log.Println("Login", "read name failed.")
@@ -29,25 +29,25 @@ func Login(ud *User, reader *utils.Packet) (ret []byte, err error) {
 		ud.Cities = city.LoadCities(ud.Id)
 	}
 
-	writer := utils.PacketWriter()
+	writer := packet.PacketWriter()
 	writer.WriteString("true")
 
 	return writer.Data(), err
 }
 
-func Echo(ud *User, reader *utils.Packet) (ret []byte, err error) {
+func Echo(ud *User, reader *packet.Packet) (ret []byte, err error) {
 	msg, err := reader.ReadString()
 	if err !=nil {
 		log.Println("Echo","read message failed.")
 		return nil, err
 	}
 
-	writer := utils.PacketWriter()
+	writer := packet.PacketWriter()
 	writer.WriteString(msg)
 	return writer.Data(), err
 }
 
-func Talk(ud *User, reader *utils.Packet) (ret []byte, err error) {
+func Talk(ud *User, reader *packet.Packet) (ret []byte, err error) {
 	user_id, err := reader.ReadString()
 	if err !=nil {
 		log.Println("Talk","read user_id failed.")
@@ -67,17 +67,17 @@ func Talk(ud *User, reader *utils.Packet) (ret []byte, err error) {
 		ch <- strings.Join(msg, " ")
 	}
 
-	writer := utils.PacketWriter()
+	writer := packet.PacketWriter()
 	writer.WriteString("OK")
 	return writer.Data(), err
 }
 
 /*
-func Newcity(ud *User, reader *utils.Packet) (ret []byte, err error) {
+func Newcity(ud *User, reader *Packet) (ret []byte, err error) {
 	newcity := City { Name:p, OwnerId:ud.Id }
 	ud.Cities = append(ud.Cities, newcity)
 	city.Create(&ud.Cities[len(ud.Cities)-1])
-	writer := utils.PacketWriter()
+	writer := PacketWriter()
 	writer.WriteString("OK")
 	return writer.Data(), err
 }
