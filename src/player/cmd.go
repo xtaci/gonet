@@ -8,7 +8,7 @@ import "utils"
 import "log"
 
 // bindings
-var ProtoHandler map[byte]func(*User, *utils.Packet)([]byte, error)
+var ProtoHandler map[uint16]func(*User, *utils.Packet)([]byte, error)
 
 func ExecCli(ud *User, p []byte) []byte {
 	reader := utils.PacketReader(p)
@@ -19,16 +19,17 @@ func ExecCli(ud *User, p []byte) []byte {
 		log.Println("read protocol error")
 	}
 
-	handle := ProtoHandler[b]
+	handle := ProtoHandler[uint16(b)]
 	if handle != nil {
 		ret, err := handle(ud, reader)
 
 		if err == nil {
 			return ret
 		}
+	} else {
+		log.Printf("no such protocol '%v'\n", b)
 	}
 
-	log.Printf("no such protocol '%v'\n", b)
 	return []byte{0}
 }
 
@@ -45,7 +46,7 @@ func ExecSrv(ud *User, msg string) string {
 }
 
 func init() {
-	ProtoHandler = make(map[byte]func(*User, *utils.Packet)([]byte, error))
+	ProtoHandler = make(map[uint16]func(*User, *utils.Packet)([]byte, error))
 	//mapping
 
 	ProtoHandler['E'] = cli.Echo
