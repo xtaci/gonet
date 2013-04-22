@@ -6,20 +6,18 @@ import cli "cmd/cli"
 import srv "cmd/srv"
 //import "log"
 
-func ExecCli(ud *User, msg string) string {
-	params := strings.SplitN(msg, " ", 2)
-
-	switch params[0] {
-	case "echo":
-		return cli.Echo(ud, params[1])
-	case "login":
-		return cli.Login(ud, params[1])
-	case "attack":
-		return cli.Attack(ud, params[1])
-	case "talk":
-		return cli.Talk(ud, params[1])
-	case "newcity":
-		return cli.Newcity(ud, params[1])
+func ExecCli(ud *User, p []byte) string {
+	switch p[0] {
+	case 'E':
+		return cli.Echo(ud, string(p[1:]))
+	case 'L':
+		return cli.Login(ud, string(p[1:]))
+	case 'A':
+		return cli.Attack(ud, string(p[1:]))
+	case 'T':
+		return cli.Talk(ud, string(p[1:]))
+	case 'N':
+		return cli.Newcity(ud, string(p[1:]))
 	}
 
 	return "Invalid Command"

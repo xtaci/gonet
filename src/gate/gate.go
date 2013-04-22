@@ -56,7 +56,7 @@ func handleClient(conn net.Conn, config map[string]string) {
 	defer conn.Close()
 
 	header := make([]byte, 2)
-	ch := make(chan string, 100)
+	ch := make(chan []byte, 100)
 
 	go NewPlayer(ch, conn, config)
 
@@ -79,7 +79,7 @@ func handleClient(conn net.Conn, config map[string]string) {
 			log.Println("error receving msg:", err)
 			break
 		}
-		ch <- string(data)
+		ch <- data
 	}
 
 	close(ch)

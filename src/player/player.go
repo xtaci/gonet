@@ -53,7 +53,7 @@ func _timer(interval int, ch chan string) {
 	}
 }
 
-func NewPlayer(in chan string, conn net.Conn, config map[string]string) {
+func NewPlayer(in chan []byte, conn net.Conn, config map[string]string) {
 	var user User
 	user.MQ = make(chan string, 100)
 
@@ -72,8 +72,8 @@ func NewPlayer(in chan string, conn net.Conn, config map[string]string) {
 L:
 	for {
 		select {
-		case msg := <-in:
-			if msg == "" {
+		case msg,ok := <-in:
+			if !ok {
 				break L
 			}
 
