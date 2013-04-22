@@ -8,6 +8,12 @@ import "log"
 import "packet"
 
 func ExecCli(ud *User, p []byte) []byte {
+	defer func() {
+		if x := recover(); x != nil {
+			log.Printf("run time panic when processing user request: %v", x)
+		}
+	}()
+
 	reader := packet.PacketReader(p)
 
 	b, err := reader.ReadByte()
@@ -27,7 +33,7 @@ func ExecCli(ud *User, p []byte) []byte {
 		log.Printf("no such protocol '%v'\n", b)
 	}
 
-	return []byte{0}
+	return nil
 }
 
 func ExecSrv(ud *User, msg string) string {
@@ -46,7 +52,7 @@ func ExecSrv(ud *User, msg string) string {
 var ProtoHandler map[uint16]func(*User, *packet.Packet)([]byte, error)
 func init() {
 	ProtoHandler = make(map[uint16]func(*User, *packet.Packet)([]byte, error))
-	ProtoHandler[1] = protos.UserRegister
+	ProtoHandler['R'] = protos.UserRegister
 	ProtoHandler[3] = protos.UserLogin
 	ProtoHandler[9] = protos.Chat
 	ProtoHandler[11] = protos.UserLogout

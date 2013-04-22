@@ -26,16 +26,8 @@ func StartDB(config map[string]string) {
 						config["mysql_password"], config["mysql_dbname"])
 		err := db.Connect()
 
-		if err != nil {
-			log.Panic(err)
-		}
+		CheckErr(err)
 
 		DBCH <- db
-	}
-}
-
-func CheckErr(err error) {
-	if err != nil {
-		log.Panic(err)
 	}
 }

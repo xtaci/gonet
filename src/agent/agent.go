@@ -29,12 +29,18 @@ func send(conn net.Conn, p []byte) error {
 }
 
 func timer_work(ud *User) {
+	defer func() {
+		if x := recover(); x != nil {
+			log.Printf("run time panic when flushing database: %v", x)
+		}
+	}()
+
 	if ud.Id != 0 {
-		FlushAll(ud)
+		_flush_all(ud)
 	}
 }
 
-func FlushAll(ud *User) {
+func _flush_all(ud *User) {
 	user.Flush(ud)
 	for i := range ud.Cities {
 		city.Flush(&ud.Cities[i])
@@ -76,15 +82,15 @@ L:
 				break L
 			}
 
-			result := ExecCli(&user, msg)
-
-			err := send(conn, result)
-			if err != nil {
-				break L
+			if result := ExecCli(&user, msg); result != nil {
+				err := send(conn, result)
+				if err != nil {
+					break L
+				}
 			}
 
-		case msg := <-user.MQ:
-			if msg == "" {
+		case msg,ok := <-user.MQ:
+			if !ok {
 				break L
 			}
 
