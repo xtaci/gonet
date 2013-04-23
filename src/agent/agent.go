@@ -36,7 +36,7 @@ func timer_work(sess *Session) {
 		}
 	}()
 
-	if sess.User.Id!= 0 {
+	if sess.User.Id != 0 {
 		user.Flush(&sess.User)
 		for i := range sess.Cities {
 			city.Flush(&sess.Cities[i])
@@ -62,14 +62,14 @@ func StartAgent(in chan []byte, conn net.Conn, config map[string]string) {
 
 	flush_interval := 300 // sec
 	if config["flush_interval"] != "" {
-		flush_interval,_ = strconv.Atoi(config["flush_interval"])
+		flush_interval, _ = strconv.Atoi(config["flush_interval"])
 	}
 
 	go _timer(flush_interval, timer_ch)
 L:
 	for {
 		select {
-		case msg,ok := <-in:
+		case msg, ok := <-in:
 			if !ok {
 				break L
 			}
@@ -82,7 +82,7 @@ L:
 				}
 			}
 
-		case msg,ok := <-sess.MQ:
+		case msg, ok := <-sess.MQ:
 			if !ok {
 				break L
 			}

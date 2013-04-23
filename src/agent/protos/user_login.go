@@ -23,5 +23,3 @@ func UserLogin(sess *Session, reader *packet.Packet) (ret []byte, err error) {
 
 	return writer.Data(), err
 }
-
-

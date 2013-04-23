@@ -15,7 +15,7 @@ func StartDB(config map[string]string) {
 	// instance
 	num := DEFAULT_INSTANCE
 	if config["max_db_conn"] != "" {
-		num,_ = strconv.Atoi(config["max_db_conn"])
+		num, _ = strconv.Atoi(config["max_db_conn"])
 	}
 
 	DBCH = make(chan mysql.Conn, num)
@@ -23,7 +23,7 @@ func StartDB(config map[string]string) {
 
 	for i := 0; i < num; i++ {
 		db := mysql.New("tcp", "", config["mysql_host"], config["mysql_username"],
-						config["mysql_password"], config["mysql_dbname"])
+			config["mysql_password"], config["mysql_dbname"])
 		err := db.Connect()
 
 		CheckErr(err)

@@ -16,6 +16,7 @@ func UnderScore(str string) string {
 
 // "foo_bar" -> "FooBar"
 var regexp3 = regexp.MustCompile(`^[a-z]|_[a-z]`)
+
 func CamelCase(str string) string {
 	str = strings.ToLower(str)
 

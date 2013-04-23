@@ -22,22 +22,22 @@ func TestPacketWriter(t *testing.T) {
 
 	tmp, _ := reader.ReadByte()
 	if a != tmp {
-			t.Error("packet readbyte mismatch")
+		t.Error("packet readbyte mismatch")
 	}
 
 	tmp1, _ := reader.ReadU16()
 	if b != tmp1 {
-			t.Error("packet readu16 mismatch")
+		t.Error("packet readu16 mismatch")
 	}
 
 	tmp2, _ := reader.ReadU24()
 	if c != tmp2 {
-			t.Error("packet readu24 mismatch")
+		t.Error("packet readu24 mismatch")
 	}
 
 	tmp3, _ := reader.ReadU32()
 	if d != tmp3 {
-			t.Error("packet readu32 mismatch")
+		t.Error("packet readu32 mismatch")
 	}
 
 	tmp4, _ := reader.ReadU64()

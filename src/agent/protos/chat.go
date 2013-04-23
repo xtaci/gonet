@@ -22,5 +22,3 @@ func Chat(sess *Session, reader *packet.Packet) (ret []byte, err error) {
 	writer.WriteString("OK")
 	return writer.Data(), err
 }
-
-

@@ -6,7 +6,7 @@ import "regexp"
 import "github.com/ziutek/mymysql/mysql"
 import "time"
 
-var escape_regexp * regexp.Regexp
+var escape_regexp *regexp.Regexp
 
 func init() {
 	escape_regexp = regexp.MustCompile(`(\'|\"|\.|\*|\/|\-|\\)`)
@@ -31,9 +31,9 @@ func SQL_dump(tbl interface{}, excludes ...string) (fields []string, values []st
 		if f.CanSet() {
 			typeok := true
 			switch f.Type().String() {
-			case "int", "int8", "int16","int32","int64":
+			case "int", "int8", "int16", "int32", "int64":
 				values[slice_idx] = fmt.Sprintf("'%d'", f.Interface())
-			case "uint", "uint8", "uint16","uint32","uint64":
+			case "uint", "uint8", "uint16", "uint32", "uint64":
 				values[slice_idx] = fmt.Sprintf("'%d'", f.Interface())
 			case "float32", "float64":
 				values[slice_idx] = fmt.Sprintf("'%f'", f.Interface())
@@ -58,7 +58,7 @@ func SQL_dump(tbl interface{}, excludes ...string) (fields []string, values []st
 				slice_idx++
 			}
 		}
-L:
+	L:
 	}
 
 	fields = fields[:slice_idx]
@@ -74,16 +74,16 @@ func SQL_load(tbl interface{}, row *mysql.Row, res mysql.Result) {
 		if f.IsValid() {
 			if f.CanSet() {
 				switch f.Type().String() {
-				case "int", "int8", "int16","int32","int64":
+				case "int", "int8", "int16", "int32", "int64":
 					f.SetInt(int64(row.Int(i)))
-				case "uint", "uint8", "uint16","uint32","uint64":
+				case "uint", "uint8", "uint16", "uint32", "uint64":
 					f.SetUint(uint64(row.Uint(i)))
 				case "float32", "float64":
 					f.SetFloat(row.Float(i))
 				case "string":
 					f.SetString(row.Str(i))
 				case "time.Time":
-					t,_ := time.Parse("2006-01-02 15:04:05", row.Str(i))
+					t, _ := time.Parse("2006-01-02 15:04:05", row.Str(i))
 					f.Set(reflect.ValueOf(t))
 				}
 			}
@@ -91,9 +91,9 @@ func SQL_load(tbl interface{}, row *mysql.Row, res mysql.Result) {
 	}
 }
 
-func SQL_set_clause(fields []string, values []string) []string{
+func SQL_set_clause(fields []string, values []string) []string {
 	changes := make([]string, len(fields))
-	for i:= range fields {
+	for i := range fields {
 		changes[i] = fields[i] + "=" + values[i]
 	}
 

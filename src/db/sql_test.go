@@ -3,7 +3,6 @@ package db
 import "time"
 import "testing"
 
-
 type Test struct {
 	T time.Time
 	A int
@@ -40,12 +39,12 @@ func TestSqlDump(t *testing.T) {
 		t.Error("string dump failed")
 	}
 
-	ti2,_ := time.Parse("2006-01-02 15:04:05", "2013-04-16 10:22:00")
-	gob,_ := ti2.GobEncode()
+	ti2, _ := time.Parse("2006-01-02 15:04:05", "2013-04-16 10:22:00")
+	gob, _ := ti2.GobEncode()
 	var ti3 time.Time
 	ti3.GobDecode(gob)
 
-	if (ti3.Format("2006-01-02 15:04:05") != "2013-04-16 10:22:00") {
+	if ti3.Format("2006-01-02 15:04:05") != "2013-04-16 10:22:00" {
 		t.Error("time gob failed")
 	}
 }

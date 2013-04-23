@@ -2,30 +2,45 @@ package agent
 
 import "net"
 import "sync"
+
 //import "time"
 import "packet"
 import "log"
+import "errors"
+
+const BUFSIZE = 65535
+const MAXCHAN = 4096
 
 type _RawPacket struct {
-	Size uint16				// payload size
-	SeqId uint32			// packet SEQ Num
-	Data []byte				// payload
+	Size  uint16 // payload size
+	SeqId uint32 // packet SEQ Num
+	Data  []byte // payload
 }
 
 type Buffer struct {
-	Pending chan _RawPacket	// Pending Packet
-	Sent chan _RawPacket	// Sent but not ACKed 
-	conn net.Conn			// connection
-	_lock sync.Mutex		// for changing conn
-	seqMax uint32			// Largest SEQ number
-	ackMax uint32			// Largest ACK number
+	Pending chan *_RawPacket // Pending Packet
+	Sent    chan *_RawPacket // Sent but not ACKed 
+	seqMax  uint32           // Largest SEQ number
+	ackMax  uint32           // Largest ACK number
+
+	conn      net.Conn   // connection
+	byteCount uint32     //
+	_lock     sync.Mutex // for changing conn
 }
 
 //---------------------------------------------------------Pend data
-func (buf *Buffer) Send(data []byte) {
-	buf.seqMax++
-	rp := _RawPacket{Size:uint16(len(data)), SeqId:buf.seqMax, Data:data}
-	buf.Pending <- rp
+func (buf *Buffer) Send(data []byte) error {
+
+	if buf.byteCount < BUFSIZE {
+		buf.seqMax++
+		rp := _RawPacket{Size: uint16(len(data)), SeqId: buf.seqMax, Data: data}
+		buf.Pending <- &rp
+
+		buf.byteCount += uint32(len(data))
+		return nil
+	}
+
+	return errors.New("Send Buffer Overflow, send rejected, possible DoS attack.")
 }
 
 //---------------------------------------------------------Ack data
@@ -64,7 +79,7 @@ func (buf *Buffer) Start() {
 
 //---------------------------------------------------------retransit
 func (buf *Buffer) retransit() {
-	Sent2 := make(chan _RawPacket, 128)
+	Sent2 := make(chan *_RawPacket, MAXCHAN)
 
 	// retrieve all 'sent' packet & send again
 	for {
@@ -73,7 +88,7 @@ func (buf *Buffer) retransit() {
 			buf.raw_send(pkt)
 			Sent2 <- pkt
 		default:
-			break;
+			break
 		}
 	}
 
@@ -83,14 +98,14 @@ func (buf *Buffer) retransit() {
 		case pkt := <-Sent2:
 			buf.Sent <- pkt
 		default:
-			break;
+			break
 		}
 	}
 }
 
-func (buf *Buffer) raw_send(pkt _RawPacket) error {
-	headwriter:= packet.PacketWriter()
-	headwriter.WriteU16(uint16(len(pkt.Data)+8))
+func (buf *Buffer) raw_send(pkt *_RawPacket) error {
+	headwriter := packet.PacketWriter()
+	headwriter.WriteU16(uint16(len(pkt.Data) + 8))
 	headwriter.WriteU32(pkt.SeqId)
 	headwriter.WriteU32(buf.ackMax)
 
@@ -112,8 +127,8 @@ func (buf *Buffer) raw_send(pkt _RawPacket) error {
 }
 
 func NewBuffer(conn net.Conn) *Buffer {
-	buf := Buffer{conn:conn, seqMax:0}
-	buf.Pending = make(chan _RawPacket, 128)
-	buf.Sent = make(chan _RawPacket, 128)
+	buf := Buffer{conn: conn, seqMax: 0, byteCount: 0}
+	buf.Pending = make(chan *_RawPacket, MAXCHAN)
+	buf.Sent = make(chan *_RawPacket, MAXCHAN)
 	return &buf
 }

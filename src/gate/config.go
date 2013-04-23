@@ -5,7 +5,7 @@ import "bufio"
 import "regexp"
 import "fmt"
 
-func read_config(path string)(ret map[string]string) {
+func read_config(path string) (ret map[string]string) {
 	ret = make(map[string]string)
 	f, err := os.Open(path)
 
@@ -19,7 +19,7 @@ func read_config(path string)(ret map[string]string) {
 	r := bufio.NewReader(f)
 
 	for {
-		line,e := r.ReadString('\n')
+		line, e := r.ReadString('\n')
 
 		// empty-line & #comment
 		if line == "" || []byte(line)[0] == '#' {

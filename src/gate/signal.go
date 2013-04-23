@@ -11,7 +11,7 @@ func SignalProc() {
 	signal.Notify(ch, syscall.SIGHUP, syscall.SIGQUIT)
 
 	for {
-		msg:= <-ch
+		msg := <-ch
 		log.Println(msg)
 	}
 }
