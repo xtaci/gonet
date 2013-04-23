@@ -61,7 +61,7 @@ func New(ud *User) bool {
 	defer func() { DBCH <- db }()
 	_, res, err := db.Query(strings.Join(stmt, " "))
 	NoticeErr(err)
-	ud.Id = res.InsertId()
+	ud.Id = int(res.InsertId())
 
 	if err == nil {
 		return true

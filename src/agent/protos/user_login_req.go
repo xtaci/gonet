@@ -4,14 +4,13 @@ import . "types"
 import "misc/packet"
 import "hub/names"
 import "db/user"
-import "time"
 
-func UserLogin(sess *Session, reader *packet.Packet) (ret []byte, err error) {
+func _user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err error) {
 
 	tbl,_ := pktread_user_login_info(reader)
 
 	if tbl.new_user == 0 {
-		if user.LoginMAC(mac, &sess.User) {
+		if user.LoginMAC(sess.User.Mac, &sess.User) {
 			names.Register(sess.MQ, sess.User.Id)
 		}
 	} else {

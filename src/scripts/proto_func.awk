@@ -7,8 +7,8 @@ BEGIN { RS = ""; FS ="\n" }
 		}
 
 		split($i, a, " ")
-		if (a[1] ~ /.*=/) {
-			name = substr(a[1], 1, length(a[1])-1)
+		if (a[1] ~ /[A-Za-z_]+=/) {
+			name = substr(a[1],1, match(a[1],/=/)-1)
 			print "func pktread_"name"(reader *packet.Packet)(tbl *"name", err error){"
 			print "\ttbl = &"name"{}"
 			typeok = "true"
