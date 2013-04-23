@@ -1,15 +1,21 @@
 package agent
 
-import "net"
-import "time"
-import "encoding/binary"
-import . "types"
-import "db/user"
-import "db/city"
-import "strconv"
-import "names"
-import "log"
-import "fmt"
+import (
+	"net"
+	"time"
+	"encoding/binary"
+	"strconv"
+	"log"
+	"fmt"
+)
+
+import (
+	"names"
+	. "types"
+	"db/user"
+	"db/city"
+	"cfg"
+)
 
 func send(conn net.Conn, p []byte) error {
 	header := make([]byte, 2)
@@ -55,12 +61,13 @@ func _timer(interval int, ch chan string) {
 	}
 }
 
-func StartAgent(in chan []byte, conn net.Conn, config map[string]string) {
+func StartAgent(in chan []byte, conn net.Conn) {
 	var sess Session
 	sess.MQ = make(chan string, 128)
 	timer_ch := make(chan string)
 
 	flush_interval := 300 // sec
+	config := cfg.Get()
 	if config["flush_interval"] != "" {
 		flush_interval, _ = strconv.Atoi(config["flush_interval"])
 	}

@@ -3,8 +3,12 @@ DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` char(20) DEFAULT NULL,
-  `score` int(11) DEFAULT '0',
   `password` char(40) DEFAULT NULL,
+  `mac`   BIGINT UNSIGNED,
+  `score` int(11) DEFAULT '0',
+  `rank`  int(11) DEFAULT '0',
+  `last_sync` datetime DEFAULT NULL,
+  `shield_remain` int(11) DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uc_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

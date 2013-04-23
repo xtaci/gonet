@@ -6,9 +6,10 @@ import . "db"
 import "io"
 import "os"
 import "log"
+import "cfg"
 
 func main() {
-	config := read_config("./config.ini")
+	config := cfg.Get()
 	if config["logfile"] != "" {
 		f, err := os.OpenFile(config["logfile"], os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
 
@@ -23,7 +24,7 @@ func main() {
 	}
 
 	log.Println("Starting the server")
-	StartDB(config)
+	StartDB()
 
 	//	
 	service := ":8080"
@@ -47,17 +48,17 @@ func main() {
 		if err != nil {
 			continue
 		}
-		go handleClient(conn, config)
+		go handleClient(conn)
 	}
 }
 
-func handleClient(conn net.Conn, config map[string]string) {
+func handleClient(conn net.Conn) {
 	defer conn.Close()
 
 	header := make([]byte, 2)
 	ch := make(chan []byte, 100)
 
-	go StartAgent(ch, conn, config)
+	go StartAgent(ch, conn)
 
 	for {
 		// header

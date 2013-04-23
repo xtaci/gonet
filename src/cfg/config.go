@@ -1,9 +1,21 @@
-package main
+package cfg
 
 import "os"
 import "bufio"
 import "regexp"
 import "fmt"
+
+var _map map[string]string
+
+const CONFIG_PATH = "./config"
+
+func Get() map[string]string {
+	if _map == nil {
+		_map = read_config(CONFIG_PATH)
+	}
+
+	return _map
+}
 
 func read_config(path string) (ret map[string]string) {
 	ret = make(map[string]string)

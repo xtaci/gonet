@@ -1,9 +1,15 @@
 package db
 
-import "strconv"
-import "github.com/ziutek/mymysql/mysql"
-import _ "github.com/ziutek/mymysql/native" // Native engine
-import "log"
+import (
+	"strconv"
+	"log"
+)
+
+import (
+	"github.com/ziutek/mymysql/mysql"
+	_ "github.com/ziutek/mymysql/native" // Native engine
+	"cfg"
+)
 
 const (
 	DEFAULT_INSTANCE = 4
@@ -11,7 +17,9 @@ const (
 
 var DBCH chan mysql.Conn
 
-func StartDB(config map[string]string) {
+func StartDB() {
+
+	config := cfg.Get()
 	// instance
 	num := DEFAULT_INSTANCE
 	if config["max_db_conn"] != "" {
