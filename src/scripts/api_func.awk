@@ -14,7 +14,6 @@ BEGIN { RS = ""; FS ="\n" }
 			typeok = "true"
 		} else if (a[2] == "string") {
 			print "\ttbl."a[1]",err = reader.ReadString()"
-			print "\tcheckErr(err)"
 		} else if (a[2] == "integer") {
 			print "\ttbl."a[1]",err = reader.ReadS32()"
 			print "\tcheckErr(err)"

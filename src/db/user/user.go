@@ -51,3 +51,20 @@ func LoginMAC(mac string, ud *User) bool {
 
 	return false
 }
+
+func New(ud *User) bool {
+	fields, values := SQL_dump(ud, "id")
+	stmt := []string{"INSERT INTO cities(", strings.Join(fields, ","),
+		") VALUES (", strings.Join(values, ","), ")"}
+
+	db := <-DBCH
+	defer func() { DBCH <- db }()
+	_, res, err := db.Query(strings.Join(stmt, " "))
+	NoticeErr(err)
+	ud.Id = res.InsertId()
+
+	if err == nil {
+		return true
+	}
+	return false
+}
