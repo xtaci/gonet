@@ -7,7 +7,7 @@ import "fmt"
 
 var _map map[string]string
 
-const CONFIG_PATH = "./config"
+const CONFIG_PATH = "./config.ini"
 
 func Get() map[string]string {
 	if _map == nil {

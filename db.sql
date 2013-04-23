@@ -8,7 +8,8 @@ CREATE TABLE `users` (
   `score` int(11) DEFAULT '0',
   `rank`  int(11) DEFAULT '0',
   `last_sync` datetime DEFAULT NULL,
-  `shield_remain` int(11) DEFAULT '0',
+  `shield_until` datetime DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uc_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

@@ -1,20 +1,20 @@
 package agent
 
 import (
-	"net"
-	"time"
 	"encoding/binary"
-	"strconv"
-	"log"
 	"fmt"
+	"log"
+	"net"
+	"strconv"
+	"time"
 )
 
 import (
+	"cfg"
+	"db/city"
+	"db/user"
 	"names"
 	. "types"
-	"db/user"
-	"db/city"
-	"cfg"
 )
 
 func send(conn net.Conn, p []byte) error {
