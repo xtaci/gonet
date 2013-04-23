@@ -67,16 +67,15 @@ func (t *Tree) Score(score int) (n* node, rank int) {
 		return
 	}
 
-	rank = _nodesize(n.left) + 1
-
+	rank = 0
 	for n!= nil {
 		if score == n.score {
+			rank+= _nodesize(n.left)+1
 			return
 		} else if score > n.score {
-			rank = _nodesize(n.left) + 1
 			n = n.left
 		} else {
-			rank = _nodesize(n.left)+1
+			rank += _nodesize(n.left)+1
 			n = n.right
 		}
 	}
