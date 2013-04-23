@@ -1,1 +1,1 @@
-Global Player Info Exchange Center.
+name center
