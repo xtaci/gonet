@@ -57,8 +57,8 @@ func _timer(interval int, ch chan string) {
 
 func StartAgent(in chan []byte, conn net.Conn, config map[string]string) {
 	var sess Session
-	sess.MQ = make(chan string, 100)
-	timer_ch := make(chan string, 10)
+	sess.MQ = make(chan string, 128)
+	timer_ch := make(chan string)
 
 	flush_interval := 300 // sec
 	if config["flush_interval"] != "" {
