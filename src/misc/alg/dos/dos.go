@@ -64,7 +64,7 @@ func (t *Tree) Insert(score int, data interface{}) {
 		n := t.root
 		for {
 			n.size+=1
-			if score < n.score {
+			if score > n.score {
 				if n.left == nil {
 					n.left = inserted_node
 					break
