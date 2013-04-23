@@ -23,6 +23,8 @@ print "import \"misc/packet\"\n"
 			print "\t"a[1] " byte"
 		} else if (a[2] == "float") {
 			print "\t"a[1] " float32"
+		} else if (a[2] == "array") {
+			print "\t"a[1]" []*"a[3]
 		}
 	}
 

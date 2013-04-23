@@ -24,6 +24,13 @@ BEGIN { RS = ""; FS ="\n" }
 		} else if (a[2] == "float") {
 			print "\ttbl."a[1]",err = reader.ReadFloat()"
 			print "\tcheckErr(err)"
+		} else if (a[2] == "array") {
+			print "\tnarr,err2 := reader.ReadU16()"
+			print "\tcheckErr(err2)"
+			print "\ttbl."a[1]"=make([]*"a[3]",narr)"
+			print "\tfor i:=0;i<int(narr);i++ {"
+			print "\t\ttbl."a[1]"[i], err = pktread_"a[3]"(reader)"
+			print "\t}"
 		}
 	}
 
