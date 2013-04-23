@@ -54,9 +54,9 @@ func print_helper(n *node, indent int) {
 		fmt.Printf(" ")
 	}
 	if n.color == BLACK {
-		fmt.Printf("[score:%v DATA:%v]\n", n.score, n.DATA)
+		fmt.Printf("[score:%v size:%v]\n", n.score, n.size)
 	} else {
-		fmt.Printf("*[score:%v DATA:%v]\n", n.score, n.DATA)
+		fmt.Printf("*[score:%v size:%v]\n", n.score, n.size)
 	}
 
 	if n.left != nil {
