@@ -52,7 +52,7 @@ func new_node(score int, data interface{}, color int, left, right *node) *node {
 	return &n
 }
 
-func (t *Tree) Rank(rank int) interface{} {
+func (t *Tree) Rank(rank int) *node {
 	return lookup_node(t.root, rank)
 }
 
