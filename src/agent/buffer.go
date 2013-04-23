@@ -1,13 +1,16 @@
 package agent
 
-import "net"
-import "sync"
-import "sync/atomic"
+import (
+	"net"
+	"sync"
+	"sync/atomic"
+	"log"
+	"errors"
+)
 
-//import "time"
-import "packet"
-import "log"
-import "errors"
+import (
+	"misc/packet"
+)
 
 const BUFSIZE = 65535
 const MAXCHAN = 4096

@@ -1,7 +1,7 @@
 package protos
 
 import . "types"
-import "packet"
+import "misc/packet"
 
 func UserLogout(sess *Session, reader *packet.Packet) (ret []byte, err error) {
 	return nil, nil

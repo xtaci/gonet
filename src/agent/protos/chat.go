@@ -3,7 +3,7 @@ package protos
 import "strings"
 import "strconv"
 import . "types"
-import "packet"
+import "misc/packet"
 import "names"
 
 func Chat(sess *Session, reader *packet.Packet) (ret []byte, err error) {

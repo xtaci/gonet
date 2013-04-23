@@ -1,7 +1,7 @@
 package protos
 
 import . "types"
-import "packet"
+import "misc/packet"
 import "names"
 import "db/user"
 import "db/city"

@@ -1,7 +1,7 @@
 package protos
 
 import . "types"
-import "packet"
+import "misc/packet"
 
 func UserRegister(sess *Session, reader *packet.Packet) (ret []byte, err error) {
 	udid, err := reader.ReadString()

@@ -5,7 +5,7 @@ import . "types"
 import srv "agent/srv"
 import "agent/protos"
 import "log"
-import "packet"
+import "misc/packet"
 
 func ExecCli(sess *Session, p []byte) []byte {
 	defer func() {
