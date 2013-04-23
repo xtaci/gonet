@@ -18,28 +18,33 @@ type Buffer struct {
 	num_packet uint32
 	conn net.Conn
 	_lock sync.Mutex
-	seqId uint32
-	ackId uint32
+	seqMax uint32
+	ackMax uint32
 }
 
 //---------------------------------------------------------Pend data
 func (buf *Buffer) Send(data []byte) {
-	buf.seqId++
-	rp := _RawPacket{Size:uint16(len(data)), SeqId:buf.seqId, Data:data}
+	buf.seqMax++
+	rp := _RawPacket{Size:uint16(len(data)), SeqId:buf.seqMax, Data:data}
 	buf.Pending <- rp
 }
 
 //---------------------------------------------------------Ack data
 func (buf *Buffer) Ack(ackId uint32) {
-	// first ack
-	for {
-		pkt := <-buf.Sent
-		if ackId >= pkt.SeqId {
-			break
+	// retransit needed
+	if ackId == buf.ackMax {
+		buf.retransit()
+	} else {
+		//
+		for {
+			pkt := <-buf.Sent
+			if buf.ackMax >= pkt.SeqId {
+				break
+			}
 		}
-	}
 
-	buf.ackId = ackId
+		buf.ackMax = ackId
+	}
 }
 
 func (buf *Buffer) Start() {
@@ -49,6 +54,19 @@ func (buf *Buffer) Start() {
 
 //---------------------------------------------------------retransit
 func (buf *Buffer) retransit() {
+	Sent2 := make(chan _RawPacket, 128)
+
+	for {
+		select {
+		case pkt := <-buf.Sent:
+			buf.send(pkt)
+			Sent2 <- pkt
+		default:
+			break;
+		}
+	}
+
+	buf.Sent = Sent2
 }
 
 //---------------------------------------------------------packet sender
@@ -56,6 +74,7 @@ func (buf *Buffer) sender() {
 	for {
 		pkt := <-buf.Pending
 		buf.send(pkt)
+		buf.Sent <- pkt
 	}
 }
 
@@ -63,7 +82,7 @@ func (buf *Buffer) send(pkt _RawPacket) error {
 	writer := packet.PacketWriter()
 	writer.WriteU16(uint16(len(pkt.Data)+8))
 	writer.WriteU32(pkt.SeqId)
-	writer.WriteU32(buf.ackId)
+	writer.WriteU32(buf.ackMax)
 
 	_, err := buf.conn.Write(writer.Data())
 	if err != nil {
@@ -81,7 +100,7 @@ func (buf *Buffer) send(pkt _RawPacket) error {
 }
 
 func NewBuffer(conn net.Conn) *Buffer {
-	buf := Buffer{conn:conn,num_packet:0, seqId:0}
+	buf := Buffer{conn:conn,num_packet:0, seqMax:0}
 	buf.Pending = make(chan _RawPacket, 128)
 	buf.Sent = make(chan _RawPacket, 128)
 	return &buf
