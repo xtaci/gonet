@@ -13,7 +13,7 @@ import (
 	"cfg"
 	"db/city"
 	"db/user"
-	"names"
+	"hub/names"
 	. "types"
 )
 

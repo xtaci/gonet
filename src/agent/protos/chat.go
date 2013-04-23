@@ -4,7 +4,7 @@ import "strings"
 import "strconv"
 import . "types"
 import "misc/packet"
-import "names"
+import "hub/names"
 
 func Chat(sess *Session, reader *packet.Packet) (ret []byte, err error) {
 	user_id, err := reader.ReadString()
