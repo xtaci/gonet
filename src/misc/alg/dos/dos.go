@@ -14,9 +14,18 @@ type node struct {
 	size  int // the size of this subtree
 	color int
 
-	DATA interface{} // associated data
+	data interface{} // associated data
 }
 
+func (n *node) Data() interface{} {
+	return n.data
+}
+
+func (n *node) Score() int {
+	return n.score
+}
+
+//
 type Tree struct {
 	root *node
 }
@@ -52,14 +61,16 @@ func lookup_node(n *node, rank int) *node {
 }
 
 func new_node(score int, data interface{}, color int, left, right *node) *node {
-	n := node{score: score, color: color, left: left, right: right, size: 1, DATA: data}
+	n := node{score: score, color: color, left: left, right: right, size: 1, data: data}
 	return &n
 }
 
+//--------------------------------------------------------- Lookup by Rank
 func (t *Tree) Rank(rank int) *node {
 	return lookup_node(t.root, rank)
 }
 
+//--------------------------------------------------------- Lookup by score
 func (t *Tree) Score(score int) (n* node, rank int) {
 	n = t.root
 
@@ -123,7 +134,7 @@ func (t *Tree) DeleteNode(n *node) {
 		pred := maximum_node(n.left)
 		n.score = pred.score
 		n.size = pred.size
-		n.DATA = pred.DATA
+		n.data = pred.data
 		n = pred
 	}
 
