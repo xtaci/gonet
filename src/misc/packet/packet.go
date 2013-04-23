@@ -1,6 +1,7 @@
 package packet
 
 import "errors"
+import "math"
 
 type Packet struct {
 	pos  uint
@@ -179,6 +180,16 @@ func (p *Packet) WriteU64(v uint64) {
 	}
 
 	p.data = append(p.data, buf...)
+}
+
+func (p *Packet) WriteFloat32(f float32) {
+	v := math.Float32bits(f)
+	p.WriteU32(v)
+}
+
+func (p *Packet) WriteFloat64(f float64) {
+	v := math.Float64bits(f)
+	p.WriteU64(v)
 }
 
 func PacketReader(data []byte) *Packet {
