@@ -65,6 +65,13 @@ func (p *Packet) ReadU16() (ret uint16, err error) {
 	return
 }
 
+func (p *Packet) ReadS16() (ret int16, err error) {
+	_ret, _err := p.ReadU16()
+	ret = int16(_ret)
+	err = _err
+	return
+}
+
 func (p *Packet) ReadU24() (ret uint32, err error) {
 	if p.pos+3 > uint(len(p.data)) {
 		err = errors.New("read uint24 failed")
@@ -74,6 +81,13 @@ func (p *Packet) ReadU24() (ret uint32, err error) {
 	buf := p.data[p.pos : p.pos+3]
 	ret = uint32(buf[2])<<16 | uint32(buf[1])<<8 | uint32(buf[0])
 	p.pos += 3
+	return
+}
+
+func (p *Packet) ReadS24() (ret int32, err error) {
+	_ret, _err := p.ReadU24()
+	ret = int32(_ret)
+	err = _err
 	return
 }
 
@@ -89,6 +103,13 @@ func (p *Packet) ReadU32() (ret uint32, err error) {
 	return
 }
 
+func (p *Packet) ReadS32() (ret int32, err error) {
+	_ret, _err := p.ReadU32()
+	ret = int32(_ret)
+	err = _err
+	return
+}
+
 func (p *Packet) ReadU64() (ret uint64, err error) {
 	if p.pos+8 > uint(len(p.data)) {
 		err = errors.New("read uint64 failed")
@@ -101,6 +122,13 @@ func (p *Packet) ReadU64() (ret uint64, err error) {
 		ret |= uint64(v) << uint(i*8)
 	}
 	p.pos += 8
+	return
+}
+
+func (p *Packet) ReadS64() (ret int64, err error) {
+	_ret, _err := p.ReadU64()
+	ret = int64(_ret)
+	err = _err
 	return
 }
 

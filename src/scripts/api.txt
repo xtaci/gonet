@@ -1,0 +1,90 @@
+# 该文件规定客户端和服务之间的通信结构体模式.注释必须独占一行!!!!!
+#
+# 基本类型 : integer float string boolean
+# 格式如下所示.若要定义数组，查找array看看已有定义你懂得.
+#
+# 每一个定义以'==='分割
+# 紧接一行注释 #描述这个逻辑结构用来干啥.
+# 然后定义结构名字，以'='结束，这样可以grep '=' 出全部逻辑名字.
+# 之后每一行代表一个成员定义.
+#
+# 发布代码前请确保这些部分最新.
+#
+
+#一般性回复payload,0代表成功
+
+#用户登陆发包
+user_login_info=
+mac_addr string
+client_version integer
+new_user boolean
+user_name string
+===
+
+#用户信息包.
+user_snapshot=
+id integer
+name string
+rank integer
+archives string
+protect_time integer
+last_save_time integer
+server_time integer
+===
+
+#普通错误信息
+command_result_pack=
+rst integer
+===
+
+#用户存档信息
+user_archives_info=
+id integer
+archives string
+===
+
+#排行榜项数据
+rank_list_item=
+id integer
+name string
+rank integer
+state integer
+protect_time integer
+===
+
+#排行榜数据
+rank_list=
+items array rank_list_item
+===
+
+#pve项数据
+pve_list_item=
+id integer
+name string
+rank integer
+state integer
+protect_time integer
+===
+
+#pve数据
+pve_list=
+items array pve_list_item
+===
+
+#id封装
+command_id_pack=
+id integer
+===
+
+#pvp结果存档
+atk_player_rst_req=
+rst integer
+protect_time integer
+===
+
+#攻击怪物结果存档
+atk_monster_rst_req=
+protect_time integer
+===
+
+

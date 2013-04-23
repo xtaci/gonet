@@ -53,9 +53,12 @@ var ProtoHandler map[uint16]func(*Session, *packet.Packet) ([]byte, error)
 
 func init() {
 	ProtoHandler = make(map[uint16]func(*Session, *packet.Packet) ([]byte, error))
+	ProtoHandler[1] = protos.UserLogin
+
+	/*
 	ProtoHandler[0] = protos.HeartBeat
 	ProtoHandler['R'] = protos.UserRegister
-	ProtoHandler[3] = protos.UserLogin
 	ProtoHandler[9] = protos.Chat
 	ProtoHandler[11] = protos.UserLogout
+	*/
 }

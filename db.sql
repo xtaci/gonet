@@ -4,7 +4,7 @@ CREATE TABLE `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` char(20) DEFAULT NULL,
   `password` char(40) DEFAULT NULL,
-  `mac`   BIGINT UNSIGNED,
+  `mac`   char(11) DEFAULT NULL,
   `score` int(11) DEFAULT '0',
   `rank`  int(11) DEFAULT '0',
   `last_sync` datetime DEFAULT NULL,

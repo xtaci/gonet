@@ -34,3 +34,20 @@ func Login(name string, password string, ud *User) bool {
 
 	return false
 }
+
+func LoginMAC(mac string, ud *User) bool {
+	stmt := "SELECT * FROM users where mac='%v'"
+
+	db := <-DBCH
+	defer func() { DBCH <- db }()
+	rows, res, err := db.Query(stmt, mac)
+
+	CheckErr(err)
+
+	if len(rows) > 0 {
+		SQL_load(ud, &rows[0], res)
+		return true
+	}
+
+	return false
+}
