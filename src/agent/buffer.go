@@ -2,6 +2,7 @@ package agent
 
 import "net"
 import "sync"
+import "sync/atomic"
 
 //import "time"
 import "packet"
@@ -24,11 +25,11 @@ type Buffer struct {
 	ackMax  uint32           // Largest ACK number
 
 	conn      net.Conn   // connection
-	byteCount uint32     //
+	byteCount int32      // packet payload bytes count
 	_lock     sync.Mutex // for changing conn
 }
 
-//---------------------------------------------------------Pend data
+//--------------------------------------------------------- Pend data
 func (buf *Buffer) Send(data []byte) error {
 
 	if buf.byteCount < BUFSIZE {
@@ -36,48 +37,50 @@ func (buf *Buffer) Send(data []byte) error {
 		rp := _RawPacket{Size: uint16(len(data)), SeqId: buf.seqMax, Data: data}
 		buf.Pending <- &rp
 
-		buf.byteCount += uint32(len(data))
+		atomic.AddInt32(&buf.byteCount, int32(len(data)))
 		return nil
 	}
 
 	return errors.New("Send Buffer Overflow, send rejected, possible DoS attack.")
 }
 
-//---------------------------------------------------------Ack data
-func (buf *Buffer) Ack(ackId uint32) {
+//--------------------------------------------------------- Ack data
+func (buf *Buffer) Ack(seqId uint32) {
 	// retransit needed
-	if ackId == buf.ackMax {
+	if seqId == buf.ackMax {
 		buf.retransit()
 	} else {
-		//
+		// drop Acked packet
 		for {
-			pkt := <-buf.Sent
-			if buf.ackMax >= pkt.SeqId {
+			pkt_old := <-buf.Sent
+			if buf.ackMax >= pkt_old.SeqId {
 				break
 			}
 		}
 
-		buf.ackMax = ackId
+		// update max ack number
+		atomic.StoreUint32(&buf.ackMax, seqId)
 	}
 }
 
-//---------------------------------------------------------Change network-connection
+//--------------------------------------------------------- Change network-connection
 func (buf *Buffer) ChangeConn(conn net.Conn) {
 	buf._lock.Lock()
 	defer buf._lock.Unlock()
 	buf.conn = conn
 }
 
-//---------------------------------------------------------packet sender goroutine
+//--------------------------------------------------------- packet sender goroutine
 func (buf *Buffer) Start() {
 	for {
 		pkt := <-buf.Pending
 		buf.raw_send(pkt)
 		buf.Sent <- pkt
+		atomic.AddInt32(&buf.byteCount, -int32(len(pkt.Data)))
 	}
 }
 
-//---------------------------------------------------------retransit
+//--------------------------------------------------------- retransit
 func (buf *Buffer) retransit() {
 	Sent2 := make(chan *_RawPacket, MAXCHAN)
 
@@ -107,7 +110,7 @@ func (buf *Buffer) raw_send(pkt *_RawPacket) error {
 	headwriter := packet.PacketWriter()
 	headwriter.WriteU16(uint16(len(pkt.Data) + 8))
 	headwriter.WriteU32(pkt.SeqId)
-	headwriter.WriteU32(buf.ackMax)
+	headwriter.WriteU32(atomic.LoadUint32(&buf.ackMax))
 
 	buf._lock.Lock()
 	defer buf._lock.Unlock()
