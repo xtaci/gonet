@@ -1,11 +1,11 @@
 package agent
 
 import (
+	"errors"
+	"log"
 	"net"
 	"sync"
 	"sync/atomic"
-	"log"
-	"errors"
 )
 
 import (
@@ -16,31 +16,31 @@ const BUFSIZE = 65535
 const MAXCHAN = 4096
 
 type _RawPacket struct {
-	Size  uint16 // payload size
-	SeqId uint32 // packet SEQ Num
-	Data  []byte // payload
+	size   uint16 // payload size
+	seq_id uint32 // packet SEQ Num
+	data   []byte // payload
 }
 
 type Buffer struct {
-	Pending chan *_RawPacket // Pending Packet
-	Sent    chan *_RawPacket // Sent but not ACKed 
-	seqMax  uint32           // Largest SEQ number
-	ackMax  uint32           // Largest ACK number
+	ch_pending chan *_RawPacket // ch_pending Packet
+	ch_sent    chan *_RawPacket // ch_sent but not ACKed 
+	seq_max    uint32           // Largest SEQ number
+	ack_max    uint32           // Largest ACK number
 
-	conn      net.Conn   // connection
-	byteCount int32      // packet payload bytes count
-	_lock     sync.Mutex // for changing conn
+	conn     net.Conn   // connection
+	byte_cnt int32      // packet payload bytes count
+	_lock    sync.Mutex // for changing conn
 }
 
 //--------------------------------------------------------- Pend data
 func (buf *Buffer) Send(data []byte) error {
 
-	if buf.byteCount < BUFSIZE {
-		buf.seqMax++
-		rp := _RawPacket{Size: uint16(len(data)), SeqId: buf.seqMax, Data: data}
-		buf.Pending <- &rp
+	if buf.byte_cnt < BUFSIZE {
+		buf.seq_max++
+		rp := _RawPacket{size: uint16(len(data)), seq_id: buf.seq_max, data: data}
+		buf.ch_pending <- &rp
 
-		atomic.AddInt32(&buf.byteCount, int32(len(data)))
+		atomic.AddInt32(&buf.byte_cnt, int32(len(data)))
 		return nil
 	}
 
@@ -50,19 +50,19 @@ func (buf *Buffer) Send(data []byte) error {
 //--------------------------------------------------------- Ack data
 func (buf *Buffer) Ack(seqId uint32) {
 	// retransit needed
-	if seqId == buf.ackMax {
+	if seqId == buf.ack_max {
 		buf.retransit()
 	} else {
 		// drop Acked packet
 		for {
-			pkt_old := <-buf.Sent
-			if buf.ackMax >= pkt_old.SeqId {
+			pkt_old := <-buf.ch_sent
+			if buf.ack_max >= pkt_old.seq_id {
 				break
 			}
 		}
 
 		// update max ack number
-		atomic.StoreUint32(&buf.ackMax, seqId)
+		atomic.StoreUint32(&buf.ack_max, seqId)
 	}
 }
 
@@ -76,23 +76,23 @@ func (buf *Buffer) ChangeConn(conn net.Conn) {
 //--------------------------------------------------------- packet sender goroutine
 func (buf *Buffer) Start() {
 	for {
-		pkt := <-buf.Pending
+		pkt := <-buf.ch_pending
 		buf.raw_send(pkt)
-		buf.Sent <- pkt
-		atomic.AddInt32(&buf.byteCount, -int32(len(pkt.Data)))
+		buf.ch_sent <- pkt
+		atomic.AddInt32(&buf.byte_cnt, -int32(len(pkt.data)))
 	}
 }
 
 //--------------------------------------------------------- retransit
 func (buf *Buffer) retransit() {
-	Sent2 := make(chan *_RawPacket, MAXCHAN)
+	ch_sent2 := make(chan *_RawPacket, MAXCHAN)
 
 	// retrieve all 'sent' packet & send again
 	for {
 		select {
-		case pkt := <-buf.Sent:
+		case pkt := <-buf.ch_sent:
 			buf.raw_send(pkt)
-			Sent2 <- pkt
+			ch_sent2 <- pkt
 		default:
 			break
 		}
@@ -101,8 +101,8 @@ func (buf *Buffer) retransit() {
 	// push back into 'sent' channel
 	for {
 		select {
-		case pkt := <-Sent2:
-			buf.Sent <- pkt
+		case pkt := <-ch_sent2:
+			buf.ch_sent <- pkt
 		default:
 			break
 		}
@@ -111,9 +111,9 @@ func (buf *Buffer) retransit() {
 
 func (buf *Buffer) raw_send(pkt *_RawPacket) error {
 	headwriter := packet.PacketWriter()
-	headwriter.WriteU16(uint16(len(pkt.Data) + 8))
-	headwriter.WriteU32(pkt.SeqId)
-	headwriter.WriteU32(atomic.LoadUint32(&buf.ackMax))
+	headwriter.WriteU16(uint16(len(pkt.data) + 8))
+	headwriter.WriteU32(pkt.seq_id)
+	headwriter.WriteU32(atomic.LoadUint32(&buf.ack_max))
 
 	buf._lock.Lock()
 	defer buf._lock.Unlock()
@@ -123,7 +123,7 @@ func (buf *Buffer) raw_send(pkt *_RawPacket) error {
 		return err
 	}
 
-	_, err = buf.conn.Write(pkt.Data)
+	_, err = buf.conn.Write(pkt.data)
 	if err != nil {
 		log.Println("Error send reply msg:", err.Error())
 		return err
@@ -133,8 +133,8 @@ func (buf *Buffer) raw_send(pkt *_RawPacket) error {
 }
 
 func NewBuffer(conn net.Conn) *Buffer {
-	buf := Buffer{conn: conn, seqMax: 0, byteCount: 0}
-	buf.Pending = make(chan *_RawPacket, MAXCHAN)
-	buf.Sent = make(chan *_RawPacket, MAXCHAN)
+	buf := Buffer{conn: conn, seq_max: 0, byte_cnt: 0}
+	buf.ch_pending = make(chan *_RawPacket, MAXCHAN)
+	buf.ch_sent = make(chan *_RawPacket, MAXCHAN)
 	return &buf
 }
