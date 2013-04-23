@@ -5,10 +5,10 @@ const (
 	BLACK
 )
 
-type node struct {
-	left   *node
-	right  *node
-	parent *node
+type Node struct {
+	left   *Node
+	right  *Node
+	parent *Node
 
 	score int // the score
 	size  int // the size of this subtree
@@ -17,25 +17,25 @@ type node struct {
 	data interface{} // associated data
 }
 
-func (n *node) Data() interface{} {
+func (n *Node) Data() interface{} {
 	return n.data
 }
 
-func (n *node) Score() int {
+func (n *Node) Score() int {
 	return n.score
 }
 
 //
 type Tree struct {
-	root *node
+	root *Node
 }
 
-func (t *Tree) Root() *node {
+func (t *Tree) Root() *Node {
 	return t.root
 }
 
 //--------------------------------------------------------- Dos Part
-func _nodesize(n *node) int {
+func _nodesize(n *Node) int {
 	if n == nil {
 		return 0
 	}
@@ -43,7 +43,7 @@ func _nodesize(n *node) int {
 	return n.size
 }
 
-func lookup_node(n *node, rank int) *node {
+func lookup_node(n *Node, rank int) *Node {
 	if n == nil {
 		return nil // beware of nil pointer
 	}
@@ -60,18 +60,18 @@ func lookup_node(n *node, rank int) *node {
 	return lookup_node(n.right, rank-size)
 }
 
-func new_node(score int, data interface{}, color int, left, right *node) *node {
-	n := node{score: score, color: color, left: left, right: right, size: 1, data: data}
+func new_node(score int, data interface{}, color int, left, right *Node) *Node {
+	n := Node{score: score, color: color, left: left, right: right, size: 1, data: data}
 	return &n
 }
 
 //--------------------------------------------------------- Lookup by Rank
-func (t *Tree) Rank(rank int) *node {
+func (t *Tree) Rank(rank int) *Node {
 	return lookup_node(t.root, rank)
 }
 
 //--------------------------------------------------------- Lookup by score
-func (t *Tree) Score(score int) (n* node, rank int) {
+func (t *Tree) Score(score int) (n *Node, rank int) {
 	n = t.root
 
 	if n==nil {
@@ -124,7 +124,7 @@ func (t *Tree) Insert(score int, data interface{}) {
 	t.insert_case1(inserted_node)
 }
 
-func (t *Tree) DeleteNode(n *node) {
+func (t *Tree) DeleteNode(n *Node) {
 	// phase 1. fix up size
 	fixup_size(n)
 
@@ -138,7 +138,7 @@ func (t *Tree) DeleteNode(n *node) {
 		n = pred
 	}
 
-	var child *node
+	var child *Node
 	if n.right == nil {
 		child = n.left
 	} else {
@@ -160,16 +160,16 @@ func (t *Tree) DeleteNode(n *node) {
 /**
  * left/right rotation call back function
  */
-func rotate_left_callback(n, parent *node) {
+func rotate_left_callback(n, parent *Node) {
 	parent.size = _nodesize(n)
 	n.size = _nodesize(n.left) + _nodesize(n.right) + 1
 }
 
-func rotate_right_callback(n, parent *node) {
+func rotate_right_callback(n, parent *Node) {
 	rotate_left_callback(n, parent)
 }
 
-func fixup_size(n *node) {
+func fixup_size(n *Node) {
 	n = n.parent
 
 	for n != nil {
@@ -179,29 +179,29 @@ func fixup_size(n *node) {
 }
 
 //--------------------------------------------------------- Tree part
-func grandparent(n *node) *node {
+func grandparent(n *Node) *Node {
 	return n.parent.parent
 }
 
-func sibling(n *node) *node {
+func sibling(n *Node) *Node {
 	if n == n.parent.left {
 		return n.parent.right
 	}
 	return n.parent.left
 }
 
-func uncle(n *node) *node {
+func uncle(n *Node) *Node {
 	return sibling(n.parent)
 }
 
-func node_color(n *node) int {
+func node_color(n *Node) int {
 	if n == nil {
 		return BLACK
 	}
 	return n.color
 }
 
-func (t *Tree) rotate_left(n *node) {
+func (t *Tree) rotate_left(n *Node) {
 	r := n.right
 	t.replace_node(n, r)
 	n.right = r.left
@@ -214,7 +214,7 @@ func (t *Tree) rotate_left(n *node) {
 	rotate_left_callback(n, r)
 }
 
-func (t *Tree) rotate_right(n *node) {
+func (t *Tree) rotate_right(n *Node) {
 	L := n.left
 	t.replace_node(n, L)
 	n.left = L.right
@@ -227,7 +227,7 @@ func (t *Tree) rotate_right(n *node) {
 	rotate_right_callback(n, L)
 }
 
-func (t *Tree) replace_node(oldn, newn *node) {
+func (t *Tree) replace_node(oldn, newn *Node) {
 	if oldn.parent == nil {
 		t.root = newn
 	} else {
@@ -242,7 +242,7 @@ func (t *Tree) replace_node(oldn, newn *node) {
 	}
 }
 
-func (t *Tree) insert_case1(n *node) {
+func (t *Tree) insert_case1(n *Node) {
 	if n.parent == nil {
 		n.color = BLACK
 	} else {
@@ -250,7 +250,7 @@ func (t *Tree) insert_case1(n *node) {
 	}
 }
 
-func (t *Tree) insert_case2(n *node) {
+func (t *Tree) insert_case2(n *Node) {
 	if node_color(n.parent) == BLACK {
 		return /* Tree is still valid */
 	} else {
@@ -258,7 +258,7 @@ func (t *Tree) insert_case2(n *node) {
 	}
 }
 
-func (t *Tree) insert_case3(n *node) {
+func (t *Tree) insert_case3(n *Node) {
 	if node_color(uncle(n)) == RED {
 		n.parent.color = BLACK
 		uncle(n).color = BLACK
@@ -269,7 +269,7 @@ func (t *Tree) insert_case3(n *node) {
 	}
 }
 
-func (t *Tree) insert_case4(n *node) {
+func (t *Tree) insert_case4(n *Node) {
 	if n == n.parent.right && n.parent == grandparent(n).left {
 		t.rotate_left(n.parent)
 		n = n.left
@@ -280,7 +280,7 @@ func (t *Tree) insert_case4(n *node) {
 	t.insert_case5(n)
 }
 
-func (t *Tree) insert_case5(n *node) {
+func (t *Tree) insert_case5(n *Node) {
 	n.parent.color = BLACK
 	grandparent(n).color = RED
 	if n == n.parent.left && n.parent == grandparent(n).left {
@@ -290,14 +290,14 @@ func (t *Tree) insert_case5(n *node) {
 	}
 }
 
-func maximum_node(n *node) *node {
+func maximum_node(n *Node) *Node {
 	for n.right != nil {
 		n = n.right
 	}
 	return n
 }
 
-func (t *Tree) delete_case1(n *node) {
+func (t *Tree) delete_case1(n *Node) {
 	if n.parent == nil {
 		return
 	} else {
@@ -305,7 +305,7 @@ func (t *Tree) delete_case1(n *node) {
 	}
 }
 
-func (t *Tree) delete_case2(n *node) {
+func (t *Tree) delete_case2(n *Node) {
 	if node_color(sibling(n)) == RED {
 		n.parent.color = RED
 		sibling(n).color = BLACK
@@ -318,7 +318,7 @@ func (t *Tree) delete_case2(n *node) {
 	t.delete_case3(n)
 }
 
-func (t *Tree) delete_case3(n *node) {
+func (t *Tree) delete_case3(n *Node) {
 	if node_color(n.parent) == BLACK &&
 		node_color(sibling(n)) == BLACK &&
 		node_color(sibling(n).left) == BLACK &&
@@ -330,7 +330,7 @@ func (t *Tree) delete_case3(n *node) {
 	}
 }
 
-func (t *Tree) delete_case4(n *node) {
+func (t *Tree) delete_case4(n *Node) {
 	if node_color(n.parent) == RED &&
 		node_color(sibling(n)) == BLACK &&
 		node_color(sibling(n).left) == BLACK &&
@@ -342,7 +342,7 @@ func (t *Tree) delete_case4(n *node) {
 	}
 }
 
-func (t *Tree) delete_case5(n *node) {
+func (t *Tree) delete_case5(n *Node) {
 	if n == n.parent.left &&
 		node_color(sibling(n)) == BLACK &&
 		node_color(sibling(n).left) == RED &&
@@ -361,7 +361,7 @@ func (t *Tree) delete_case5(n *node) {
 	t.delete_case6(n)
 }
 
-func (t *Tree) delete_case6(n *node) {
+func (t *Tree) delete_case6(n *Node) {
 	sibling(n).color = node_color(n.parent)
 	n.parent.color = BLACK
 	if n == n.parent.left {
