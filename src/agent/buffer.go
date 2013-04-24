@@ -1,7 +1,7 @@
 package agent
 
 import "net"
-import "sync"
+//import "sync"
 //import "time"
 import "packet"
 import "log"
@@ -16,7 +16,6 @@ type Buffer struct {
 	Pending chan _RawPacket	// Pending Packet
 	Sent chan _RawPacket	// Sent but not ACKed 
 	conn net.Conn			// connection
-	_lock sync.Mutex		// for changing conn
 	seqMax uint32			// Largest SEQ number
 	ackMax uint32			// Largest ACK number
 }
@@ -48,8 +47,6 @@ func (buf *Buffer) Ack(ackId uint32) {
 
 //---------------------------------------------------------Change network-connection
 func (buf *Buffer) ChangeConn(conn net.Conn) {
-	buf._lock.Lock()
-	defer buf._lock.Unlock()
 	buf.conn = conn
 }
 
@@ -94,8 +91,6 @@ func (buf *Buffer) raw_send(pkt _RawPacket) error {
 	headwriter.WriteU32(pkt.SeqId)
 	headwriter.WriteU32(buf.ackMax)
 
-	buf._lock.Lock()
-	defer buf._lock.Unlock()
 	_, err := buf.conn.Write(headwriter.Data())
 	if err != nil {
 		log.Println("Error send reply header:", err.Error())
