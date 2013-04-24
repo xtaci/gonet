@@ -7,19 +7,18 @@ import "packet"
 import "log"
 
 type _RawPacket struct {
-	Size uint16
-	SeqId uint32
-	Data []byte
+	Size uint16				// payload size
+	SeqId uint32			// packet SEQ Num
+	Data []byte				// payload
 }
 
 type Buffer struct {
-	Pending chan _RawPacket	// CSP
-	Sent chan _RawPacket
-	num_packet uint32
-	conn net.Conn
-	_lock sync.Mutex
-	seqMax uint32
-	ackMax uint32
+	Pending chan _RawPacket	// Pending Packet
+	Sent chan _RawPacket	// Sent but not ACKed 
+	conn net.Conn			// connection
+	_lock sync.Mutex		// for changing conn
+	seqMax uint32			// Largest SEQ number
+	ackMax uint32			// Largest ACK number
 }
 
 //---------------------------------------------------------Pend data
@@ -47,44 +46,57 @@ func (buf *Buffer) Ack(ackId uint32) {
 	}
 }
 
+//---------------------------------------------------------Change network-connection
+func (buf *Buffer) ChangeConn(conn net.Conn) {
+	buf._lock.Lock()
+	defer buf._lock.Unlock()
+	buf.conn = conn
+}
+
+//---------------------------------------------------------packet sender goroutine
 func (buf *Buffer) Start() {
-	go buf.retransit()
-	go buf.sender()
+	for {
+		pkt := <-buf.Pending
+		buf.raw_send(pkt)
+		buf.Sent <- pkt
+	}
 }
 
 //---------------------------------------------------------retransit
 func (buf *Buffer) retransit() {
 	Sent2 := make(chan _RawPacket, 128)
 
+	// retrieve all 'sent' packet & send again
 	for {
 		select {
 		case pkt := <-buf.Sent:
-			buf.send(pkt)
+			buf.raw_send(pkt)
 			Sent2 <- pkt
 		default:
 			break;
 		}
 	}
 
-	buf.Sent = Sent2
-}
-
-//---------------------------------------------------------packet sender
-func (buf *Buffer) sender() {
+	// push back into 'sent' channel
 	for {
-		pkt := <-buf.Pending
-		buf.send(pkt)
-		buf.Sent <- pkt
+		select {
+		case pkt := <-Sent2:
+			buf.Sent <- pkt
+		default:
+			break;
+		}
 	}
 }
 
-func (buf *Buffer) send(pkt _RawPacket) error {
-	writer := packet.PacketWriter()
-	writer.WriteU16(uint16(len(pkt.Data)+8))
-	writer.WriteU32(pkt.SeqId)
-	writer.WriteU32(buf.ackMax)
+func (buf *Buffer) raw_send(pkt _RawPacket) error {
+	headwriter:= packet.PacketWriter()
+	headwriter.WriteU16(uint16(len(pkt.Data)+8))
+	headwriter.WriteU32(pkt.SeqId)
+	headwriter.WriteU32(buf.ackMax)
 
-	_, err := buf.conn.Write(writer.Data())
+	buf._lock.Lock()
+	defer buf._lock.Unlock()
+	_, err := buf.conn.Write(headwriter.Data())
 	if err != nil {
 		log.Println("Error send reply header:", err.Error())
 		return err
@@ -100,7 +112,7 @@ func (buf *Buffer) send(pkt _RawPacket) error {
 }
 
 func NewBuffer(conn net.Conn) *Buffer {
-	buf := Buffer{conn:conn,num_packet:0, seqMax:0}
+	buf := Buffer{conn:conn, seqMax:0}
 	buf.Pending = make(chan _RawPacket, 128)
 	buf.Sent = make(chan _RawPacket, 128)
 	return &buf
