@@ -16,6 +16,11 @@ func TestDos(t *testing.T) {
 		t.Error("dynamic order stat failed")
 	}
 
+	_,rank := tree.Score(99)
+	if rank != 1 {
+		t.Error("get by score failed")
+	}
+
 	// delete 50 elements
 	fmt.Println("delete 50 elements")
 	for i := 1; i <= 50; i++ {

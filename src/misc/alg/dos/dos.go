@@ -60,6 +60,30 @@ func (t *Tree) Rank(rank int) *node {
 	return lookup_node(t.root, rank)
 }
 
+func (t *Tree) Score(score int) (n* node, rank int) {
+	n = t.root
+
+	if n==nil {
+		return
+	}
+
+	rank = _nodesize(n.left) + 1
+
+	for n!= nil {
+		if score == n.score {
+			return
+		} else if score > n.score {
+			rank = _nodesize(n.left) + 1
+			n = n.left
+		} else {
+			rank = _nodesize(n.left)+1
+			n = n.right
+		}
+	}
+
+	return
+}
+
 func (t *Tree) Insert(score int, data interface{}) {
 	inserted_node := new_node(score, data, RED, nil, nil)
 	if t.root == nil {

@@ -18,14 +18,17 @@ func AddUser(id, score int) {
 	_ranklist.Insert(score, id)
 }
 
-//--------------------------------------------------------- delete user on rank list
-func DeleteUser(rank int) {
+//--------------------------------------------------------- find user on rank list
+func FindUser(id int) (rank int){
 	_lock.Lock()
 	defer _lock.Unlock()
 
 	n := _ranklist.Get(rank)
 	_ranklist.DeleteNode(n)
 }
+
+//--------------------------------------------------------- find user on rank list
+
 
 //--------------------------------------------------------- get users from ranklist in [from, to] 
 func GetRank(from, to, int) []int {
