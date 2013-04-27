@@ -2,6 +2,7 @@ package ranklist
 
 import (
 	"sync"
+	"sync/atomic"
 	"errors"
 )
 
@@ -12,11 +13,22 @@ import (
 var _ranklist dos.Tree
 var _lock sync.RWMutex
 
+var _count int32
+
+func Increase() int32 {
+	return atomic.AddInt32(&_count, 1)
+}
+
+func Decrease() int32 {
+	return atomic.AddInt32(&_count, -1)
+}
+
 //--------------------------------------------------------- add a user to rank list
 func AddUser(id, score int) {
 	_lock.Lock()
 	defer _lock.Unlock()
 	_ranklist.Insert(score, id)
+	Increase()
 }
 
 //--------------------------------------------------------- change score of user

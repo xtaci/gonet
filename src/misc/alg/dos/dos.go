@@ -70,6 +70,15 @@ func (t *Tree) Rank(rank int) *Node {
 	return lookup_node(t.root, rank)
 }
 
+//--------------------------------------------------------- Lookup by Rank
+func (t *Tree) Count(rank int) int {
+	if t.root != nil {
+		return t.root.size
+	}
+
+	return 0
+}
+
 //--------------------------------------------------------- Lookup by score
 func (t *Tree) Score(score int) (n *Node, rank int) {
 	n = t.root

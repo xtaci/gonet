@@ -3,12 +3,10 @@ DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` char(20) DEFAULT NULL,
-  `password` char(40) DEFAULT NULL,
   `mac`   char(11) DEFAULT NULL,
   `score` int(11) DEFAULT '0',
-  `rank`  int(11) DEFAULT '0',
-  `last_sync` datetime DEFAULT NULL,
-  `shield_until` datetime DEFAULT NULL,
+  `last_save_time` datetime DEFAULT NULL,
+  `protect_time` datetime DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uc_name` (`name`)

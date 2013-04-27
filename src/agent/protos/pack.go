@@ -3,8 +3,7 @@ package protos
 import "misc/packet"
 import "reflect"
 
-func pack(tbl interface{}) []byte {
-	writer := packet.PacketWriter()
+func pack(tbl interface{}, writer *packet.Packet) []byte {
 	v := reflect.ValueOf(tbl).Elem()
 	key := v.Type()
 	count := key.NumField()
@@ -39,6 +38,12 @@ func pack(tbl interface{}) []byte {
 
 			case "string":
 				writer.WriteString(f.Interface().(string))
+
+			case "slice", "array":
+				writer.WriteU16(uint16(f.Len()))
+				for a:=0; a< f.Len();a++ {
+					pack(f.Index(a).Interface(), writer)
+				}
 			}
 		}
 	}

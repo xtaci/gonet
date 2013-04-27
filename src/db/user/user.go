@@ -1,9 +1,14 @@
 package user
 
-import . "db"
-import . "types"
-import "strings"
-import "fmt"
+import (
+	. "db"
+	. "types"
+)
+
+import (
+	"strings"
+	"fmt"
+)
 
 func Flush(ud *User) {
 	fields, values := SQL_dump(ud)
@@ -54,14 +59,14 @@ func LoginMAC(mac string, ud *User) bool {
 
 func New(ud *User) bool {
 	fields, values := SQL_dump(ud, "id")
-	stmt := []string{"INSERT INTO cities(", strings.Join(fields, ","),
+	stmt := []string{"INSERT INTO users(", strings.Join(fields, ","),
 		") VALUES (", strings.Join(values, ","), ")"}
 
 	db := <-DBCH
 	defer func() { DBCH <- db }()
 	_, res, err := db.Query(strings.Join(stmt, " "))
 	NoticeErr(err)
-	ud.Id = int(res.InsertId())
+	ud.Id = int32(res.InsertId())
 
 	if err == nil {
 		return true
