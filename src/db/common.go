@@ -13,3 +13,12 @@ func CheckErr(err error) {
 		panic("error occured in database module")
 	}
 }
+
+func NoticeErr(err error) {
+	if err != nil {
+		funcName, file, line, ok := runtime.Caller(1)
+		if ok {
+			log.Printf("NOTICE:%v,[func:%v,file:%v,line:%v]\n", err, runtime.FuncForPC(funcName).Name(), file, line)
+		}
+	}
+}

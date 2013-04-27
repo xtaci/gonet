@@ -2,19 +2,13 @@ package types
 
 import "time"
 
-const (
-	FREE = iota
-	ONLINE
-	RAID // being raid
-)
+
 
 type User struct {
-	Id          int
+	Id          int32
 	Name        string
-	Status      int
-	Score		int
-	Rank		int
-	LastSync	time.Time
-	ShieldUntil time.Time
-	CreatedAt   time.Time
+	Mac			string
+	Score		int32
+	LastSaveTime	time.Time
+	ProtectTime	time.Time
 }

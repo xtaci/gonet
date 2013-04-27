@@ -2,31 +2,30 @@ package names
 
 import "sync"
 
-var names map[int]chan string
+var names map[int32]chan interface{}
 var _lock sync.RWMutex
 
-func Register(ch chan string, id int) {
+func Register(ch chan interface{}, id int32) {
+	defer _lock.Unlock()
 	_lock.Lock()
+
 	names[id] = ch
-	_lock.Unlock()
 }
 
-func Unregister(id int) {
+func Unregister(id int32) {
+	defer _lock.Unlock()
 	_lock.Lock()
+
 	delete(names, id)
-	_lock.Unlock()
 }
 
-func Query(id int) chan string {
-	var ch chan string
-
+func Query(id int32) chan interface{} {
+	defer _lock.RUnlock()
 	_lock.RLock()
-	ch = names[id]
-	_lock.RUnlock()
 
-	return ch
+	return names[id]
 }
 
 func init() {
-	names = make(map[int]chan string)
+	names = make(map[int32]chan interface{})
 }

@@ -110,7 +110,7 @@ func (buf *Buffer) retransit() {
 }
 
 func (buf *Buffer) raw_send(pkt *_RawPacket) error {
-	headwriter := packet.PacketWriter()
+	headwriter := packet.Writer()
 	headwriter.WriteU16(uint16(len(pkt.data) + 8))
 	headwriter.WriteU32(pkt.seq_id)
 	headwriter.WriteU32(atomic.LoadUint32(&buf.ack_max))

@@ -12,8 +12,18 @@ func TestDos(t *testing.T) {
 
 	print_helper(tree.Root(), 0)
 
-	if tree.Rank(1).DATA.(int) != 1 {
+	if tree.Rank(1).Data().(int) != 1 {
 		t.Error("dynamic order stat failed")
+	}
+
+	for i := 0; i < 100; i++ {
+		node,rank := tree.Score(100-i)
+		fmt.Printf("score %v, rank %v, node %v\n", 100-i, rank, node)
+	}
+
+	_,rank := tree.Score(97)
+	if rank != 3 {
+		t.Error("get by score failed %v", rank)
 	}
 
 	// delete 50 elements
@@ -34,7 +44,7 @@ func TestDos(t *testing.T) {
 
 	print_helper(tree.Root(), 0)
 
-	if tree.Rank(1).DATA.(int) != 2100 {
+	if tree.Rank(1).Data().(int) != 2100 {
 		t.Error("dynamic order stat failed")
 	}
 
@@ -42,7 +52,7 @@ func TestDos(t *testing.T) {
 
 const INDENT_STEP = 4
 
-func print_helper(n *node, indent int) {
+func print_helper(n *Node, indent int) {
 	if n == nil {
 		fmt.Printf("<empty tree>")
 		return

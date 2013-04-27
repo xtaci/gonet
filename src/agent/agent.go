@@ -11,8 +11,6 @@ import (
 
 import (
 	"cfg"
-	"db/city"
-	"db/user"
 	"hub/names"
 	. "types"
 )
@@ -35,20 +33,6 @@ func send(conn net.Conn, p []byte) error {
 	return nil
 }
 
-func timer_work(sess *Session) {
-	defer func() {
-		if x := recover(); x != nil {
-			log.Printf("run time panic when flushing database: %v", x)
-		}
-	}()
-
-	if sess.User.Id != 0 {
-		user.Flush(&sess.User)
-		for i := range sess.Cities {
-			city.Flush(&sess.Cities[i])
-		}
-	}
-}
 
 func _timer(interval int, ch chan string) {
 	defer func() {
@@ -63,16 +47,28 @@ func _timer(interval int, ch chan string) {
 
 func StartAgent(in chan []byte, conn net.Conn) {
 	var sess Session
-	sess.MQ = make(chan string, 128)
-	timer_ch := make(chan string)
+	sess.MQ = make(chan interface{}, 128)
 
-	flush_interval := 300 // sec
 	config := cfg.Get()
+
+	// db flush timer
+	timer_ch_db := make(chan string)
+	flush_interval := 300 // sec
 	if config["flush_interval"] != "" {
 		flush_interval, _ = strconv.Atoi(config["flush_interval"])
 	}
 
-	go _timer(flush_interval, timer_ch)
+	go _timer(flush_interval, timer_ch_db)
+
+	// session timeout
+	timer_ch_session := make(chan string)
+	session_timeout := 30 // sec
+	if config["session_timeout"] != "" {
+		session_timeout, _ = strconv.Atoi(config["session_timeout"])
+	}
+
+	go _timer(session_timeout, timer_ch_session)
+
 L:
 	for {
 		select {
@@ -94,20 +90,25 @@ L:
 				break L
 			}
 
-			result := ExecSrv(&sess, msg)
-
-			if result != "" {
+			if result := ExecSrv(&sess, msg); result != nil{
+				fmt.Println(result)
 				err := send(conn, []byte(result))
 				if err != nil {
 					break L
 				}
 			}
-		case _ = <-timer_ch:
-			timer_work(&sess)
+		case _ = <-timer_ch_db:
+			db_work(&sess)
+		case _ = <-timer_ch_session:
+			if session_work(&sess,session_timeout) {
+				db_work(&sess)
+				conn.Close()
+			}
 		}
 	}
 
 	// cleanup
 	names.Unregister(sess.User.Id)
-	close(timer_ch)
+	close(timer_ch_db)
+	close(timer_ch_session)
 }

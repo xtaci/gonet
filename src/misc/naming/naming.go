@@ -1,4 +1,4 @@
-package db
+package naming
 
 import "regexp"
 import "strings"

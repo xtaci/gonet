@@ -1,9 +1,14 @@
 package user
 
-import . "db"
-import . "types"
-import "strings"
-import "fmt"
+import (
+	. "db"
+	. "types"
+)
+
+import (
+	"strings"
+	"fmt"
+)
 
 func Flush(ud *User) {
 	fields, values := SQL_dump(ud)
@@ -32,5 +37,39 @@ func Login(name string, password string, ud *User) bool {
 		return true
 	}
 
+	return false
+}
+
+func LoginMAC(mac string, ud *User) bool {
+	stmt := "SELECT * FROM users where mac='%v'"
+
+	db := <-DBCH
+	defer func() { DBCH <- db }()
+	rows, res, err := db.Query(stmt, mac)
+
+	CheckErr(err)
+
+	if len(rows) > 0 {
+		SQL_load(ud, &rows[0], res)
+		return true
+	}
+
+	return false
+}
+
+func New(ud *User) bool {
+	fields, values := SQL_dump(ud, "id")
+	stmt := []string{"INSERT INTO users(", strings.Join(fields, ","),
+		") VALUES (", strings.Join(values, ","), ")"}
+
+	db := <-DBCH
+	defer func() { DBCH <- db }()
+	_, res, err := db.Query(strings.Join(stmt, " "))
+	NoticeErr(err)
+	ud.Id = int32(res.InsertId())
+
+	if err == nil {
+		return true
+	}
 	return false
 }
