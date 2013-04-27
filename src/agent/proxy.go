@@ -1,8 +1,7 @@
 package agent
 
-import "strings"
 import . "types"
-import srv "agent/srv"
+import "agent/ipc"
 import "agent/protos"
 import "log"
 import "misc/packet"
@@ -36,14 +35,18 @@ func ExecCli(sess *Session, p []byte) []byte {
 	return nil
 }
 
-func ExecSrv(sess *Session, msg string) string {
-	params := strings.SplitN(msg, " ", 2)
-	switch params[0] {
-	case "MESG":
-		return srv.Mesg(&sess.User, params[1])
-	case "ATTACKED":
-		return srv.Attacked(&sess.User, params[1])
+func ExecSrv(sess *Session, p interface{}) []byte {
+	defer func() {
+		if x := recover(); x != nil {
+			log.Printf("run time panic when processing IPC request: %v", x)
+		}
+	}()
+
+	msg := p.(ipc.RequestType)
+
+	switch msg.Code {
+	case ipc.USERINFO_REQUEST:
 	}
 
-	return ""
+	return nil
 }

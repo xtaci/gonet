@@ -47,7 +47,7 @@ func _timer(interval int, ch chan string) {
 
 func StartAgent(in chan []byte, conn net.Conn) {
 	var sess Session
-	sess.MQ = make(chan string, 128)
+	sess.MQ = make(chan interface{}, 128)
 
 	config := cfg.Get()
 
@@ -90,9 +90,8 @@ L:
 				break L
 			}
 
-			result := ExecSrv(&sess, msg)
-
-			if result != "" {
+			if result := ExecSrv(&sess, msg); result != nil{
+				fmt.Println(result)
 				err := send(conn, []byte(result))
 				if err != nil {
 					break L

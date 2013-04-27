@@ -9,7 +9,7 @@ const (
 )
 
 type Session struct {
-	MQ     chan string
+	MQ     chan interface{}
 	User   User
 	Cities []City
 
