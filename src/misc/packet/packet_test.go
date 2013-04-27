@@ -3,7 +3,7 @@ package packet
 import "testing"
 
 func TestPacketWriter(t *testing.T) {
-	p := PacketWriter()
+	p := Writer()
 	a := byte(0xFF)
 	b := uint16(0xFF00)
 	c := uint32(0xFF0000)
@@ -18,7 +18,7 @@ func TestPacketWriter(t *testing.T) {
 
 	p.WriteString("hello world")
 
-	reader := PacketReader(p.Data())
+	reader := Reader(p.Data())
 
 	tmp, _ := reader.ReadByte()
 	if a != tmp {

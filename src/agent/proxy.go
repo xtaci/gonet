@@ -14,7 +14,7 @@ func ExecCli(sess *Session, p []byte) []byte {
 		}
 	}()
 
-	reader := packet.PacketReader(p)
+	reader := packet.Reader(p)
 
 	b, err := reader.ReadU16()
 

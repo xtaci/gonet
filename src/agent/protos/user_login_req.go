@@ -16,7 +16,7 @@ import (
 func _user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err error) {
 
 	tbl,_ := pktread_user_login_info(reader)
-	writer := packet.PacketWriter()
+	writer := packet.Writer()
 	failed := command_result_pack{rst:0}
 
 	config := cfg.Get()
