@@ -24,7 +24,7 @@ func Decrease() int32 {
 }
 
 //--------------------------------------------------------- add a user to rank list
-func AddUser(id, score int) {
+func AddUser(id int32, score int) {
 	_lock.Lock()
 	defer _lock.Unlock()
 	_ranklist.Insert(score, id)
@@ -32,11 +32,11 @@ func AddUser(id, score int) {
 }
 
 //--------------------------------------------------------- change score of user
-func ChangeScore(id, oldscore, newscore int) (err error){
+func ChangeScore(id int32, oldscore, newscore int) (err error){
 	_lock.Lock()
 	defer _lock.Unlock()
 
-	var idlist []int
+	var idlist []int32
 	defer func() {
 		for i := range idlist {
 			AddUser(idlist[i], oldscore)
@@ -51,14 +51,14 @@ func ChangeScore(id, oldscore, newscore int) (err error){
 			return
 		}
 
-		if n.Data().(int) == id {
+		if n.Data().(int32) == id {
 			_ranklist.DeleteNode(n)
 			_ranklist.Insert(newscore,id)
 			return
 		} else {
 			// temporary delete 
 			_ranklist.DeleteNode(n)
-			idlist = append(idlist, n.Data().(int))
+			idlist = append(idlist, n.Data().(int32))
 		}
 	}
 
@@ -66,11 +66,11 @@ func ChangeScore(id, oldscore, newscore int) (err error){
 }
 
 //--------------------------------------------------------- find user rank
-func Find(id, score int) (rank int, err error){
+func Find(id int32, score int) (rank int, err error){
 	_lock.Lock()
 	defer _lock.Unlock()
 
-	var idlist []int
+	var idlist []int32
 	defer func() {
 		for i := range idlist {
 			AddUser(idlist[i], score)
@@ -86,7 +86,7 @@ func Find(id, score int) (rank int, err error){
 		}
 
 		_ranklist.DeleteNode(n)
-		if n.Data().(int) == id {
+		if n.Data().(int32) == id {
 			rank = r
 			return
 		}
@@ -95,16 +95,22 @@ func Find(id, score int) (rank int, err error){
 	return
 }
 
+func Count() int {
+	_lock.RLock()
+	defer _lock.RUnlock()
+	return _ranklist.Count()
+}
+
 
 //--------------------------------------------------------- get users from ranklist in [from, to] 
-func GetRankList(from, to int) []int {
-	sublist := make([]int, to-from+1)
+func GetRankList(from, to int) []int32 {
+	sublist := make([]int32, to-from+1)
 
 	_lock.RLock()
 	defer _lock.RUnlock()
 
 	for i:=from;i<=to;i++ {
-		sublist[i-from] = _ranklist.Rank(i).Data().(int)
+		sublist[i-from] = _ranklist.Rank(i).Data().(int32)
 	}
 
 	return sublist

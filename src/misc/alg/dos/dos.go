@@ -71,7 +71,7 @@ func (t *Tree) Rank(rank int) *Node {
 }
 
 //--------------------------------------------------------- Lookup by Rank
-func (t *Tree) Count(rank int) int {
+func (t *Tree) Count() int {
 	if t.root != nil {
 		return t.root.size
 	}

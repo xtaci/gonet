@@ -37,7 +37,7 @@ type rank_list_item struct {
 }
 
 type rank_list struct {
-	items []*rank_list_item
+	items []rank_list_item
 }
 
 type pve_list_item struct {
@@ -49,7 +49,7 @@ type pve_list_item struct {
 }
 
 type pve_list struct {
-	items []*pve_list_item
+	items []pve_list_item
 }
 
 type command_id_pack struct {
@@ -65,8 +65,7 @@ type atk_monster_rst_req struct {
 	protect_time int32
 }
 
-func pktread_user_login_info(reader *packet.Packet)(tbl *user_login_info, err error){
-	tbl = &user_login_info{}
+func pktread_user_login_info(reader *packet.Packet)(tbl user_login_info, err error){
 	tbl.mac_addr,err = reader.ReadString()
 	tbl.client_version,err = reader.ReadS32()
 	checkErr(err)
@@ -76,8 +75,7 @@ func pktread_user_login_info(reader *packet.Packet)(tbl *user_login_info, err er
 	return
 }
 
-func pktread_user_snapshot(reader *packet.Packet)(tbl *user_snapshot, err error){
-	tbl = &user_snapshot{}
+func pktread_user_snapshot(reader *packet.Packet)(tbl user_snapshot, err error){
 	tbl.id,err = reader.ReadS32()
 	checkErr(err)
 	tbl.name,err = reader.ReadString()
@@ -93,23 +91,20 @@ func pktread_user_snapshot(reader *packet.Packet)(tbl *user_snapshot, err error)
 	return
 }
 
-func pktread_command_result_pack(reader *packet.Packet)(tbl *command_result_pack, err error){
-	tbl = &command_result_pack{}
+func pktread_command_result_pack(reader *packet.Packet)(tbl command_result_pack, err error){
 	tbl.rst,err = reader.ReadS32()
 	checkErr(err)
 	return
 }
 
-func pktread_user_archives_info(reader *packet.Packet)(tbl *user_archives_info, err error){
-	tbl = &user_archives_info{}
+func pktread_user_archives_info(reader *packet.Packet)(tbl user_archives_info, err error){
 	tbl.id,err = reader.ReadS32()
 	checkErr(err)
 	tbl.archives,err = reader.ReadString()
 	return
 }
 
-func pktread_rank_list_item(reader *packet.Packet)(tbl *rank_list_item, err error){
-	tbl = &rank_list_item{}
+func pktread_rank_list_item(reader *packet.Packet)(tbl rank_list_item, err error){
 	tbl.id,err = reader.ReadS32()
 	checkErr(err)
 	tbl.name,err = reader.ReadString()
@@ -122,19 +117,17 @@ func pktread_rank_list_item(reader *packet.Packet)(tbl *rank_list_item, err erro
 	return
 }
 
-func pktread_rank_list(reader *packet.Packet)(tbl *rank_list, err error){
-	tbl = &rank_list{}
+func pktread_rank_list(reader *packet.Packet)(tbl rank_list, err error){
 	narr,err2 := reader.ReadU16()
 	checkErr(err2)
-	tbl.items=make([]*rank_list_item,narr)
+	tbl.items=make([]rank_list_item,narr)
 	for i:=0;i<int(narr);i++ {
 		tbl.items[i], err = pktread_rank_list_item(reader)
 	}
 	return
 }
 
-func pktread_pve_list_item(reader *packet.Packet)(tbl *pve_list_item, err error){
-	tbl = &pve_list_item{}
+func pktread_pve_list_item(reader *packet.Packet)(tbl pve_list_item, err error){
 	tbl.id,err = reader.ReadS32()
 	checkErr(err)
 	tbl.name,err = reader.ReadString()
@@ -147,26 +140,23 @@ func pktread_pve_list_item(reader *packet.Packet)(tbl *pve_list_item, err error)
 	return
 }
 
-func pktread_pve_list(reader *packet.Packet)(tbl *pve_list, err error){
-	tbl = &pve_list{}
+func pktread_pve_list(reader *packet.Packet)(tbl pve_list, err error){
 	narr,err2 := reader.ReadU16()
 	checkErr(err2)
-	tbl.items=make([]*pve_list_item,narr)
+	tbl.items=make([]pve_list_item,narr)
 	for i:=0;i<int(narr);i++ {
 		tbl.items[i], err = pktread_pve_list_item(reader)
 	}
 	return
 }
 
-func pktread_command_id_pack(reader *packet.Packet)(tbl *command_id_pack, err error){
-	tbl = &command_id_pack{}
+func pktread_command_id_pack(reader *packet.Packet)(tbl command_id_pack, err error){
 	tbl.id,err = reader.ReadS32()
 	checkErr(err)
 	return
 }
 
-func pktread_atk_player_rst_req(reader *packet.Packet)(tbl *atk_player_rst_req, err error){
-	tbl = &atk_player_rst_req{}
+func pktread_atk_player_rst_req(reader *packet.Packet)(tbl atk_player_rst_req, err error){
 	tbl.rst,err = reader.ReadS32()
 	checkErr(err)
 	tbl.protect_time,err = reader.ReadS32()
@@ -174,8 +164,7 @@ func pktread_atk_player_rst_req(reader *packet.Packet)(tbl *atk_player_rst_req, 
 	return
 }
 
-func pktread_atk_monster_rst_req(reader *packet.Packet)(tbl *atk_monster_rst_req, err error){
-	tbl = &atk_monster_rst_req{}
+func pktread_atk_monster_rst_req(reader *packet.Packet)(tbl atk_monster_rst_req, err error){
 	tbl.protect_time,err = reader.ReadS32()
 	checkErr(err)
 	return
