@@ -6,22 +6,22 @@ import (
 )
 
 import (
-	. "types"
-	"misc/packet"
+	"cfg"
+	"db/user_tbl"
 	"hub/names"
 	"hub/ranklist"
-	"db/user_tbl"
-	"cfg"
+	"misc/packet"
+	. "types"
 )
 
 func _user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err error) {
 
-	tbl,_ := pktread_user_login_info(reader)
+	tbl, _ := pktread_user_login_info(reader)
 	writer := packet.Writer()
-	failed := command_result_pack{F_rst:0}
+	failed := command_result_pack{F_rst: 0}
 
 	config := cfg.Get()
-	version, _ :=  strconv.Atoi(config["version"])
+	version, _ := strconv.Atoi(config["version"])
 
 	if tbl.F_client_version != int32(version) {
 		ret = pack(Code["user_login_faild_ack"], failed, writer)
@@ -61,7 +61,7 @@ func _user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err erro
 		}
 	}
 
-	return nil,nil
+	return nil, nil
 }
 
 func _fill_user_snapshot(user *User, snapshot *user_snapshot) {

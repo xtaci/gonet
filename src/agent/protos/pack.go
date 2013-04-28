@@ -10,20 +10,20 @@ func pack(tos uint16, tbl interface{}, writer *packet.Packet) []byte {
 	count := v.NumField()
 
 	// write code
-	if (tos != 65535) {
+	if tos != 65535 {
 		writer.WriteU16(tos)
 	}
 
 	for i := 0; i < count; i++ {
 		f := v.Field(i)
-		if (_is_primitive(f)){
+		if _is_primitive(f) {
 			_write_primitive(f, writer)
 		} else {
 			switch f.Type().Kind() {
 			case reflect.Slice, reflect.Array:
 				writer.WriteU16(uint16(f.Len()))
-				for a:=0; a<f.Len();a++ {
-					if (_is_primitive(f.Index(a))) {
+				for a := 0; a < f.Len(); a++ {
+					if _is_primitive(f.Index(a)) {
 						_write_primitive(f.Index(a), writer)
 					} else {
 						elem := f.Index(a).Interface()

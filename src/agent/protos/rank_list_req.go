@@ -5,12 +5,12 @@ import (
 )
 
 import (
-	. "types"
-	"misc/packet"
 	"agent/ipc"
-	"hub/ranklist"
-	"fmt"
 	"db/user_tbl"
+	"fmt"
+	"hub/ranklist"
+	"misc/packet"
+	. "types"
 )
 
 func _rank_list_req(sess *Session, reader *packet.Packet) (ret []byte, err error) {
@@ -18,12 +18,12 @@ func _rank_list_req(sess *Session, reader *packet.Packet) (ret []byte, err error
 	out := rank_list{}
 	out.F_items = make([]rank_list_item, len(list))
 
-	for i:=0;i<len(list);i++ {
+	for i := 0; i < len(list); i++ {
 		var user User
 
 		// first acquire data by call
 		// if failed , read in database
-		result, err := ipc.Call(list[i], ipc.USERINFO_REQUEST,nil)
+		result, err := ipc.Call(list[i], ipc.USERINFO_REQUEST, nil)
 		if err != nil {
 			user, err = user_tbl.Read(list[i])
 			if err != nil {
@@ -40,7 +40,7 @@ func _rank_list_req(sess *Session, reader *packet.Packet) (ret []byte, err error
 		out.F_items[i].F_state = int32(user.State)
 
 		t := int32(user.ProtectTime.Unix() - time.Now().Unix())
-		if t >0 {
+		if t > 0 {
 			out.F_items[i].F_protect_time = t
 		} else {
 			out.F_items[i].F_protect_time = 0

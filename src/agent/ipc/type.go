@@ -1,9 +1,9 @@
 package ipc
 
 import (
-	. "types"
-	"hub/names"
 	"errors"
+	"hub/names"
+	. "types"
 )
 
 const (
@@ -12,18 +12,18 @@ const (
 )
 
 type RequestType struct {
-	Code int16			// tos
-	CH chan interface{} // service-oriented data channel
+	Code   int16            // tos
+	CH     chan interface{} // service-oriented data channel
 	Params interface{}
 }
 
-var RequestHandler map[int16]func(*Session, interface{}) (interface{}) = map[int16]func(*Session, interface{})(interface{}){
-	USERINFO_REQUEST:userinfo_request,
+var RequestHandler map[int16]func(*Session, interface{}) interface{} = map[int16]func(*Session, interface{}) interface{}{
+	USERINFO_REQUEST: userinfo_request,
 }
 
 func Call(id int32, tos int16, params interface{}) (ret interface{}, err error) {
-	if peer := names.Query(id);peer!=nil {
-		req := &RequestType{Code:tos}
+	if peer := names.Query(id); peer != nil {
+		req := &RequestType{Code: tos}
 		req.CH = make(chan interface{}, 1)
 		req.Params = params
 		peer <- req
