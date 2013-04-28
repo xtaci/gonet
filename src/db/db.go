@@ -1,14 +1,14 @@
 package db
 
 import (
-	"strconv"
 	"log"
+	"strconv"
 )
 
 import (
+	"cfg"
 	"github.com/ziutek/mymysql/mysql"
 	_ "github.com/ziutek/mymysql/native" // Native engine
-	"cfg"
 )
 
 const (

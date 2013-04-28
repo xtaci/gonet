@@ -83,19 +83,19 @@ func (t *Tree) Count() int {
 func (t *Tree) Score(score int) (n *Node, rank int) {
 	n = t.root
 
-	if n==nil {
+	if n == nil {
 		return
 	}
 
 	rank = 0
-	for n!= nil {
+	for n != nil {
 		if score == n.score {
-			rank+= _nodesize(n.left)+1
+			rank += _nodesize(n.left) + 1
 			return
 		} else if score > n.score {
 			n = n.left
 		} else {
-			rank += _nodesize(n.left)+1
+			rank += _nodesize(n.left) + 1
 			n = n.right
 		}
 	}

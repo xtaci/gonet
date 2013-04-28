@@ -9,13 +9,13 @@ const (
 )
 
 type User struct {
-	Id          int32
-	Name        string
-	Mac			string
-	Score		int32
-	State		int
-	Archives	string
-	LastSaveTime	time.Time
-	ProtectTime	time.Time
-	CreatedAt	time.Time
+	Id           int32
+	Name         string
+	Mac          string
+	Score        int32
+	State        int
+	Archives     string
+	LastSaveTime time.Time
+	ProtectTime  time.Time
+	CreatedAt    time.Time
 }

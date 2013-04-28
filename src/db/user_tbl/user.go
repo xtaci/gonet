@@ -6,9 +6,9 @@ import (
 )
 
 import (
-	"strings"
-	"fmt"
 	"errors"
+	"fmt"
+	"strings"
 )
 
 func Sync(ud *User) {
@@ -81,7 +81,6 @@ func New(ud *User) (ret bool) {
 	return false
 }
 
-
 func Read(id int32) (ud User, err error) {
 	stmt := "SELECT * FROM users where id ='%v'"
 
@@ -96,6 +95,6 @@ func Read(id int32) (ud User, err error) {
 		return
 	}
 
-	err = errors.New(fmt.Sprint("cannot find user with id:%v" , id))
+	err = errors.New(fmt.Sprint("cannot find user with id:%v", id))
 	return
 }

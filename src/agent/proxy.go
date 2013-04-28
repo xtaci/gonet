@@ -1,16 +1,16 @@
 package agent
 
 import (
-	. "types"
 	"agent/ipc"
 	"agent/protos"
 	"misc/packet"
+	. "types"
 )
 
 import (
+	"fmt"
 	"log"
 	"runtime"
-	"fmt"
 )
 
 func UserRequestProxy(sess *Session, p []byte) []byte {
@@ -42,7 +42,7 @@ func IPCRequestProxy(sess *Session, p interface{}) []byte {
 
 	msg := p.(ipc.RequestType)
 	handle := ipc.RequestHandler[msg.Code]
-	if handle !=nil {
+	if handle != nil {
 		msg.CH <- handle(sess, msg.Params)
 	}
 
@@ -52,7 +52,7 @@ func IPCRequestProxy(sess *Session, p interface{}) []byte {
 func _ProxyError() {
 	if x := recover(); x != nil {
 		log.Printf("run time panic when processing user request: %v", x)
-		for i:=0;i<10;i++ {
+		for i := 0; i < 10; i++ {
 			funcName, file, line, ok := runtime.Caller(i)
 			if ok {
 				log.Printf("frame %v:[func:%v,file:%v,line:%v]\n", i, runtime.FuncForPC(funcName).Name(), file, line)

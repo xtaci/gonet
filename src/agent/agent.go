@@ -33,7 +33,6 @@ func send(conn net.Conn, p []byte) error {
 	return nil
 }
 
-
 func _timer(interval int, ch chan string) {
 	defer func() {
 		recover()
@@ -88,7 +87,7 @@ func StartAgent(in chan []byte, conn net.Conn) {
 				return
 			}
 
-			if result := IPCRequestProxy(&sess, msg); result != nil{
+			if result := IPCRequestProxy(&sess, msg); result != nil {
 				fmt.Println(result)
 				err := send(conn, []byte(result))
 				if err != nil {
@@ -107,7 +106,7 @@ func StartAgent(in chan []byte, conn net.Conn) {
 			}
 
 		case _ = <-timer_ch_session:
-			if session_work(&sess,session_timeout) {
+			if session_work(&sess, session_timeout) {
 				conn.Close()
 				return
 			}
