@@ -10,16 +10,15 @@ import (
 import (
 	"log"
 	"runtime"
+	"fmt"
 )
 
 func UserRequestProxy(sess *Session, p []byte) []byte {
 	defer _ProxyError()
 
 	reader := packet.Reader(p)
-
 	b, err := reader.ReadU16()
 
-	println(b)
 	if err != nil {
 		log.Println("read protocol error")
 	}
@@ -27,7 +26,7 @@ func UserRequestProxy(sess *Session, p []byte) []byte {
 	handle := protos.ProtoHandler[b]
 	if handle != nil {
 		ret, err := handle(sess, reader)
-
+		fmt.Println(ret)
 		if err == nil {
 			return ret
 		}

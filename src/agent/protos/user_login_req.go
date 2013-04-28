@@ -24,7 +24,7 @@ func _user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err erro
 	version, _ :=  strconv.Atoi(config["version"])
 
 	if tbl.F_client_version != int32(version) {
-		ret = pack(failed, writer)
+		ret = pack(Code["user_login_faild_ack"], failed, writer)
 		return
 	}
 
@@ -32,13 +32,11 @@ func _user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err erro
 		if user_tbl.LoginMAC(sess.User.Mac, &sess.User) {
 			names.Register(sess.MQ, sess.User.Id)
 			success := user_snapshot{}
-			success.F_id = sess.User.Id
-			success.F_name = sess.User.Name
-			success.F_rank = sess.User.Score
-			ret = pack(success, writer)
+			_fill_user_snapshot(&sess.User, &success)
+			ret = pack(Code["user_login_succeed_ack"], success, writer)
 			return
 		} else {
-			ret = pack(failed,writer)
+			ret = pack(Code["user_login_faild_ack"], failed, writer)
 			return
 		}
 	} else {
@@ -53,14 +51,32 @@ func _user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err erro
 		if user_tbl.New(&sess.User) {
 			names.Register(sess.MQ, sess.User.Id)
 			success := user_snapshot{}
-			ret = pack(success,writer)
+			_fill_user_snapshot(&sess.User, &success)
+			ret = pack(Code["user_login_succeed_ack"], success, writer)
 			return
 		} else {
 			ranklist.Decrease()
-			ret = pack(failed,writer)
+			ret = pack(Code["user_login_faild_ack"], failed, writer)
 			return
 		}
 	}
 
 	return nil,nil
 }
+
+func _fill_user_snapshot(user *User, snapshot *user_snapshot) {
+	snapshot.F_id = user.Id
+	snapshot.F_name = user.Name
+	snapshot.F_rank = user.Score
+
+	pt := user.ProtectTime.Unix() - time.Now().Unix()
+	if pt > 0	{
+		snapshot.F_protect_time = int32(pt)
+	} else {
+		snapshot.F_protect_time = 0
+	}
+
+	snapshot.F_last_save_time = int32(user.LastSaveTime.Unix())
+	snapshot.F_server_time = int32(time.Now().Unix())
+}
+

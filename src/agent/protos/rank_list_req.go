@@ -48,5 +48,5 @@ func _rank_list_req(sess *Session, reader *packet.Packet) (ret []byte, err error
 	}
 
 	writer := packet.Writer()
-	return pack(out, writer), nil
+	return pack(Code["rank_list_ack"], out, writer), nil
 }

@@ -20,7 +20,7 @@ print "var Code map[string]uint16 = map[string]uint16 {"
 			desc = a[2]
 		}
 	}
-	if (name != "") {
+	if (name!= "") {
 		print "\t\""name"\":"type",\t// payload:"payload" "desc
 	}
 }

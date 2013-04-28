@@ -5,15 +5,13 @@ import (
 	"reflect"
 )
 
-func pack(tbl interface{}, writer *packet.Packet) []byte {
+func pack(tos uint16, tbl interface{}, writer *packet.Packet) []byte {
 	v := reflect.ValueOf(tbl)
 	count := v.NumField()
 
-	// code test
-	code,ok := Code[reflect.TypeOf(tbl).Name()]
-	if ok {
-		// write code
-		writer.WriteU16(code)
+	// write code
+	if (tos != 65535) {
+		writer.WriteU16(tos)
 	}
 
 	for i := 0; i < count; i++ {
@@ -29,14 +27,14 @@ func pack(tbl interface{}, writer *packet.Packet) []byte {
 						_write_primitive(f.Index(a), writer)
 					} else {
 						elem := f.Index(a).Interface()
-						pack(elem, writer)
+						pack(65535, elem, writer)
 					}
 				}
 			}
 		}
 	}
 
-	return nil
+	return writer.Data()
 }
 
 func _is_primitive(f reflect.Value) bool {
