@@ -16,4 +16,5 @@ type User struct {
 	State		int
 	LastSaveTime	time.Time
 	ProtectTime	time.Time
+	CreatedAt	time.Time
 }

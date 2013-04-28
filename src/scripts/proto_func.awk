@@ -12,22 +12,22 @@ BEGIN { RS = ""; FS ="\n" }
 			print "func pktread_"name"(reader *packet.Packet)(tbl "name", err error){"
 			typeok = "true"
 		} else if (a[2] == "string") {
-			print "\ttbl."a[1]",err = reader.ReadString()"
+			print "\ttbl.F_"a[1]",err = reader.ReadString()"
 		} else if (a[2] == "integer") {
-			print "\ttbl."a[1]",err = reader.ReadS32()"
+			print "\ttbl.F_"a[1]",err = reader.ReadS32()"
 			print "\tcheckErr(err)"
 		} else if (a[2] == "boolean") {
-			print "\ttbl."a[1]",err = reader.ReadByte()"
+			print "\ttbl.F_"a[1]",err = reader.ReadByte()"
 			print "\tcheckErr(err)"
 		} else if (a[2] == "float") {
-			print "\ttbl."a[1]",err = reader.ReadFloat()"
+			print "\ttbl.F_"a[1]",err = reader.ReadFloat()"
 			print "\tcheckErr(err)"
 		} else if (a[2] == "array") {
 			print "\tnarr,err2 := reader.ReadU16()"
 			print "\tcheckErr(err2)"
-			print "\ttbl."a[1]"=make([]"a[3]",narr)"
+			print "\ttbl.F_"a[1]"=make([]"a[3]",narr)"
 			print "\tfor i:=0;i<int(narr);i++ {"
-			print "\t\ttbl."a[1]"[i], err = pktread_"a[3]"(reader)"
+			print "\t\ttbl.F_"a[1]"[i], err = pktread_"a[3]"(reader)"
 			print "\t}"
 		}
 	}

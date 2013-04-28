@@ -1,15 +1,27 @@
 package agent
 
-import . "types"
-import "agent/ipc"
-import "agent/protos"
-import "log"
-import "misc/packet"
+import (
+	. "types"
+	"agent/ipc"
+	"agent/protos"
+	"misc/packet"
+)
+
+import (
+	"log"
+	"runtime"
+)
 
 func UserRequestProxy(sess *Session, p []byte) []byte {
 	defer func() {
 		if x := recover(); x != nil {
 			log.Printf("run time panic when processing user request: %v", x)
+			for i:=0;i<10;i++ {
+				funcName, file, line, ok := runtime.Caller(i)
+				if ok {
+					log.Printf("frame %v:[func:%v,file:%v,line:%v]\n", i, runtime.FuncForPC(funcName).Name(), file, line)
+				}
+			}
 		}
 	}()
 

@@ -15,6 +15,7 @@ type TEST struct {
 	D uint32
 	F []byte
 	Sub []SUB
+	m int
 }
 
 func TestPack(t *testing.T) {

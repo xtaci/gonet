@@ -5,6 +5,7 @@ CREATE TABLE `users` (
   `name` char(20) DEFAULT NULL,
   `mac`   char(11) DEFAULT NULL,
   `score` int(11) DEFAULT '0',
+  `state` int(11) DEFAULT '0',
   `last_save_time` datetime DEFAULT NULL,
   `protect_time` datetime DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,

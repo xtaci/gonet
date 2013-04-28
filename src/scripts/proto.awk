@@ -17,15 +17,15 @@ print "import \"misc/packet\"\n"
 			print "type",name, "struct {"
 			typeok = "true"
 		} else if (a[2] == "string") {
-			print "\t"a[1] " string"
+			print "\tF_"a[1] " string"
 		} else if (a[2] == "integer") {
-			print "\t"a[1] " int32"
+			print "\tF_"a[1] " int32"
 		} else if (a[2] == "boolean") {
-			print "\t"a[1] " byte"
+			print "\tF_"a[1] " byte"
 		} else if (a[2] == "float") {
-			print "\t"a[1] " float32"
+			print "\tF_"a[1] " float32"
 		} else if (a[2] == "array") {
-			print "\t"a[1]" []"a[3]
+			print "\tF_"a[1]" []"a[3]
 		}
 	}
 
