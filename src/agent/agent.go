@@ -48,6 +48,7 @@ func _timer(interval int, ch chan string) {
 func StartAgent(in chan []byte, conn net.Conn) {
 	var sess Session
 	sess.MQ = make(chan interface{}, 128)
+	sess.ServerMQ = make(chan []byte, 128)
 
 	config := cfg.Get()
 
@@ -88,6 +89,17 @@ L:
 					break L
 				}
 			}
+
+		case msg, ok := <-sess.ServerMQ:
+			if !ok {
+				break L
+			}
+
+			err := send(conn, msg)
+			if err != nil {
+				break L
+			}
+
 		case _ = <-timer_ch_session:
 			if session_work(&sess,session_timeout) {
 				conn.Close()
