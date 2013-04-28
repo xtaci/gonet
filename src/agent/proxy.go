@@ -17,6 +17,7 @@ func UserRequestProxy(sess *Session, p []byte) []byte {
 
 	b, err := reader.ReadU16()
 
+	println(b)
 	if err != nil {
 		log.Println("read protocol error")
 	}

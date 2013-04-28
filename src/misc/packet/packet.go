@@ -61,7 +61,7 @@ func (p *Packet) ReadU16() (ret uint16, err error) {
 	}
 
 	buf := p.data[p.pos : p.pos+2]
-	ret = uint16(buf[1])<<8 | uint16(buf[0])
+	ret = uint16(buf[0])<<8 | uint16(buf[1])
 	p.pos += 2
 	return
 }
@@ -80,7 +80,7 @@ func (p *Packet) ReadU24() (ret uint32, err error) {
 	}
 
 	buf := p.data[p.pos : p.pos+3]
-	ret = uint32(buf[2])<<16 | uint32(buf[1])<<8 | uint32(buf[0])
+	ret = uint32(buf[0])<<16 | uint32(buf[1])<<8 | uint32(buf[2])
 	p.pos += 3
 	return
 }
@@ -99,7 +99,7 @@ func (p *Packet) ReadU32() (ret uint32, err error) {
 	}
 
 	buf := p.data[p.pos : p.pos+4]
-	ret = uint32(buf[3])<<24 | uint32(buf[2])<<16 | uint32(buf[1])<<8 | uint32(buf[0])
+	ret = uint32(buf[0])<<24 | uint32(buf[1])<<16 | uint32(buf[2])<<8 | uint32(buf[3])
 	p.pos += 4
 	return
 }
@@ -120,7 +120,7 @@ func (p *Packet) ReadU64() (ret uint64, err error) {
 	ret = 0
 	buf := p.data[p.pos : p.pos+8]
 	for i, v := range buf {
-		ret |= uint64(v) << uint(i*8)
+		ret |= uint64(v) << uint((7-i)*8)
 	}
 	p.pos += 8
 	return
@@ -151,32 +151,32 @@ func (p *Packet) WriteString(v string) {
 
 func (p *Packet) WriteU16(v uint16) {
 	buf := make([]byte, 2)
-	buf[0] = byte(v)
-	buf[1] = byte(v >> 8)
+	buf[0] = byte(v >> 8)
+	buf[1] = byte(v)
 	p.data = append(p.data, buf...)
 }
 
 func (p *Packet) WriteU24(v uint32) {
 	buf := make([]byte, 3)
-	buf[0] = byte(v)
+	buf[0] = byte(v >> 16)
 	buf[1] = byte(v >> 8)
-	buf[2] = byte(v >> 16)
+	buf[2] = byte(v)
 	p.data = append(p.data, buf...)
 }
 
 func (p *Packet) WriteU32(v uint32) {
 	buf := make([]byte, 4)
-	buf[0] = byte(v)
-	buf[1] = byte(v >> 8)
-	buf[2] = byte(v >> 16)
-	buf[3] = byte(v >> 24)
+	buf[0] = byte(v >> 24)
+	buf[1] = byte(v >> 16)
+	buf[2] = byte(v >> 8)
+	buf[3] = byte(v)
 	p.data = append(p.data, buf...)
 }
 
 func (p *Packet) WriteU64(v uint64) {
 	buf := make([]byte, 8)
 	for i := range buf {
-		buf[i] = byte(v >> uint(i*8))
+		buf[i] = byte(v >> uint((7-i)*8))
 	}
 
 	p.data = append(p.data, buf...)
