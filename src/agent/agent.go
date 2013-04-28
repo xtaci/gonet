@@ -61,53 +61,57 @@ func StartAgent(in chan []byte, conn net.Conn) {
 
 	go _timer(session_timeout, timer_ch_session)
 
-L:
+	// cleanup work
+	defer func() {
+		names.Unregister(sess.User.Id)
+		close(timer_ch_session)
+	}()
+
+	// the main message loop
 	for {
 		select {
 		case msg, ok := <-in:
 			if !ok {
-				break L
+				return
 			}
 
 			if result := UserRequestProxy(&sess, msg); result != nil {
 				fmt.Println(result)
 				err := send(conn, result)
 				if err != nil {
-					break L
+					return
 				}
 			}
 
 		case msg, ok := <-sess.MQ:
 			if !ok {
-				break L
+				return
 			}
 
 			if result := IPCRequestProxy(&sess, msg); result != nil{
 				fmt.Println(result)
 				err := send(conn, []byte(result))
 				if err != nil {
-					break L
+					return
 				}
 			}
 
 		case msg, ok := <-sess.ServerMQ:
 			if !ok {
-				break L
+				return
 			}
 
 			err := send(conn, msg)
 			if err != nil {
-				break L
+				return
 			}
 
 		case _ = <-timer_ch_session:
 			if session_work(&sess,session_timeout) {
 				conn.Close()
+				return
 			}
 		}
 	}
 
-	// cleanup
-	names.Unregister(sess.User.Id)
-	close(timer_ch_session)
 }

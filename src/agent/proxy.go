@@ -13,17 +13,7 @@ import (
 )
 
 func UserRequestProxy(sess *Session, p []byte) []byte {
-	defer func() {
-		if x := recover(); x != nil {
-			log.Printf("run time panic when processing user request: %v", x)
-			for i:=0;i<10;i++ {
-				funcName, file, line, ok := runtime.Caller(i)
-				if ok {
-					log.Printf("frame %v:[func:%v,file:%v,line:%v]\n", i, runtime.FuncForPC(funcName).Name(), file, line)
-				}
-			}
-		}
-	}()
+	defer _ProxyError()
 
 	reader := packet.Reader(p)
 
@@ -49,11 +39,7 @@ func UserRequestProxy(sess *Session, p []byte) []byte {
 }
 
 func IPCRequestProxy(sess *Session, p interface{}) []byte {
-	defer func() {
-		if x := recover(); x != nil {
-			log.Printf("run time panic when processing IPC request: %v", x)
-		}
-	}()
+	defer _ProxyError()
 
 	msg := p.(ipc.RequestType)
 	handle := ipc.RequestHandler[msg.Code]
@@ -62,4 +48,16 @@ func IPCRequestProxy(sess *Session, p interface{}) []byte {
 	}
 
 	return nil
+}
+
+func _ProxyError() {
+	if x := recover(); x != nil {
+		log.Printf("run time panic when processing user request: %v", x)
+		for i:=0;i<10;i++ {
+			funcName, file, line, ok := runtime.Caller(i)
+			if ok {
+				log.Printf("frame %v:[func:%v,file:%v,line:%v]\n", i, runtime.FuncForPC(funcName).Name(), file, line)
+			}
+		}
+	}
 }

@@ -58,7 +58,13 @@ func LoginMAC(mac string, ud *User) bool {
 	return false
 }
 
-func New(ud *User) bool {
+func New(ud *User) (ret bool) {
+	defer func() {
+		if x := recover(); x != nil {
+			ret = false
+		}
+	}()
+
 	fields, values := SQL_dump(ud, "id")
 	stmt := []string{"INSERT INTO users(", strings.Join(fields, ","),
 		") VALUES (", strings.Join(values, ","), ")"}
@@ -66,7 +72,7 @@ func New(ud *User) bool {
 	db := <-DBCH
 	defer func() { DBCH <- db }()
 	_, res, err := db.Query(strings.Join(stmt, " "))
-	NoticeErr(err)
+	CheckErr(err)
 	ud.Id = int32(res.InsertId())
 
 	if err == nil {
@@ -83,7 +89,7 @@ func Read(id int32) (ud User, err error) {
 	defer func() { DBCH <- db }()
 
 	rows, res, err := db.Query(stmt, id)
-	NoticeErr(err)
+	CheckErr(err)
 
 	if len(rows) > 0 {
 		SQL_load(&ud, &rows[0], res)
