@@ -11,7 +11,7 @@ import (
 	"errors"
 )
 
-func Flush(ud *User) {
+func Sync(ud *User) {
 	fields, values := SQL_dump(ud)
 	changes := SQL_set_clause(fields, values)
 
