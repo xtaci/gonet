@@ -17,7 +17,7 @@ type RequestType struct {
 	Params interface{}
 }
 
-var RequestHandler map[int16]func(*Session, *RequestType) ([]byte, error) = map[int16]func(*Session, *RequestType)([]byte, error){
+var RequestHandler map[int16]func(*Session, interface{}) (interface{}) = map[int16]func(*Session, interface{})(interface{}){
 	USERINFO_REQUEST:userinfo_request,
 }
 

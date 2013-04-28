@@ -68,7 +68,7 @@ L:
 				break L
 			}
 
-			if result := ExecCli(&sess, msg); result != nil {
+			if result := UserRequestProxy(&sess, msg); result != nil {
 				fmt.Println(result)
 				err := send(conn, result)
 				if err != nil {
@@ -81,7 +81,7 @@ L:
 				break L
 			}
 
-			if result := ExecSrv(&sess, msg); result != nil{
+			if result := IPCRequestProxy(&sess, msg); result != nil{
 				fmt.Println(result)
 				err := send(conn, []byte(result))
 				if err != nil {

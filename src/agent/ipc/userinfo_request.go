@@ -4,7 +4,6 @@ import (
 	. "types"
 )
 
-func userinfo_request(sess *Session, request *RequestType)(ret []byte, err error) {
-	request.CH <- sess.User
-	return
+func userinfo_request(sess *Session, params interface{})(ret interface{}) {
+	return sess.User
 }

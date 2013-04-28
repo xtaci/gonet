@@ -3,7 +3,9 @@ package types
 import "time"
 
 type Session struct {
-	MQ     chan interface{}
+	MQ chan interface{}
+	ServerMQ chan []byte
+
 	User   User
 	Cities []City
 

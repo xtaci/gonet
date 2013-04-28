@@ -6,7 +6,7 @@ import "agent/protos"
 import "log"
 import "misc/packet"
 
-func ExecCli(sess *Session, p []byte) []byte {
+func UserRequestProxy(sess *Session, p []byte) []byte {
 	defer func() {
 		if x := recover(); x != nil {
 			log.Printf("run time panic when processing user request: %v", x)
@@ -35,7 +35,7 @@ func ExecCli(sess *Session, p []byte) []byte {
 	return nil
 }
 
-func ExecSrv(sess *Session, p interface{}) []byte {
+func IPCRequestProxy(sess *Session, p interface{}) []byte {
 	defer func() {
 		if x := recover(); x != nil {
 			log.Printf("run time panic when processing IPC request: %v", x)
@@ -43,9 +43,9 @@ func ExecSrv(sess *Session, p interface{}) []byte {
 	}()
 
 	msg := p.(ipc.RequestType)
-
-	switch msg.Code {
-	case ipc.USERINFO_REQUEST:
+	handle := ipc.RequestHandler[msg.Code]
+	if handle !=nil {
+		msg.CH <- handle(sess, msg.Params)
 	}
 
 	return nil
