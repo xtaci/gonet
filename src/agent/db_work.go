@@ -5,8 +5,8 @@ import (
 )
 
 import (
-	"db/city"
-	"db/user"
+	"db/city_tbl"
+	"db/user_tbl"
 	. "types"
 )
 
@@ -18,9 +18,9 @@ func db_work(sess *Session) {
 	}()
 
 	if sess.User.Id != 0 {
-		user.Flush(&sess.User)
+		user_tbl.Flush(&sess.User)
 		for i := range sess.Cities {
-			city.Flush(&sess.Cities[i])
+			city_tbl.Flush(&sess.Cities[i])
 		}
 	}
 }

@@ -1,4 +1,4 @@
-package city
+package city_tbl
 
 import . "db"
 import . "types"

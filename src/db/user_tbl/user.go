@@ -1,4 +1,4 @@
-package user
+package user_tbl
 
 import (
 	. "db"
@@ -8,6 +8,7 @@ import (
 import (
 	"strings"
 	"fmt"
+	"errors"
 )
 
 func Flush(ud *User) {
@@ -72,4 +73,23 @@ func New(ud *User) bool {
 		return true
 	}
 	return false
+}
+
+
+func Read(id int32) (ud User, err error) {
+	stmt := "SELECT * FROM users where id ='%v'"
+
+	db := <-DBCH
+	defer func() { DBCH <- db }()
+
+	rows, res, err := db.Query(stmt, id)
+	NoticeErr(err)
+
+	if len(rows) > 0 {
+		SQL_load(&ud, &rows[0], res)
+		return
+	}
+
+	err = errors.New(fmt.Sprint("cannot find user with id:%v" , id))
+	return
 }

@@ -9,7 +9,7 @@ import (
 	"misc/packet"
 	"hub/names"
 	"hub/ranklist"
-	"db/user"
+	"db/user_tbl"
 	"cfg"
 )
 
@@ -28,9 +28,9 @@ func _user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err erro
 	}
 
 	if tbl.new_user == 0 {
-		if user.LoginMAC(sess.User.Mac, &sess.User) {
+		if user_tbl.LoginMAC(sess.User.Mac, &sess.User) {
 			names.Register(sess.MQ, sess.User.Id)
-			success  := user_snapshot{}
+			success := user_snapshot{}
 			success.id = sess.User.Id
 			success.name = sess.User.Name
 			success.rank = sess.User.Score
@@ -45,7 +45,7 @@ func _user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err erro
 		sess.User.Mac = tbl.mac_addr
 		sess.User.Score = ranklist.Increase()
 
-		if user.New(&sess.User) {
+		if user_tbl.New(&sess.User) {
 			names.Register(sess.MQ, sess.User.Id)
 			success := user_snapshot{}
 			ret = pack(success,writer)
