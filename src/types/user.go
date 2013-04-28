@@ -14,6 +14,7 @@ type User struct {
 	Mac			string
 	Score		int32
 	State		int
+	Archives	string
 	LastSaveTime	time.Time
 	ProtectTime	time.Time
 	CreatedAt	time.Time

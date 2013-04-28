@@ -7,7 +7,6 @@ type Session struct {
 	ServerMQ chan []byte
 
 	User   User
-	Cities []City
 
 	SESSID    [128]byte // UNIQUE session ID
 	HeartBeat time.Time
