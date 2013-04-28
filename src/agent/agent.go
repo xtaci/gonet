@@ -51,15 +51,6 @@ func StartAgent(in chan []byte, conn net.Conn) {
 
 	config := cfg.Get()
 
-	// db flush timer
-	timer_ch_db := make(chan string)
-	flush_interval := 300 // sec
-	if config["flush_interval"] != "" {
-		flush_interval, _ = strconv.Atoi(config["flush_interval"])
-	}
-
-	go _timer(flush_interval, timer_ch_db)
-
 	// session timeout
 	timer_ch_session := make(chan string)
 	session_timeout := 30 // sec
@@ -97,11 +88,8 @@ L:
 					break L
 				}
 			}
-		case _ = <-timer_ch_db:
-			db_work(&sess)
 		case _ = <-timer_ch_session:
 			if session_work(&sess,session_timeout) {
-				db_work(&sess)
 				conn.Close()
 			}
 		}
@@ -109,6 +97,5 @@ L:
 
 	// cleanup
 	names.Unregister(sess.User.Id)
-	close(timer_ch_db)
 	close(timer_ch_session)
 }
