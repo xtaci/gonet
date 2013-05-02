@@ -33,7 +33,7 @@ func Send(id int32, tos int16, params interface{}) (err error) {
 	peer := names.Query(id);
 	req := &RequestType{Code: tos}
 	req.Params = params
-	peer <- req
+	peer.MQ <- req
 
 	return nil
 }
@@ -52,7 +52,7 @@ func Call(id int32, tos int16, params interface{}) (ret interface{}, err error) 
 	req.CH = make(chan interface{})
 	req.Params = params
 
-	peer <- req
+	peer.CALL <- req
 	ret = <-req.CH
 
 	return

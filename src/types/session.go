@@ -3,8 +3,9 @@ package types
 import "time"
 
 type Session struct {
-	MQ       chan interface{}
-	ServerMQ chan []byte			// server internal sending queue, like heartbeat.
+	MQ      chan interface{}		// ASYNC
+	CALL	chan interface{}		// SYNC
+	OUT		chan []byte			// server internal sending queue, like heartbeat.
 
 	User User
 

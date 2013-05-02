@@ -30,7 +30,7 @@ func _user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err erro
 
 	if tbl.F_new_user == 0 {
 		if user_tbl.LoginMAC(sess.User.Mac, &sess.User) {
-			names.Register(sess.MQ, sess.User.Id)
+			names.Register(sess, sess.User.Id)
 			success := user_snapshot{}
 			_fill_user_snapshot(&sess.User, &success)
 			ret = pack(Code["user_login_succeed_ack"], success, writer)
@@ -49,7 +49,7 @@ func _user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err erro
 		sess.User.CreatedAt = time.Now()
 
 		if user_tbl.New(&sess.User) {
-			names.Register(sess.MQ, sess.User.Id)
+			names.Register(sess, sess.User.Id)
 			success := user_snapshot{}
 			_fill_user_snapshot(&sess.User, &success)
 			ret = pack(Code["user_login_succeed_ack"], success, writer)

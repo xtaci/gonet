@@ -1,15 +1,16 @@
 package names
 
 import "sync"
+import . "types"
 
-var names map[int32]chan interface{}
+var names map[int32]*Session
 var _lock sync.RWMutex
 
-func Register(ch chan interface{}, id int32) {
+func Register(sess *Session, id int32) {
 	defer _lock.Unlock()
 	_lock.Lock()
 
-	names[id] = ch
+	names[id] = sess
 }
 
 func Unregister(id int32) {
@@ -19,7 +20,7 @@ func Unregister(id int32) {
 	delete(names, id)
 }
 
-func Query(id int32) chan interface{} {
+func Query(id int32) *Session {
 	defer _lock.RUnlock()
 	_lock.RLock()
 
@@ -27,5 +28,5 @@ func Query(id int32) chan interface{} {
 }
 
 func init() {
-	names = make(map[int32]chan interface{})
+	names = make(map[int32]*Session)
 }

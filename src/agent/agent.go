@@ -47,7 +47,8 @@ func _timer(interval int, ch chan string) {
 func StartAgent(in chan []byte, conn net.Conn) {
 	var sess Session
 	sess.MQ = make(chan interface{}, 128)
-	sess.ServerMQ = make(chan []byte, 128)
+	sess.CALL = make(chan interface{})
+	sess.OUT = make(chan []byte, 128)
 
 	config := cfg.Get()
 
@@ -82,7 +83,7 @@ func StartAgent(in chan []byte, conn net.Conn) {
 				}
 			}
 
-		case msg, ok := <-sess.MQ:
+		case msg, ok := <-sess.MQ:	// async
 			if !ok {
 				return
 			}
@@ -95,7 +96,20 @@ func StartAgent(in chan []byte, conn net.Conn) {
 				}
 			}
 
-		case msg, ok := <-sess.ServerMQ:
+		case msg, ok := <-sess.CALL: // sync
+			if !ok {
+				return
+			}
+
+			if result := IPCRequestProxy(&sess, msg); result != nil {
+				fmt.Println(result)
+				err := send(conn, []byte(result))
+				if err != nil {
+					return
+				}
+			}
+
+		case msg, ok := <-sess.OUT:
 			if !ok {
 				return
 			}
