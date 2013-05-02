@@ -52,7 +52,7 @@ func Call(id int32, tos int16, params interface{}) (ret interface{}, err error) 
 	req.CH = make(chan interface{})
 	req.Params = params
 
-	peer.CALL <- req
+	peer.CALL <- req		// panic on closed channel
 	ret = <-req.CH
 
 	return

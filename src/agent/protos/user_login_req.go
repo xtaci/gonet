@@ -15,10 +15,11 @@ import (
 )
 
 func _user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err error) {
-
 	tbl, _ := pktread_user_login_info(reader)
 	writer := packet.Writer()
 	failed := command_result_pack{F_rst: 0}
+	success := user_snapshot{}
+	//------------------------------------------------
 
 	config := cfg.Get()
 	version, _ := strconv.Atoi(config["version"])
@@ -31,7 +32,6 @@ func _user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err erro
 	if tbl.F_new_user == 0 {
 		if user_tbl.LoginMAC(sess.User.Mac, &sess.User) {
 			names.Register(sess, sess.User.Id)
-			success := user_snapshot{}
 			_fill_user_snapshot(&sess.User, &success)
 			ret = pack(Code["user_login_succeed_ack"], success, writer)
 			return
@@ -50,7 +50,6 @@ func _user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err erro
 
 		if user_tbl.New(&sess.User) {
 			names.Register(sess, sess.User.Id)
-			success := user_snapshot{}
 			_fill_user_snapshot(&sess.User, &success)
 			ret = pack(Code["user_login_succeed_ack"], success, writer)
 			return
@@ -61,7 +60,7 @@ func _user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err erro
 		}
 	}
 
-	return nil, nil
+	return
 }
 
 func _fill_user_snapshot(user *User, snapshot *user_snapshot) {

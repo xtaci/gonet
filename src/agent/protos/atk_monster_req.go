@@ -2,9 +2,14 @@ package protos
 
 import . "types"
 import "misc/packet"
-import "time"
 
 func _atk_monster_req(sess *Session, reader *packet.Packet) (ret []byte, err error) {
-	sess.HeartBeat = time.Now()
+	tbl, _ := pktread_command_id_pack(reader)
+	writer := packet.Writer()
+	payload := command_result_pack{}
+
+	//
+	println(tbl.F_id)
+	ret = pack(Code["atk_monster_ack"], payload, writer)
 	return
 }
