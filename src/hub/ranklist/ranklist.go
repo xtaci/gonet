@@ -49,31 +49,29 @@ func AddUser(ud *User, score int) {
 }
 
 //--------------------------------------------------------- change score of user
-func ChangeScore(ud *User, newscore int) (err error) {
+func ChangeScore(id, oldscore, newscore int32) (err error) {
 	_lock.Lock()
 	defer _lock.Unlock()
-
-	oldscore := int(ud.Score)
 
 	var tmplist []interface{}
 	defer func() {
 		for i := range tmplist {
-			_ranklist.Insert(oldscore, tmplist[i])
+			_ranklist.Insert(int(oldscore), tmplist[i])
 		}
 	}()
 
 	for {
-		n, _ := _ranklist.Score(int(ud.Score))
+		n, _ := _ranklist.Score(int(oldscore))
 
 		if n == nil {
 			err = errors.New("cannot change user with score")
 			return
 		}
 
-		if n.Data().(*User).Id == ud.Id {
+		if n.Data().(*User).Id == id {
 			_ranklist.DeleteNode(n)
-			ud.Score = int32(newscore)
-			_ranklist.Insert(newscore, ud)
+			n.Data().(*User).Score = newscore
+			_ranklist.Insert(int(newscore), n.Data().(*User))
 			return
 		} else {
 			// temporary delete 
@@ -85,11 +83,11 @@ func ChangeScore(ud *User, newscore int) (err error) {
 	return
 }
 
-//--------------------------------------------------------- find user rank
-func Find(id int32) (ud *User) {
+//--------------------------------------------------------- find user rank, return a copy
+func GetUserCopy(id int32) (ud User) {
 	_userlock.RLock()
 	defer _userlock.RUnlock()
-	return _users[id]
+	return *_users[id]
 }
 
 func Count() int {
@@ -110,4 +108,21 @@ func GetRankList(from, to int) []*User {
 	}
 
 	return sublist
+}
+
+//--------------------------------------------------------- change user state
+func ChangeState(id int32, oldstate, newstate int32) bool {
+	_userlock.Lock()
+	defer _userlock.Unlock()
+
+	user := _users[id]
+	return atomic.CompareAndSwapInt32(&user.State, oldstate, newstate)
+}
+
+func GetState(id int32) int32 {
+	_userlock.RLock()
+	defer _userlock.RUnlock()
+
+	user := _users[id]
+	return atomic.LoadInt32(&user.State)
 }

@@ -2,7 +2,6 @@ package types
 
 import (
 	"time"
-	"sync/atomic"
 )
 
 const (
@@ -22,8 +21,4 @@ type User struct {
 	LastSaveTime time.Time
 	ProtectTime  time.Time
 	CreatedAt    time.Time
-}
-
-func (ud *User) ChangeState(oldstate, newstate int32) bool {
-	return atomic.CompareAndSwapInt32(&ud.State, oldstate, newstate)
 }
