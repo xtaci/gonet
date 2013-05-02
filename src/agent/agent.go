@@ -11,7 +11,7 @@ import (
 
 import (
 	"cfg"
-	"hub/names"
+	"hub/online"
 	. "types"
 )
 
@@ -63,7 +63,7 @@ func StartAgent(in chan []byte, conn net.Conn) {
 
 	// cleanup work
 	defer func() {
-		names.Unregister(sess.User.Id)
+		online.Unregister(sess.User.Id)
 		close(timer_ch_session)
 		close(sess.MQ)
 		close(sess.CALL)

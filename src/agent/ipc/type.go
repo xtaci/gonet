@@ -2,7 +2,7 @@ package ipc
 
 import (
 	"errors"
-	"hub/names"
+	"hub/online"
 	. "types"
 )
 
@@ -30,7 +30,7 @@ func Send(id int32, tos int16, params interface{}) (err error) {
 		}
 	}()
 
-	peer := names.Query(id);
+	peer := online.Query(id);
 	req := &RequestType{Code: tos}
 	req.Params = params
 	peer.MQ <- req
@@ -47,7 +47,7 @@ func Call(id int32, tos int16, params interface{}) (ret interface{}, err error) 
 		}
 	}()
 
-	peer := names.Query(id);
+	peer := online.Query(id);
 	req := &RequestType{Code: tos}
 	req.CH = make(chan interface{})
 	req.Params = params

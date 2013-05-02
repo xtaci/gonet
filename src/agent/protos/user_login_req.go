@@ -8,11 +8,13 @@ import (
 import (
 	"cfg"
 	"db/user_tbl"
-	"hub/names"
+	"hub/online"
 	"hub/ranklist"
 	"misc/packet"
 	. "types"
 )
+
+var EPOCH = time.Unix(0,0)
 
 func _user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err error) {
 	tbl, _ := pktread_user_login_info(reader)
@@ -31,7 +33,7 @@ func _user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err erro
 
 	if tbl.F_new_user == 0 {
 		if user_tbl.LoginMAC(sess.User.Mac, &sess.User) {
-			names.Register(sess, sess.User.Id)
+			online.Register(sess, sess.User.Id)
 			_fill_user_snapshot(&sess.User, &success)
 			ret = pack(Code["user_login_succeed_ack"], success, writer)
 			return
@@ -44,12 +46,12 @@ func _user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err erro
 		sess.User.Mac = tbl.F_mac_addr
 		sess.User.Score = ranklist.Increase()
 		sess.User.State = 0
-		sess.User.LastSaveTime = time.Now()
+		sess.User.LastSaveTime = EPOCH
 		sess.User.ProtectTime = time.Now()
 		sess.User.CreatedAt = time.Now()
 
 		if user_tbl.New(&sess.User) {
-			names.Register(sess, sess.User.Id)
+			online.Register(sess, sess.User.Id)
 			_fill_user_snapshot(&sess.User, &success)
 			ret = pack(Code["user_login_succeed_ack"], success, writer)
 			return

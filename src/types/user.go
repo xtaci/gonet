@@ -6,6 +6,7 @@ const (
 	FREE = iota
 	ONLINE
 	BEING_RAID
+	PROTECTED
 )
 
 type User struct {

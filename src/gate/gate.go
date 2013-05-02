@@ -32,6 +32,9 @@ func main() {
 		service = config["service"]
 	}
 
+	// Load RankList
+	load_ranklist()
+
 	//
 	go SignalProc()
 
@@ -71,7 +74,7 @@ func handleClient(conn net.Conn) {
 		}
 
 		// data
-		size := int(header[0]<<8 | header[1])
+		size := int(header[0])<<8 | int(header[1])
 		data := make([]byte, size)
 		n, err = io.ReadFull(conn, data)
 

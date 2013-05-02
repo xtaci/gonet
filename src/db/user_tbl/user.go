@@ -98,3 +98,21 @@ func Read(id int32) (ud User, err error) {
 	err = errors.New(fmt.Sprint("cannot find user with id:%v", id))
 	return
 }
+
+func ReadAll() (uds []User) {
+	stmt := "SELECT * FROM users"
+
+	db := <-DBCH
+	defer func() { DBCH <- db }()
+
+	rows, res, err := db.Query(stmt)
+	CheckErr(err)
+
+	for i := range rows {
+		var ud User
+		SQL_load(&ud, &rows[i], res)
+		uds = append(uds, ud)
+	}
+
+	return
+}

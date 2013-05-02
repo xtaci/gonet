@@ -8,10 +8,14 @@ import (
 
 import (
 	"misc/alg/dos"
+	. "types"
 )
 
 var _ranklist dos.Tree
 var _lock sync.RWMutex
+
+var _users map[int32]*User
+var _userlock sync.RWMutex
 
 var _count int32
 
@@ -23,42 +27,58 @@ func Decrease() int32 {
 	return atomic.AddInt32(&_count, -1)
 }
 
-//--------------------------------------------------------- add a user to rank list
-func AddUser(id int32, score int) {
+func init() {
+	_users = make(map[int32]*User)
+}
+
+//--------------------------------------------------------- add a user to rank list, only useful when startup & register
+func AddUser(ud *User, score int) {
 	_lock.Lock()
-	defer _lock.Unlock()
-	_ranklist.Insert(score, id)
+	_userlock.Lock()
+
+	defer func() {
+		_lock.Unlock()
+		_userlock.Unlock()
+	}()
+
+	_ranklist.Insert(score, ud)
+	_users[ud.Id] = ud
+
+	// atomic ops
 	Increase()
 }
 
 //--------------------------------------------------------- change score of user
-func ChangeScore(id int32, oldscore, newscore int) (err error) {
+func ChangeScore(ud *User, newscore int) (err error) {
 	_lock.Lock()
 	defer _lock.Unlock()
 
-	var idlist []int32
+	oldscore := int(ud.Score)
+
+	var tmplist []interface{}
 	defer func() {
-		for i := range idlist {
-			AddUser(idlist[i], oldscore)
+		for i := range tmplist {
+			_ranklist.Insert(oldscore, tmplist[i])
 		}
 	}()
 
 	for {
-		n, _ := _ranklist.Score(oldscore)
+		n, _ := _ranklist.Score(int(ud.Score))
 
 		if n == nil {
 			err = errors.New("cannot change user with score")
 			return
 		}
 
-		if n.Data().(int32) == id {
+		if n.Data().(*User).Id == ud.Id {
 			_ranklist.DeleteNode(n)
-			_ranklist.Insert(newscore, id)
+			ud.Score = int32(newscore)
+			_ranklist.Insert(newscore, ud)
 			return
 		} else {
 			// temporary delete 
 			_ranklist.DeleteNode(n)
-			idlist = append(idlist, n.Data().(int32))
+			tmplist = append(tmplist, n.Data())
 		}
 	}
 
@@ -66,33 +86,10 @@ func ChangeScore(id int32, oldscore, newscore int) (err error) {
 }
 
 //--------------------------------------------------------- find user rank
-func Find(id int32, score int) (rank int, err error) {
-	_lock.Lock()
-	defer _lock.Unlock()
-
-	var idlist []int32
-	defer func() {
-		for i := range idlist {
-			AddUser(idlist[i], score)
-		}
-	}()
-
-	for {
-		n, r := _ranklist.Score(score)
-
-		if n == nil {
-			err = errors.New("find user with score")
-			return
-		}
-
-		_ranklist.DeleteNode(n)
-		if n.Data().(int32) == id {
-			rank = r
-			return
-		}
-	}
-
-	return
+func Find(id int32) (ud *User) {
+	_userlock.RLock()
+	defer _userlock.RUnlock()
+	return _users[id]
 }
 
 func Count() int {
@@ -109,7 +106,7 @@ func GetRankList(from, to int) []int32 {
 	defer _lock.RUnlock()
 
 	for i := from; i <= to; i++ {
-		sublist[i-from] = _ranklist.Rank(i).Data().(int32)
+		sublist[i-from] = _ranklist.Rank(i).Data().(*User).Id
 	}
 
 	return sublist
