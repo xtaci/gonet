@@ -65,6 +65,9 @@ func StartAgent(in chan []byte, conn net.Conn) {
 	defer func() {
 		names.Unregister(sess.User.Id)
 		close(timer_ch_session)
+		close(sess.MQ)
+		close(sess.CALL)
+		close(sess.OUT)
 	}()
 
 	// the main message loop
