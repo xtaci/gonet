@@ -21,19 +21,39 @@ var RequestHandler map[int16]func(*Session, interface{}) interface{} = map[int16
 	USERINFO_REQUEST: userinfo_request,
 }
 
-func Call(id int32, tos int16, params interface{}) (ret interface{}, err error) {
-	if peer := names.Query(id); peer != nil {
-		req := &RequestType{Code: tos}
-		req.CH = make(chan interface{}, 1)
-		req.Params = params
-		peer <- req
 
-		ret, ok := <-req.CH
-
-		if ok {
-			return ret, nil
+//--------------------------------------------------------- Non-Blocking Send
+func Send(id int32, tos int16, params interface{}) (err error) {
+	defer func() {
+		if x := recover(); x != nil {
+			err = errors.New("ipc.Send() failed")
 		}
-	}
+	}()
 
-	return nil, errors.New("Call() failed")
+	peer := names.Query(id);
+	req := &RequestType{Code: tos}
+	req.Params = params
+	peer <- req
+
+	return nil
+}
+
+
+//--------------------------------------------------------- Blocking Call
+func Call(id int32, tos int16, params interface{}) (ret interface{}, err error) {
+	defer func() {
+		if x := recover(); x != nil {
+			err = errors.New("ipc.Call() failed")
+		}
+	}()
+
+	peer := names.Query(id);
+	req := &RequestType{Code: tos}
+	req.CH = make(chan interface{})
+	req.Params = params
+
+	peer <- req
+	ret = <-req.CH
+
+	return
 }

@@ -4,7 +4,7 @@ import "time"
 
 type Session struct {
 	MQ       chan interface{}
-	ServerMQ chan []byte
+	ServerMQ chan []byte			// server internal sending queue, like heartbeat.
 
 	User User
 
