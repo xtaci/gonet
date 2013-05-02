@@ -1,6 +1,9 @@
 package types
 
-import "time"
+import (
+	"time"
+	"sync/atomic"
+)
 
 const (
 	FREE = iota
@@ -14,9 +17,13 @@ type User struct {
 	Name         string
 	Mac          string
 	Score        int32
-	State        int
+	State        int32
 	Archives     string
 	LastSaveTime time.Time
 	ProtectTime  time.Time
 	CreatedAt    time.Time
+}
+
+func (ud *User) ChangeState(oldstate, newstate int32) bool {
+	return atomic.CompareAndSwapInt32(&ud.State, oldstate, newstate)
 }

@@ -5,9 +5,6 @@ import (
 )
 
 import (
-	"agent/ipc"
-	"db/user_tbl"
-	"fmt"
 	"hub/ranklist"
 	"misc/packet"
 	. "types"
@@ -18,22 +15,8 @@ func _rank_list_req(sess *Session, reader *packet.Packet) (ret []byte, err error
 	out := rank_list{}
 	out.F_items = make([]rank_list_item, len(list))
 
-	for i := 0; i < len(list); i++ {
-		var user User
-
-		// first acquire data by call
-		// if failed , read in database
-		result, err := ipc.Call(list[i], ipc.USERINFO_REQUEST, nil)
-		if err != nil {
-			user, err = user_tbl.Read(list[i])
-			if err != nil {
-				panic(fmt.Sprintf("cannot read user:%v in database", list[i]))
-			}
-		} else {
-			user = result.(User)
-		}
-
-		fmt.Println(user)
+	for i := range list {
+		user := list[i]
 		out.F_items[i].F_id = user.Id
 		out.F_items[i].F_name = user.Name
 		out.F_items[i].F_rank = user.Score

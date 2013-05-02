@@ -99,14 +99,14 @@ func Count() int {
 }
 
 //--------------------------------------------------------- get users from ranklist in [from, to] 
-func GetRankList(from, to int) []int32 {
-	sublist := make([]int32, to-from+1)
+func GetRankList(from, to int) []*User {
+	sublist := make([]*User, to-from+1)
 
 	_lock.RLock()
 	defer _lock.RUnlock()
 
 	for i := from; i <= to; i++ {
-		sublist[i-from] = _ranklist.Rank(i).Data().(*User).Id
+		sublist[i-from] = _ranklist.Rank(i).Data().(*User)
 	}
 
 	return sublist

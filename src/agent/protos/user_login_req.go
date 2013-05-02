@@ -42,6 +42,7 @@ func _user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err erro
 			return
 		}
 	} else {
+		// register to db & online user
 		sess.User.Name = tbl.F_user_name
 		sess.User.Mac = tbl.F_mac_addr
 		sess.User.Score = ranklist.Increase()

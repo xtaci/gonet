@@ -24,11 +24,16 @@ func _atk_player_req(sess *Session, reader *packet.Packet) (ret []byte, err erro
 	case PROTECTED:
 		failed.F_rst = 3
 		ret = pack(Code["atk_player_faild_ack"], failed, writer)
-	default:
+	case FREE:
+		_fill_user_snapshot(opponent, &success)
+		if opponent.ChangeState(int32(FREE), int32(BEING_RAID)) {
+			ret = pack(Code["atk_player_succeed_ack"], success, writer)
+		} else {
+			failed.F_rst = 1
+			ret = pack(Code["atk_player_faild_ack"], failed, writer)
+		}
 	}
 
 	// 
-	_fill_user_snapshot(&sess.User,&success)
-	ret = pack(Code["atk_player_succeed_ack"], success, writer)
 	return
 }
