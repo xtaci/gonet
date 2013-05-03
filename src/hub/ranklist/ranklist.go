@@ -84,7 +84,7 @@ func ChangeScore(id, oldscore, newscore int32) (err error) {
 }
 
 //--------------------------------------------------------- find user rank, return a copy
-func GetUserCopy(id int32) (ud User) {
+func GetUserInfo(id int32) (ud User) {
 	_userlock.RLock()
 	defer _userlock.RUnlock()
 	return *_users[id]
