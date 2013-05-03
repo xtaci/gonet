@@ -36,7 +36,11 @@ func Send(id int32, tos int16, params interface{}) (err error) {
 	peer := online.Query(id)
 	req := &RequestType{Code: tos}
 	req.Params = params
-	peer.MQ <- req
+	select {
+	case peer.MQ <- req:
+	case <-time.After(time.Second):
+		panic("deadlock") // rare case, when both chan is full
+	}
 
 	return nil
 }
