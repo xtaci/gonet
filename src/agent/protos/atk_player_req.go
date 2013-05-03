@@ -1,9 +1,9 @@
 package protos
 
 import (
-	. "types"
-	"misc/packet"
 	"hub/ranklist"
+	"misc/packet"
+	. "types"
 )
 
 func _atk_player_req(sess *Session, reader *packet.Packet) (ret []byte, err error) {

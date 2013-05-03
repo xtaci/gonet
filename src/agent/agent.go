@@ -86,7 +86,7 @@ func StartAgent(in chan []byte, conn net.Conn) {
 				}
 			}
 
-		case msg, ok := <-sess.MQ:	// async
+		case msg, ok := <-sess.MQ: // async
 			if !ok {
 				return
 			}

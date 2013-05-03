@@ -2,6 +2,10 @@ package ipc
 
 import (
 	"errors"
+	"time"
+)
+
+import (
 	"hub/online"
 	. "types"
 )
@@ -21,7 +25,6 @@ var RequestHandler map[int16]func(*Session, interface{}) interface{} = map[int16
 	USERINFO_REQUEST: userinfo_request,
 }
 
-
 //--------------------------------------------------------- Non-Blocking Send
 func Send(id int32, tos int16, params interface{}) (err error) {
 	defer func() {
@@ -30,14 +33,13 @@ func Send(id int32, tos int16, params interface{}) (err error) {
 		}
 	}()
 
-	peer := online.Query(id);
+	peer := online.Query(id)
 	req := &RequestType{Code: tos}
 	req.Params = params
 	peer.MQ <- req
 
 	return nil
 }
-
 
 //--------------------------------------------------------- Blocking Call
 func Call(id int32, tos int16, params interface{}) (ret interface{}, err error) {
@@ -47,13 +49,17 @@ func Call(id int32, tos int16, params interface{}) (ret interface{}, err error) 
 		}
 	}()
 
-	peer := online.Query(id);
+	peer := online.Query(id)
 	req := &RequestType{Code: tos}
 	req.CH = make(chan interface{})
 	req.Params = params
 
-	peer.CALL <- req		// panic on closed channel
-	ret = <-req.CH
+	select {
+	case peer.CALL <- req: // panic on closed channel
+		ret = <-req.CH
+	case <-time.After(time.Second):
+		panic("deadlock")
+	}
 
 	return
 }

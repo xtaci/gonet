@@ -14,7 +14,7 @@ import (
 	. "types"
 )
 
-var EPOCH = time.Unix(0,0)
+var EPOCH = time.Unix(0, 0)
 
 func _user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err error) {
 	tbl, _ := pktread_user_login_info(reader)
