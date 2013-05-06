@@ -51,7 +51,7 @@ func StartAgent(in chan []byte, conn net.Conn) {
 		close(timer_ch_session)
 		close(sess.MQ)
 		close(sess.CALL)
-		bufctrl<-0
+		bufctrl <- 0
 	}()
 
 	// the main message loop
