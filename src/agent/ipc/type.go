@@ -22,7 +22,8 @@ type RequestType struct {
 	Params interface{}
 }
 
-var RequestHandler map[int16]func(*Session, interface{}) interface{} = map[int16]func(*Session, interface{}) interface{}{
+//--------------------------------------------------------- return to ipc && bytes to client
+var RequestHandler map[int16]func(*Session, interface{})(interface{}, []byte) = map[int16]func(*Session, interface{})(interface{}, []byte){
 	USERINFO_REQUEST: userinfo_request,
 }
 

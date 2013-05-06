@@ -43,7 +43,9 @@ func IPCRequestProxy(sess *Session, p interface{}) []byte {
 	msg := p.(ipc.RequestType)
 	handle := ipc.RequestHandler[msg.Code]
 	if handle != nil {
-		msg.CH <- handle(sess, msg.Params)
+		ipc, client := handle(sess, msg.Params)
+		msg.CH <- ipc
+		return client
 	}
 
 	return nil
