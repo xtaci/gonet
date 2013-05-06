@@ -41,7 +41,7 @@ func StartAgent(in chan []byte, conn net.Conn) {
 	go _timer(session_timeout, timer_ch_session)
 
 	// write buffer
-	bufctrl := make(chan int)
+	bufctrl := make(chan string)
 	buf := NewBuffer(conn, bufctrl)
 	go buf.Start()
 
@@ -51,7 +51,7 @@ func StartAgent(in chan []byte, conn net.Conn) {
 		close(timer_ch_session)
 		close(sess.MQ)
 		close(sess.CALL)
-		bufctrl <- 0
+		bufctrl <- "exit"
 		conn.Close()
 	}()
 

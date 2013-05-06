@@ -23,7 +23,7 @@ type _RawPacket struct {
 }
 
 type Buffer struct {
-	ctrl    chan int
+	ctrl    chan string
 	pending chan *_RawPacket // pending Packet
 	size    int32            // packet payload bytes count
 
@@ -77,7 +77,7 @@ func (buf *Buffer) raw_send(pkt *_RawPacket) {
 	return
 }
 
-func NewBuffer(conn net.Conn, ctrl chan int) *Buffer {
+func NewBuffer(conn net.Conn, ctrl chan string) *Buffer {
 	buf := Buffer{conn: conn, size: 0}
 	buf.pending = make(chan *_RawPacket, MAXCHAN)
 	buf.ctrl = ctrl
