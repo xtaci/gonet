@@ -26,8 +26,8 @@ func init() {
 	_codes = make(map[int32]map[uint64]*Item)
 }
 
-//--------------------------------------------------------- Sell Goods
-func Sell(seller int32, code int32, price float64, count uint32) uint64 {
+//--------------------------------------------------------- New Selling Order 
+func Add(seller int32, code int32, price float64, count uint32) uint64 {
 	nr := atomic.AddUint64(&_next_order_no, 1)
 
 	_lock.Lock()
@@ -44,8 +44,8 @@ func Sell(seller int32, code int32, price float64, count uint32) uint64 {
 	return nr
 }
 
-//--------------------------------------------------------- Buy Goods
-func Buy(order_no uint64) bool {
+//--------------------------------------------------------- Delete a Order
+func Delete(order_no uint64) bool {
 	_lock.Lock()
 	defer _lock.Unlock()
 
@@ -56,17 +56,6 @@ func Buy(order_no uint64) bool {
 	}
 
 	return false
-}
-
-//--------------------------------------------------------- Revoke order
-func Revoke(order_no uint64) {
-	_lock.Lock()
-	defer _lock.Unlock()
-
-	if item := _items[order_no]; item != nil {
-		delete(_codes[item.Code], order_no)
-		delete(_items, order_no)
-	}
 }
 
 //--------------------------------------------------------- Get Product List
