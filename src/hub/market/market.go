@@ -15,11 +15,13 @@ type Item struct {
 	Date		time.Time		// time on shelf
 }
 
-var _items map[uint64]*Item				// map order->item
-var _codes map[int32]map[uint64]*Item	// map to map 
+var (
+	_items map[uint64]*Item				// map order->item
+	_codes map[int32]map[uint64]*Item	// map to map 
 
-var _lock sync.RWMutex
-var _next_order_no uint64
+	_lock sync.RWMutex
+	_next_order_no uint64
+)
 
 func init() {
 	_items = make(map[uint64]*Item)
@@ -27,7 +29,7 @@ func init() {
 }
 
 //--------------------------------------------------------- New Selling Order 
-func Add(seller int32, code int32, price float64, count uint32) uint64 {
+func NewSell(seller int32, code int32, price float64, count uint32) uint64 {
 	nr := atomic.AddUint64(&_next_order_no, 1)
 
 	_lock.Lock()
@@ -45,7 +47,7 @@ func Add(seller int32, code int32, price float64, count uint32) uint64 {
 }
 
 //--------------------------------------------------------- Delete a Order
-func Delete(order_no uint64) bool {
+func DeleteOrder(order_no uint64) bool {
 	_lock.Lock()
 	defer _lock.Unlock()
 
@@ -59,7 +61,7 @@ func Delete(order_no uint64) bool {
 }
 
 //--------------------------------------------------------- Get Product List
-func List(start, count int, code int32) (ret []Item){
+func List(start, count int, code int32) (ret []Item) {
 	_lock.RLock()
 	defer _lock.RUnlock()
 
