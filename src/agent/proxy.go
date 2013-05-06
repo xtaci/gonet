@@ -53,7 +53,7 @@ func IPCRequestProxy(sess *Session, p interface{}) []byte {
 
 func _ProxyError() {
 	if x := recover(); x != nil {
-		log.Printf("run time panic when processing user request: %v", x)
+		log.Printf("run time panic when processing request: %v", x)
 		for i := 0; i < 10; i++ {
 			funcName, file, line, ok := runtime.Caller(i)
 			if ok {
