@@ -4,6 +4,7 @@ import (
 	"errors"
 	"sync"
 	"sync/atomic"
+	"time"
 )
 
 import (
@@ -11,13 +12,21 @@ import (
 	. "types"
 )
 
-var _ranklist dos.Tree
-var _lock sync.RWMutex
+//--------------------------------------------------------- striped version of user
+type PlayerInfo struct {
+	Id	int32
+	Name string
+	Score int32
+	State int32
+	ProtectTime time.Time
+}
 
-var _users map[int32]*User
-var _userlock sync.RWMutex
-
-var _count int32
+var (
+	_ranklist dos.Tree
+	_lock sync.RWMutex
+	_players map[int32]*PlayerInfo
+	_count int32
+)
 
 func Increase() int32 {
 	return atomic.AddInt32(&_count, 1)
@@ -28,21 +37,17 @@ func Decrease() int32 {
 }
 
 func init() {
-	_users = make(map[int32]*User)
+	_players = make(map[int32]*PlayerInfo)
 }
 
 //--------------------------------------------------------- add a user to rank list, only useful when startup & register
 func AddUser(ud *User, score int) {
 	_lock.Lock()
-	_userlock.Lock()
+	defer _lock.Unlock()
 
-	defer func() {
-		_lock.Unlock()
-		_userlock.Unlock()
-	}()
-
-	_ranklist.Insert(score, ud)
-	_users[ud.Id] = ud
+	info := &PlayerInfo{Id:ud.Id, Name:ud.Name, Score:ud.Score, State:ud.State, ProtectTime:ud.ProtectTime}
+	_players[ud.Id] = info
+	_ranklist.Insert(score, info)
 
 	// atomic ops
 	Increase()
@@ -68,10 +73,10 @@ func ChangeScore(id, oldscore, newscore int32) (err error) {
 			return
 		}
 
-		if n.Data().(*User).Id == id {
+		if n.Data().(*PlayerInfo).Id == id {
 			_ranklist.DeleteNode(n)
-			n.Data().(*User).Score = newscore
-			_ranklist.Insert(int(newscore), n.Data().(*User))
+			n.Data().(*PlayerInfo).Score = newscore
+			_ranklist.Insert(int(newscore), n.Data().(*PlayerInfo))
 			return
 		} else {
 			// temporary delete 
@@ -83,11 +88,11 @@ func ChangeScore(id, oldscore, newscore int32) (err error) {
 	return
 }
 
-//--------------------------------------------------------- find user rank, return a copy
-func GetUserInfo(id int32) (ud User) {
-	_userlock.RLock()
-	defer _userlock.RUnlock()
-	return *_users[id]
+//--------------------------------------------------------- find player rank, return info
+func GetUserInfo(id int32) PlayerInfo {
+	_lock.RLock()
+	defer _lock.RUnlock()
+	return *_players[id]
 }
 
 func Count() int {
@@ -96,33 +101,32 @@ func Count() int {
 	return _ranklist.Count()
 }
 
-//--------------------------------------------------------- get users from ranklist in [from, to] 
-func GetRankList(from, to int) []*User {
-	sublist := make([]*User, to-from+1)
+//--------------------------------------------------------- get players from ranklist in [from, to] 
+func GetRankList(from, to int) []*PlayerInfo {
+	sublist := make([]*PlayerInfo, to-from+1)
 
 	_lock.RLock()
 	defer _lock.RUnlock()
 
 	for i := from; i <= to; i++ {
-		sublist[i-from] = _ranklist.Rank(i).Data().(*User)
+		sublist[i-from] = _ranklist.Rank(i).Data().(*PlayerInfo)
 	}
 
 	return sublist
 }
 
-//--------------------------------------------------------- change user state
+//--------------------------------------------------------- change player state
 func ChangeState(id int32, oldstate, newstate int32) bool {
-	_userlock.Lock()
-	defer _userlock.Unlock()
+	_lock.Lock()
+	defer _lock.Unlock()
 
-	user := _users[id]
-	return atomic.CompareAndSwapInt32(&user.State, oldstate, newstate)
+	player := _players[id]
+
+	return atomic.CompareAndSwapInt32(&player.State, oldstate, newstate)
 }
 
 func GetState(id int32) int32 {
-	_userlock.RLock()
-	defer _userlock.RUnlock()
-
-	user := _users[id]
-	return atomic.LoadInt32(&user.State)
+	_lock.RLock()
+	defer _lock.RUnlock()
+	return _players[id].State
 }
