@@ -48,7 +48,6 @@ func StartAgent(in chan []byte, conn net.Conn) {
 	var sess Session
 	sess.MQ = make(chan interface{}, 128)
 	sess.CALL = make(chan interface{})
-	sess.OUT = make(chan []byte, 128)
 
 	config := cfg.Get()
 
@@ -67,7 +66,6 @@ func StartAgent(in chan []byte, conn net.Conn) {
 		close(timer_ch_session)
 		close(sess.MQ)
 		close(sess.CALL)
-		close(sess.OUT)
 	}()
 
 	// the main message loop
@@ -110,16 +108,6 @@ func StartAgent(in chan []byte, conn net.Conn) {
 				if err != nil {
 					return
 				}
-			}
-
-		case msg, ok := <-sess.OUT:
-			if !ok {
-				return
-			}
-
-			err := send(conn, msg)
-			if err != nil {
-				return
 			}
 
 		case _ = <-timer_ch_session:

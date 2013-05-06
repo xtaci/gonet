@@ -5,7 +5,6 @@ import "time"
 type Session struct {
 	MQ      chan interface{}		// ASYNC
 	CALL	chan interface{}		// SYNC
-	OUT		chan []byte			// server internal sending queue, like heartbeat.
 
 	User User
 

@@ -13,6 +13,7 @@ import (
 const (
 	UNKNOWN = int16(iota)
 	USERINFO_REQUEST
+	PLAIN_DATA				// userful for server generated packet
 )
 
 type RequestType struct {
