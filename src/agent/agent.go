@@ -52,6 +52,7 @@ func StartAgent(in chan []byte, conn net.Conn) {
 		close(sess.MQ)
 		close(sess.CALL)
 		bufctrl <- 0
+		conn.Close()
 	}()
 
 	// the main message loop
@@ -98,7 +99,6 @@ func StartAgent(in chan []byte, conn net.Conn) {
 
 		case _ = <-timer_ch_session:
 			if session_work(&sess, session_timeout) {
-				conn.Close()
 				return
 			}
 		}
