@@ -12,6 +12,13 @@ import (
 	. "types"
 )
 
+const (
+	FREE = iota
+	ONLINE
+	BEING_RAID
+	PROTECTED
+)
+
 //--------------------------------------------------------- striped version of user
 type PlayerInfo struct {
 	Id	int32
@@ -37,7 +44,12 @@ func AddUser(ud *User) {
 	_lock.Lock()
 	defer _lock.Unlock()
 
-	info := &PlayerInfo{Id:ud.Id, Name:ud.Name, Score:ud.Score, State:ud.State, ProtectTime:ud.ProtectTime}
+	state := FREE
+	if ud.ProtectTime.Unix() > time.Now().Unix() {
+		state = PROTECTED
+	}
+
+	info := &PlayerInfo{Id:ud.Id, Name:ud.Name, Score:ud.Score, State:int32(state), ProtectTime:ud.ProtectTime}
 	_players[ud.Id] = info
 	_ranklist.Insert(int(ud.Score), info)
 }
@@ -77,13 +89,7 @@ func ChangeScore(id, oldscore, newscore int32) (err error) {
 	return
 }
 
-//--------------------------------------------------------- find player rank, return info
-func GetUserInfo(id int32) PlayerInfo {
-	_lock.RLock()
-	defer _lock.RUnlock()
-	return *_players[id]
-}
-
+//--------------------------------------------------------- players count
 func Count() int {
 	_lock.RLock()
 	defer _lock.RUnlock()
@@ -104,13 +110,13 @@ func GetRankList(from, to int) []*PlayerInfo {
 	return sublist
 }
 
-//--------------------------------------------------------- change player state
+// change player state
+// the atomicity of state is guaranted by ranklist
 func ChangeState(id int32, oldstate, newstate int32) bool {
 	_lock.Lock()
 	defer _lock.Unlock()
 
 	player := _players[id]
-
 	return atomic.CompareAndSwapInt32(&player.State, oldstate, newstate)
 }
 

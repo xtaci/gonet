@@ -45,7 +45,6 @@ func _user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err erro
 		// register to db & online user
 		sess.User.Name = tbl.F_user_name
 		sess.User.Mac = tbl.F_mac_addr
-		sess.User.State = 0
 		sess.User.LastSaveTime = EPOCH
 		sess.User.ProtectTime = time.Now()
 		sess.User.CreatedAt = time.Now()

@@ -1,10 +1,10 @@
 package protos
 
 import (
+	"db/user_tbl"
 	"hub/ranklist"
 	"misc/packet"
 	. "types"
-	"db/user_tbl"
 )
 
 func _atk_player_req(sess *Session, reader *packet.Packet) (ret []byte, err error) {
@@ -14,8 +14,8 @@ func _atk_player_req(sess *Session, reader *packet.Packet) (ret []byte, err erro
 	failed := command_result_pack{}
 
 	state := ranklist.GetState(tbl.F_id)
-	if state == FREE {
-		if ranklist.ChangeState(tbl.F_id, int32(FREE), int32(BEING_RAID)) {
+	if state == ranklist.FREE {
+		if ranklist.ChangeState(tbl.F_id, state, int32(ranklist.BEING_RAID)) {
 			opponent, e := user_tbl.Read(tbl.F_id)
 			if e == nil {
 				_fill_user_snapshot(&opponent, &success)

@@ -5,7 +5,6 @@ CREATE TABLE `users` (
   `name` char(20) DEFAULT NULL,
   `mac`   char(11) DEFAULT NULL,
   `score` int(11) DEFAULT '0',
-  `state` int(11) DEFAULT '0',
   `archives` varchar(10240) DEFAULT NULL,
   `last_save_time` datetime DEFAULT NULL,
   `protect_time` datetime DEFAULT NULL,
@@ -14,6 +13,8 @@ CREATE TABLE `users` (
   UNIQUE KEY `uc_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+DROP PROCEDURE IF EXISTS gen_users;
+DELIMITER //
 CREATE PROCEDURE gen_users(MAX INT)
 BEGIN
 	DECLARE x INT;
