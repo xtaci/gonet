@@ -39,6 +39,23 @@ func init() {
 	_players = make(map[int32]*PlayerInfo)
 }
 
+//--------------------------------------------------------- expire protect time
+func ExpireRoutine() {
+
+	for {
+
+		_lock.Lock()
+		for _,v := range _players {
+			if v.ProtectTime.Unix() <  time.Now().Unix() {
+				v.State = FREE
+			}
+		}
+		_lock.Unlock()
+
+		time.Sleep(time.Minute)
+	}
+}
+
 //--------------------------------------------------------- add a user to rank list, only useful when startup & register
 func AddUser(ud *User) {
 	_lock.Lock()
@@ -97,14 +114,14 @@ func Count() int {
 }
 
 //--------------------------------------------------------- get players from ranklist in [from, to] 
-func GetRankList(from, to int) []*PlayerInfo {
-	sublist := make([]*PlayerInfo, to-from+1)
+func GetRankList(from, to int) []PlayerInfo {
+	sublist := make([]PlayerInfo, to-from+1)
 
 	_lock.RLock()
 	defer _lock.RUnlock()
 
 	for i := from; i <= to; i++ {
-		sublist[i-from] = _ranklist.Rank(i).Data().(*PlayerInfo)
+		sublist[i-from] = *_ranklist.Rank(i).Data().(*PlayerInfo)
 	}
 
 	return sublist

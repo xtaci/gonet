@@ -103,5 +103,4 @@ func StartAgent(in chan []byte, conn net.Conn) {
 			}
 		}
 	}
-
 }

@@ -12,4 +12,6 @@ func load_ranklist() {
 	for i := range uds {
 		ranklist.AddUser(&uds[i])
 	}
+
+	go ranklist.ExpireRoutine()
 }
