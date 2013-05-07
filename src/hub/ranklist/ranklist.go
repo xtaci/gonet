@@ -145,7 +145,7 @@ func Login(id int32) bool {
 
 	player := _players[id]
 
-	if player.State == FREE {
+	if player.State == FREE || player.State == PROTECTED {
 		player.State = ONLINE
 		return true
 	}
