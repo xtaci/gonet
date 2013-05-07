@@ -45,7 +45,6 @@ func _user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err erro
 		// register to db & online user
 		sess.User.Name = tbl.F_user_name
 		sess.User.Mac = tbl.F_mac_addr
-		sess.User.Score = ranklist.Increase()
 		sess.User.State = 0
 		sess.User.LastSaveTime = EPOCH
 		sess.User.ProtectTime = time.Now()
@@ -53,11 +52,11 @@ func _user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err erro
 
 		if user_tbl.New(&sess.User) {
 			online.Register(sess, sess.User.Id)
+			ranklist.AddUser(&sess.User)
 			_fill_user_snapshot(&sess.User, &success)
 			ret = pack(Code["user_login_succeed_ack"], success, writer)
 			return
 		} else {
-			ranklist.Decrease()
 			ret = pack(Code["user_login_faild_ack"], failed, writer)
 			return
 		}

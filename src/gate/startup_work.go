@@ -10,6 +10,6 @@ func load_ranklist() {
 	uds := user_tbl.ReadAll()
 
 	for i := range uds {
-		ranklist.AddUser(&uds[i], int(uds[i].Score))
+		ranklist.AddUser(&uds[i])
 	}
 }

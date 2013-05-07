@@ -71,10 +71,29 @@ func New(ud *User) (ret bool) {
 
 	db := <-DBCH
 	defer func() { DBCH <- db }()
-	_, res, err := db.Query(strings.Join(stmt, " "))
-	CheckErr(err)
-	ud.Id = int32(res.InsertId())
 
+	// begin transaction
+	tr, err := db.Begin()
+	CheckErr(err)
+
+	// insert new user
+	_, res, err := tr.Query(strings.Join(stmt, " "))
+	if err != nil {
+		tr.Rollback()
+		return
+	}
+
+	// set score to num of user	
+	ud.Id = int32(res.InsertId())
+	score_stmt := "UPDATE users SET score = ID WHERE ID = '%v'"
+	_, _, err = tr.Query(score_stmt, ud.Id)
+	if err != nil {
+		tr.Rollback()
+		return
+	}
+
+	// commit
+	err = tr.Commit()
 	if err == nil {
 		return true
 	}

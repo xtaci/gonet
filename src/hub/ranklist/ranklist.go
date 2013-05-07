@@ -28,29 +28,18 @@ var (
 	_count int32
 )
 
-func Increase() int32 {
-	return atomic.AddInt32(&_count, 1)
-}
-
-func Decrease() int32 {
-	return atomic.AddInt32(&_count, -1)
-}
-
 func init() {
 	_players = make(map[int32]*PlayerInfo)
 }
 
 //--------------------------------------------------------- add a user to rank list, only useful when startup & register
-func AddUser(ud *User, score int) {
+func AddUser(ud *User) {
 	_lock.Lock()
 	defer _lock.Unlock()
 
 	info := &PlayerInfo{Id:ud.Id, Name:ud.Name, Score:ud.Score, State:ud.State, ProtectTime:ud.ProtectTime}
 	_players[ud.Id] = info
-	_ranklist.Insert(score, info)
-
-	// atomic ops
-	Increase()
+	_ranklist.Insert(int(ud.Score), info)
 }
 
 //--------------------------------------------------------- change score of user
