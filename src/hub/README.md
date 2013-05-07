@@ -1,3 +1,3 @@
-put public (non player) data here, like
+put public data here, like
 
-market, ranklist
+market, ranklist, online 
