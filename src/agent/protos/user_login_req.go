@@ -45,8 +45,6 @@ func _user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err erro
 		// register to db & online user
 		sess.User.Name = tbl.F_user_name
 		sess.User.Mac = tbl.F_mac_addr
-		sess.User.LastSaveTime = EPOCH
-		sess.User.ProtectTime = time.Now()
 		sess.User.CreatedAt = time.Now()
 
 		if user_tbl.New(&sess.User) {
@@ -69,7 +67,7 @@ func _fill_user_snapshot(user *User, snapshot *user_snapshot) {
 	snapshot.F_name = user.Name
 	snapshot.F_rank = user.Score
 
-	pt := user.ProtectTime.Unix() - time.Now().Unix()
+	pt := ranklist.ProtectTime(user.Id).Unix() - time.Now().Unix()
 	if pt > 0 {
 		snapshot.F_protect_time = int32(pt)
 	} else {

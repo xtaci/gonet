@@ -7,7 +7,6 @@ CREATE TABLE `users` (
   `score` int(11) DEFAULT '0',
   `archives` varchar(10240) DEFAULT NULL,
   `last_save_time` datetime DEFAULT NULL,
-  `protect_time` datetime DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uc_name` (`name`)
