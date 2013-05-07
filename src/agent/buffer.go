@@ -6,16 +6,16 @@ import (
 	"log"
 	"net"
 	"sync/atomic"
+	"strconv"
 )
 
 import (
 	"misc/packet"
+	"cfg"
 )
 
-const (
-	BUFSIZE = 65535
-	MAXCHAN = 4096
-)
+var	_BUFSIZE int32
+var _MAXCHAN int32
 
 type _RawPacket struct {
 	size uint16 // payload size
@@ -32,7 +32,7 @@ type Buffer struct {
 
 //--------------------------------------------------------- Send packet
 func (buf *Buffer) Send(data []byte) (err error) {
-	if buf.size <= BUFSIZE {
+	if buf.size <= _BUFSIZE {
 		rp := _RawPacket{size: uint16(len(data)), data: data}
 		buf.pending <- &rp
 
@@ -79,7 +79,19 @@ func (buf *Buffer) raw_send(pkt *_RawPacket) {
 
 func NewBuffer(conn net.Conn, ctrl chan string) *Buffer {
 	buf := Buffer{conn: conn, size: 0}
-	buf.pending = make(chan *_RawPacket, MAXCHAN)
+	buf.pending = make(chan *_RawPacket, _MAXCHAN)
 	buf.ctrl = ctrl
 	return &buf
+}
+
+func init() {
+	_BUFSIZE = 65535
+
+	config := cfg.Get()
+	if config["write_buffer"] != "" {
+		v, _ := strconv.Atoi(config["write_buffer"])
+		_BUFSIZE = int32(v)
+	}
+
+	_MAXCHAN = _BUFSIZE / 16
 }
