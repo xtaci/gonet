@@ -7,9 +7,9 @@ import (
 
 type ClanInfo struct {
 	Id      int32
-	Name    string
 	Members []int32
 	MQ		*queue.Queue
+	Name    string
 }
 
 var _clans map[int32]*ClanInfo       // id -> claninfo
@@ -25,7 +25,7 @@ func init() {
 var _maxqueue int
 
 func init() {
-	_maxqueue = 256 
+	_maxqueue = 256
 }
 
 //------------------------------------------------ create clan

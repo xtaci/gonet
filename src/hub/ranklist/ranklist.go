@@ -38,12 +38,12 @@ var _raidtime_max int64
 //--------------------------------------------------------- player info 
 type PlayerInfo struct {
 	Id          int32
-	Name        string
 	Score       int32
 	State       int32
 	ProtectTime int64 // unix time
 	RaidStart   int64 // unix time
 	Clan		int32 // clan info
+	Name        string
 }
 
 var (
