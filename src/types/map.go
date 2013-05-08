@@ -28,10 +28,20 @@ func (m *Map) MapTest(X,Y int) bool {
 	return false
 }
 
-func (m *Map) MapSet(X,Y int) bool {
-	return false
+func (m *Map) MapSet(X,Y int) {
+	if X < MAP_W && Y < MAP_H {
+		bit := Y * MAP_W + X
+		n := bit/8
+		off := uint(bit%8)
+		m.Bitset[n] |= byte(128)>>off
+	}
 }
 
-func (m *Map) MapUnset(X,Y int) bool {
-	return false
+func (m *Map) MapUnset(X,Y uint) {
+	if X < MAP_W && Y < MAP_H {
+		bit := Y * MAP_W + X
+		n := bit/8
+		off := uint(bit%8)
+		m.Bitset[n] &= ^(byte(128)>>off)
+	}
 }
