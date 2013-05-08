@@ -33,32 +33,21 @@ func (q *Queue) Enqueue(elem interface{}) bool {
 }
 
 //----------------------------------------------- Dequeue
-func (q *Queue) Dequeue(elem interface{}) {
+func (q *Queue) Dequeue()(ret interface{}, result bool) {
 	if q.size > 0 {
+		ret = q.elements[q.front]
+		result = true
+
 		q.size--
 		q.front++
 
 		if q.front == q.capacity {
 			q.front = 0
 		}
-	}
-}
-
-//----------------------------------------------- Front
-func (q *Queue) Front() interface {} {
-	if q.size == 0 {
-		return nil
-	}
-	return q.elements[q.front]
-}
-
-//----------------------------------------------- IsEmpty
-func (q *Queue) IsEmpty() bool {
-	if q.size == 0 {
-		return true
+		return
 	}
 
-	return false
+	return nil, false
 }
 
 //----------------------------------------------- return queue
