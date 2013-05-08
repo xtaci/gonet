@@ -43,6 +43,7 @@ type PlayerInfo struct {
 	State       int32
 	ProtectTime int64 // unix time
 	RaidStart   int64 // unix time
+	Clan		int32 // clan info
 }
 
 var (
