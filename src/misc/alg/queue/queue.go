@@ -59,9 +59,8 @@ func (q *Queue) All()(all []interface{}) {
 	for count > 0  {
 		all[q.size-count]= q.elements[idx]
 
-		if idx < q.capacity {
-			idx++
-		} else {
+		idx++
+		if idx >= q.capacity {
 			idx = 0
 		}
 
