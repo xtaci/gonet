@@ -7,7 +7,7 @@ import (
 
 // load user table into memory
 func load_ranklist() {
-	uds := user_tbl.ReadAll()
+	uds := user_tbl.LoadAll()
 
 	for i := range uds {
 		ranklist.AddUser(&uds[i])

@@ -14,7 +14,7 @@ func _atk_player_req(sess *Session, reader *packet.Packet) (ret []byte, err erro
 	failed := command_result_pack{}
 
 	if ranklist.Raid(tbl.F_id) {
-		opponent, e := user_tbl.Read(tbl.F_id)
+		opponent, e := user_tbl.Load(tbl.F_id)
 		if e == nil {
 			_fill_user_snapshot(&opponent, &success)
 			ret = pack(Code["atk_player_succeed_ack"], success, writer)

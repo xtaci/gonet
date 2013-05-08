@@ -76,5 +76,4 @@ func _fill_user_snapshot(user *User, snapshot *user_snapshot) {
 
 	snapshot.F_last_save_time = int32(user.LastSaveTime.Unix())
 	snapshot.F_server_time = int32(time.Now().Unix())
-	snapshot.F_archives = user.Archives
 }

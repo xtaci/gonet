@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-func Sync(ud *User) {
+func Store(ud *User) {
 	fields, values := SQL_dump(ud)
 	changes := SQL_set_clause(fields, values)
 
@@ -100,7 +100,7 @@ func New(ud *User) (ret bool) {
 	return false
 }
 
-func Read(id int32) (ud User, err error) {
+func Load(id int32) (ud User, err error) {
 	stmt := "SELECT * FROM users where id ='%v'"
 
 	db := <-DBCH
@@ -118,7 +118,7 @@ func Read(id int32) (ud User, err error) {
 	return
 }
 
-func ReadAll() (uds []User) {
+func LoadAll() (uds []User) {
 	stmt := "SELECT * FROM users"
 
 	db := <-DBCH
