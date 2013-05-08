@@ -1,0 +1,1 @@
+The Clan Manager
