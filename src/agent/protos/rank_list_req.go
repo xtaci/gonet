@@ -22,7 +22,7 @@ func _rank_list_req(sess *Session, reader *packet.Packet) (ret []byte, err error
 		out.F_items[i].F_rank = user.Score
 		out.F_items[i].F_state = int32(user.State)
 
-		t := int32(user.ProtectTime.Unix() - time.Now().Unix())
+		t := int32(user.ProtectTime - time.Now().Unix())
 		if t > 0 {
 			out.F_items[i].F_protect_time = t
 		} else {

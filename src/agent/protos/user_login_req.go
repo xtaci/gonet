@@ -67,7 +67,7 @@ func _fill_user_snapshot(user *User, snapshot *user_snapshot) {
 	snapshot.F_name = user.Name
 	snapshot.F_rank = user.Score
 
-	pt := ranklist.ProtectTime(user.Id).Unix() - time.Now().Unix()
+	pt := ranklist.ProtectTime(user.Id) - time.Now().Unix()
 	if pt > 0 {
 		snapshot.F_protect_time = int32(pt)
 	} else {

@@ -11,11 +11,23 @@ import (
 )
 
 const (
-	FREE = iota
-	ONLINE
-	BEING_RAID
-	PROTECTED
+	HISHIFT = 16
+
+	// 
+	OFFLINE = 1 << HISHIFT
+	ONLINE = 1<<1<< HISHIFT
+
+	// battle status
+	BEING_RAID = 1<<2
+	PROTECTED = 1<<3
+	FREE = 1<<4
+
+	LOMASK = 0xFFFF
+	HIMASK = 0xFFFF0000
 )
+
+// OFFLINE|BEING_RAID, OFFLINE|PROTECTED , OFFLINE |FREE
+// ONLINE|PROTECTED , ONLINE|FREE
 
 const (
 	RAID_TIME = 300 // seconds
@@ -28,38 +40,48 @@ type PlayerInfo struct {
 	Id	int32
 	Name string
 	Score int32
-	State int
-	ProtectTime time.Time
-	RaidStart time.Time
+	State int32
+	ProtectTime int64			// unix time
+	RaidStart	int64			// unix time
 }
 
 var (
-	_ranklist dos.Tree
+	_ranklist dos.Tree			// dynamic order statistics
 	_lock sync.RWMutex
-	_players map[int32]*PlayerInfo
-	_count int32
+	_players map[int32]*PlayerInfo		// free players
+	_raids map[int32]*PlayerInfo			// being raided
+	_protects map[int32]*PlayerInfo		// protecting
 )
 
 func init() {
 	_players = make(map[int32]*PlayerInfo)
+	_raids = make(map[int32]*PlayerInfo)
+	_protects = make(map[int32]*PlayerInfo)
 	_raidtime_max = RAID_TIME
 }
 
 //--------------------------------------------------------- expires
 func ExpireRoutine() {
-
 	for {
-
 		_lock.Lock()
-		for _,v := range _players {
-			if v.State == PROTECTED && v.ProtectTime.Unix() <  time.Now().Unix() {
+		now := time.Now().Unix()
+		for k,v := range _protects {
+			if v.ProtectTime <  now {
 				// PROTECTED->FREE
-				v.State = FREE
-			} else if v.State == BEING_RAID && time.Now().Unix() - v.RaidStart.Unix() > _raidtime_max {
-				// expire BEING_RAID
-				// in case someone do evil.
-				v.State = FREE
+				v.State = v.State & (^PROTECTED) | FREE
+				delete(_protects, k)
 			}
+
+		}
+		_lock.Unlock()
+		_lock.Lock()
+		for k,v := range _raids {
+			if now - v.RaidStart > _raidtime_max {
+				// RAID->FREE
+				v.State = v.State & (^BEING_RAID) | FREE
+				delete(_raids, k)
+			}
+
 		}
 		_lock.Unlock()
 
@@ -72,11 +94,10 @@ func AddUser(ud *User) {
 	_lock.Lock()
 	defer _lock.Unlock()
 
-	info := &PlayerInfo{Id:ud.Id, Name:ud.Name, Score:ud.Score, State:FREE }
+	info := &PlayerInfo{Id:ud.Id, Name:ud.Name, Score:ud.Score, State:OFFLINE|FREE }
 	_players[ud.Id] = info
 	_ranklist.Insert(int(ud.Score), info)
 }
-
 
 //========================================================= Rank List operations
 // change score of user
@@ -135,19 +156,22 @@ func GetRankList(from, to int) []PlayerInfo {
 	return sublist
 }
 
-
 //========================================================= The State Machine Of Player
 // the user is not allowed to login 
 // when being attacked
 func Login(id int32) bool {
-	_lock.RLock()
-	defer _lock.RUnlock()
+	_lock.Lock()
+	defer _lock.Unlock()
 
 	player := _players[id]
 
-	if player.State == FREE || player.State == PROTECTED {
-		player.State = ONLINE
-		return true
+	if player != nil {
+		state := player.State
+
+		if state & OFFLINE !=0 && state & BEING_RAID == 0 {
+			player.State = int32(ONLINE|(state&LOMASK))
+			return true
+		}
 	}
 
 	return false
@@ -162,10 +186,15 @@ func Raid(id int32) bool {
 
 	player := _players[id]
 
-	if player.State == FREE {
-		player.State = BEING_RAID
-		player.RaidStart = time.Now()
-		return true
+	if player != nil {
+		state := player.State
+
+		if state & OFFLINE != 0 && state & FREE != 0 {
+			player.State = int32(OFFLINE|BEING_RAID)
+			player.RaidStart = time.Now().Unix()
+			_raids[id] = player		// add to being raided queue
+			return true
+		}
 	}
 
 	return false
@@ -178,10 +207,16 @@ func Protect(id int32, until time.Time) bool {
 
 	player := _players[id]
 
-	if player.State == BEING_RAID {
-		player.ProtectTime = until
-		player.State = PROTECTED
-		return true
+	if player != nil {
+		state := player.State
+
+		if state & BEING_RAID !=0 {
+			player.State = int32(OFFLINE|PROTECTED)
+			player.ProtectTime = until.Unix()
+			delete(_raids,id ) // remove from raids
+			_protects[id] = player	// add to protects
+			return true
+		}
 	}
 
 	return false
@@ -194,25 +229,26 @@ func Free(id int32) bool {
 
 	player := _players[id]
 
-	if player.State == BEING_RAID {
-		player.State = FREE
+	if player.State & BEING_RAID !=0 {
+		player.State = int32(OFFLINE|FREE)
+		delete(_raids,id ) // remove from raids
 		return true
 	}
 
 	return false
 }
 
-// Reader
-func State(id int32) int {
-	_lock.Lock()
-	defer _lock.Unlock()
+// Readers
+func State(id int32) int32 {
+	_lock.RLock()
+	defer _lock.RUnlock()
 
 	return _players[id].State
 }
 
-func ProtectTime(id int32) time.Time {
-	_lock.Lock()
-	defer _lock.Unlock()
+func ProtectTime(id int32) int64 {
+	_lock.RLock()
+	defer _lock.RUnlock()
 
 	return _players[id].ProtectTime
 }
