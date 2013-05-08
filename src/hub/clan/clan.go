@@ -20,7 +20,7 @@ func init() {
 	_clan_names = make(map[string]*ClanInfo)
 }
 
-//------------------------------------------------- create clan
+//------------------------------------------------ create clan
 func Create(id int32, name string) (int32, bool) {
 	_lock.Lock()
 	defer _lock.Unlock()
@@ -37,7 +37,7 @@ func Create(id int32, name string) (int32, bool) {
 	return -1, false
 }
 
-//------------------------------------------------- Join clan
+//------------------------------------------------ Join clan
 func Join(id, clanid int32) bool {
 	_lock.Lock()
 	defer _lock.Unlock()
@@ -61,7 +61,7 @@ func Join(id, clanid int32) bool {
 	return false
 }
 
-//------------------------------------------------- leave clan
+//------------------------------------------------ leave clan
 func Leave(id, clanid int32) bool {
 	_lock.Lock()
 	defer _lock.Unlock()
@@ -85,4 +85,8 @@ func Leave(id, clanid int32) bool {
 	}
 
 	return false
+}
+
+//------------------------------------------------  Send Message  
+func Send(msg string, clanid int32) {
 }
