@@ -18,9 +18,9 @@ const (
 	ONLINE  = 1 << 1 << HISHIFT
 
 	// battle status
-	RAID = 1 << 2
-	PROTECTED  = 1 << 3
-	FREE       = 1 << 4
+	RAID      = 1 << 2
+	PROTECTED = 1 << 3
+	FREE      = 1 << 4
 
 	LOMASK = 0xFFFF
 	HIMASK = 0xFFFF0000
@@ -48,7 +48,7 @@ type PlayerInfo struct {
 var (
 	_ranklist dos.Tree // dynamic order statistics
 	_lock     sync.RWMutex
-	_players  map[int32]*PlayerInfo // free players
+	_players  map[int32]*PlayerInfo // all players
 	_raids    map[int32]*PlayerInfo // being raided
 	_protects map[int32]*PlayerInfo // protecting
 )
@@ -189,7 +189,7 @@ func Logout(id int32) bool {
 		state := player.State
 
 		if state&ONLINE != 0 {
-			player.State = int32(OFFLINE|(state & LOMASK))
+			player.State = int32(OFFLINE | (state & LOMASK))
 			return true
 		}
 	}
@@ -254,7 +254,7 @@ func Free(id int32) bool {
 
 	if player != nil {
 		if player.State&RAID != 0 {
-			player.State = int32(OFFLINE|FREE)
+			player.State = int32(OFFLINE | FREE)
 			delete(_raids, id) // remove from raids
 			return true
 		}
@@ -273,7 +273,7 @@ func Unprotect(id int32) bool {
 
 	if player != nil {
 		if player.State&RAID != 0 {
-			player.State = int32(ONLINE|FREE)
+			player.State = int32(ONLINE | FREE)
 			delete(_protects, id) // remove from raids
 			return true
 		}
