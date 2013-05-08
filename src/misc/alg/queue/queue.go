@@ -33,10 +33,9 @@ func (q *Queue) Enqueue(elem interface{}) bool {
 }
 
 //----------------------------------------------- Dequeue
-func (q *Queue) Dequeue()(ret interface{}, result bool) {
+func (q *Queue) Dequeue()(ret interface{}) {
 	if q.size > 0 {
 		ret = q.elements[q.front]
-		result = true
 
 		q.size--
 		q.front++
@@ -47,7 +46,7 @@ func (q *Queue) Dequeue()(ret interface{}, result bool) {
 		return
 	}
 
-	return nil, false
+	return nil
 }
 
 //----------------------------------------------- return queue
@@ -58,7 +57,7 @@ func (q *Queue) All()(all []interface{}) {
 	idx := q.front
 
 	for count > 0  {
-		all[idx] = q.elements[idx]
+		all[q.size-count]= q.elements[idx]
 
 		if idx < q.capacity {
 			idx++
