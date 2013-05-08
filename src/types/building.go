@@ -16,7 +16,7 @@ const (
 	FMT = "%v:%v:%v:%v"
 )
 
-func Marshal(list []Building) string {
+func BuildingMarshal(list []Building) string {
 	var build_strs []string
 	for k := range list {
 		b := &list[k]
@@ -26,7 +26,7 @@ func Marshal(list []Building) string {
 	return strings.Join(build_strs,"#")
 }
 
-func Unmarshal(list_str string) []Building {
+func BuildingUnmarshal(list_str string) []Building {
 	list := strings.Split(list_str,"#")
 	var buildings []Building
 	for k := range list {
