@@ -1,14 +1,14 @@
 package queue
 
 type Queue struct {
-	capacity int32
-	size	int32
-	front	int32
-	rear	int32
+	capacity int
+	size	int
+	front	int
+	rear	int
 	elements []interface{}
 }
 
-func New(max int32) *Queue {
+func New(max int) *Queue {
 	queue := &Queue {capacity:max, size:0, front:0, rear:-1}
 	queue.elements = make([]interface{}, max)
 	return queue

@@ -2,12 +2,14 @@ package clan
 
 import (
 	"sync"
+	"misc/alg/queue"
 )
 
 type ClanInfo struct {
 	Id      int32
 	Name    string
 	Members []int32
+	MQ		*queue.Queue
 }
 
 var _clans map[int32]*ClanInfo       // id -> claninfo
@@ -18,6 +20,12 @@ var _lock sync.RWMutex
 func init() {
 	_clans = make(map[int32]*ClanInfo)
 	_clan_names = make(map[string]*ClanInfo)
+}
+
+var _maxqueue int
+
+func init() {
+	_maxqueue = 256 
 }
 
 //------------------------------------------------ create clan
@@ -31,6 +39,7 @@ func Create(id int32, name string) (int32, bool) {
 		clan := &ClanInfo{Id: clanid, Name: name, Members: []int32{id}}
 		_clans[clan.Id] = clan
 		_clan_names[clan.Name] = clan
+		clan.MQ = queue.New(_maxqueue)
 		return 0, true
 	}
 
@@ -89,4 +98,15 @@ func Leave(id, clanid int32) bool {
 
 //------------------------------------------------  Send Message  
 func Send(msg string, clanid int32) {
+	_lock.Lock()
+	defer _lock.Unlock()
+
+	clan := _clans[clanid]
+
+	if clan != nil {
+		if !clan.MQ.Enqueue(msg) {
+			clan.MQ.Dequeue()
+			clan.MQ.Enqueue(msg)
+		}
+	}
 }
