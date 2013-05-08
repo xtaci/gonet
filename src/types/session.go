@@ -3,10 +3,11 @@ package types
 import "time"
 
 type Session struct {
-	MQ      chan interface{}		// ASYNC
-	CALL	chan interface{}		// SYNC
+	MQ   chan interface{} // ASYNC
+	CALL chan interface{} // SYNC
 
-	User	User
-	SESSID    [128]byte // UNIQUE session ID
+	User      User
+	Bitmap    []byte
+	Buildings []byte
 	HeartBeat time.Time
 }
