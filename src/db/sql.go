@@ -13,10 +13,12 @@ func init() {
 	escape_regexp = regexp.MustCompile(`(\'|\"|\.|\*|\/|\-|\\)`)
 }
 
+//----------------------------------------------- escape chars
 func SQL_escape(v string) string {
 	return escape_regexp.ReplaceAllString(v, `\${1}`)
 }
 
+//----------------------------------------------- dump struct into sql (fields, values) array.
 func SQL_dump(tbl interface{}, excludes ...string) (fields []string, values []string) {
 
 	v := reflect.ValueOf(tbl).Elem()
@@ -68,6 +70,7 @@ func SQL_dump(tbl interface{}, excludes ...string) (fields []string, values []st
 	return
 }
 
+//----------------------------------------------- Load query result into the struct.
 func SQL_load(tbl interface{}, row *mysql.Row, res mysql.Result) {
 	v := reflect.ValueOf(tbl).Elem()
 	for i, field := range res.Fields() {
@@ -92,6 +95,7 @@ func SQL_load(tbl interface{}, row *mysql.Row, res mysql.Result) {
 	}
 }
 
+//----------------------------------------------- SET xxx=nnn, xx=nn clause
 func SQL_set_clause(fields []string, values []string) []string {
 	changes := make([]string, len(fields))
 	for i := range fields {

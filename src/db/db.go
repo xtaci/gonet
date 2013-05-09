@@ -17,6 +17,7 @@ const (
 
 var DBCH chan mysql.Conn
 
+//----------------------------------------------- create db connection pool
 func StartDB() {
 
 	config := cfg.Get()

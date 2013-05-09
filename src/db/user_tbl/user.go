@@ -11,6 +11,7 @@ import (
 	"strings"
 )
 
+//----------------------------------------------- Store user struct into db
 func Store(ud *User) {
 	fields, values := SQL_dump(ud)
 	changes := SQL_set_clause(fields, values)
@@ -24,6 +25,7 @@ func Store(ud *User) {
 	CheckErr(err)
 }
 
+//----------------------------------------------- login with (name, password) pair
 func Login(name string, password string, ud *User) bool {
 	stmt := "select * from users where name = '%v' AND password = MD5('%v')"
 
@@ -41,6 +43,7 @@ func Login(name string, password string, ud *User) bool {
 	return false
 }
 
+//----------------------------------------------- login with MAC addr
 func LoginMAC(mac string, ud *User) bool {
 	stmt := "SELECT * FROM users where mac='%v'"
 
@@ -58,6 +61,7 @@ func LoginMAC(mac string, ud *User) bool {
 	return false
 }
 
+//----------------------------------------------- Create a new user
 func New(ud *User) (ret bool) {
 	defer func() {
 		if x := recover(); x != nil {
@@ -100,6 +104,7 @@ func New(ud *User) (ret bool) {
 	return false
 }
 
+//----------------------------------------------- Load a user from db
 func Load(id int32) (ud User, err error) {
 	stmt := "SELECT * FROM users where id ='%v'"
 
@@ -118,6 +123,7 @@ func Load(id int32) (ud User, err error) {
 	return
 }
 
+//----------------------------------------------- Load all users from db
 func LoadAll() (uds []User) {
 	stmt := "SELECT * FROM users"
 

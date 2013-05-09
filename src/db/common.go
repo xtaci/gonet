@@ -3,6 +3,7 @@ package db
 import "log"
 import "runtime"
 
+//----------------------------------------------- error checking and logging for database
 func CheckErr(err error) {
 	if err != nil {
 		funcName, file, line, ok := runtime.Caller(1)

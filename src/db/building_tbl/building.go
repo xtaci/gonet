@@ -6,17 +6,17 @@ import (
 )
 
 import (
+	"encoding/base64"
+	"errors"
 	"fmt"
 	"strings"
-	"errors"
-	"encoding/base64"
 )
 
 const (
 	FMT = "%v:%v:%v:%v"
 )
 
-
+//----------------------------------------------- Loading Building-List from db
 func Load(user_id int32) (list []Building, bitmap *Map, err error) {
 	stmt := "SELECT list, map FROM buildings where user_id ='%v' LIMIT 1"
 
@@ -36,6 +36,7 @@ func Load(user_id int32) (list []Building, bitmap *Map, err error) {
 
 }
 
+//----------------------------------------------- Store Building-List into db
 func Store(user_id int32, list []Building, bitmap *Map) {
 	str_list := _pack(list)
 	str_bitmap := _encode_map(bitmap.Bitset)
@@ -49,18 +50,20 @@ func Store(user_id int32, list []Building, bitmap *Map) {
 	CheckErr(err)
 }
 
+//----------------------------------------------- pack building list into string
 func _pack(list []Building) string {
 	var build_strs []string
 	for k := range list {
 		b := &list[k]
-		build_strs = append(build_strs, fmt.Sprintf(FMT, b.TYPE, b.X,b.Y,b.LV))
+		build_strs = append(build_strs, fmt.Sprintf(FMT, b.TYPE, b.X, b.Y, b.LV))
 	}
 
-	return strings.Join(build_strs,"#")
+	return strings.Join(build_strs, "#")
 }
 
+//----------------------------------------------- unpack building string into building-list
 func _unpack(list_str string) []Building {
-	list := strings.Split(list_str,"#")
+	list := strings.Split(list_str, "#")
 	var buildings []Building
 	for k := range list {
 		b := &Building{}
@@ -71,6 +74,7 @@ func _unpack(list_str string) []Building {
 	return buildings
 }
 
+//----------------------------------------------- decode bitmap bits from base64
 func _decode_map(mapstr string) *Map {
 	bitmap := &Map{}
 	mapdata, err := base64.StdEncoding.DecodeString(mapstr)
@@ -83,6 +87,7 @@ func _decode_map(mapstr string) *Map {
 	return bitmap
 }
 
+//----------------------------------------------- encode bitmap bits into base64
 func _encode_map(bitmap []byte) string {
 	return base64.StdEncoding.EncodeToString(bitmap)
 }
