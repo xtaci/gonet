@@ -1,9 +1,12 @@
 package cfg
 
-import "os"
-import "bufio"
-import "regexp"
-import "fmt"
+import (
+	"os"
+	"bufio"
+	"regexp"
+	"fmt"
+	"strings"
+)
 
 var _map map[string]string
 
@@ -33,13 +36,12 @@ func _load_config(path string) (ret map[string]string) {
 
 	for {
 		line, e := r.ReadString('\n')
+		line = strings.TrimSpace(line)
 
 		// empty-line & #comment
 		if line == "" || []byte(line)[0] == '#' {
 			if e == nil {
 				continue
-			} else {
-				break
 			}
 		}
 
