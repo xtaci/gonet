@@ -9,15 +9,16 @@ var _map map[string]string
 
 const CONFIG_PATH = "./config.ini"
 
+//----------------------------------------------- Singleton method for accessing config.ini
 func Get() map[string]string {
 	if _map == nil {
-		_map = read_config(CONFIG_PATH)
+		_map = _load_config(CONFIG_PATH)
 	}
 
 	return _map
 }
 
-func read_config(path string) (ret map[string]string) {
+func _load_config(path string) (ret map[string]string) {
 	ret = make(map[string]string)
 	f, err := os.Open(path)
 
