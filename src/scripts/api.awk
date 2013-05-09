@@ -1,3 +1,6 @@
+###########################################################
+## Scripts for generate protocol string->code(uint16)
+##
 BEGIN { RS = ""; FS ="\n" 
 print "package protos"
 print ""

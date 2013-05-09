@@ -1,3 +1,6 @@
+###########################################################
+## Scripts for generate ProtoHandler map binding code
+##
 BEGIN { RS = ""; FS ="\n" 
 print ""
 print "var ProtoHandler map[uint16]func(*Session, *packet.Packet) ([]byte, error) = map[uint16]func(*Session, *packet.Packet)([]byte, error){"

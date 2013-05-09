@@ -1,3 +1,6 @@
+###########################################################
+## Scripts for generate protocol code(uint16)->(string)
+##
 BEGIN { RS = ""; FS ="\n" 
 print "var RCode map[uint16]string = map[uint16]string {"
 }
