@@ -6,6 +6,7 @@ import . "types"
 var _active map[int32]*Session
 var _lock sync.RWMutex
 
+//----------------------------------------------- register a user as online user
 func Register(sess *Session, id int32) {
 	defer _lock.Unlock()
 	_lock.Lock()
@@ -13,6 +14,7 @@ func Register(sess *Session, id int32) {
 	_active[id] = sess
 }
 
+//----------------------------------------------- unregister a user from online users
 func Unregister(id int32) {
 	defer _lock.Unlock()
 	_lock.Lock()
@@ -20,6 +22,7 @@ func Unregister(id int32) {
 	delete(_active, id)
 }
 
+//----------------------------------------------- query a online user
 func Query(id int32) *Session {
 	defer _lock.RUnlock()
 	_lock.RLock()

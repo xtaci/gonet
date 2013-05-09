@@ -1,14 +1,14 @@
 package clan
 
 import (
-	"sync"
 	"misc/alg/queue"
+	"sync"
 )
 
 type ClanInfo struct {
 	Id      int32
 	Members []int32
-	MQ		*queue.Queue
+	MQ      *queue.Queue
 	Name    string
 }
 
@@ -96,7 +96,7 @@ func Leave(id, clanid int32) bool {
 	return false
 }
 
-//------------------------------------------------  Send Message  
+//------------------------------------------------  send message to clan
 func Send(msg string, clanid int32) {
 	_lock.Lock()
 	defer _lock.Unlock()
