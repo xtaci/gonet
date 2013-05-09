@@ -156,16 +156,21 @@ func Raid(id int32) bool {
 
 	if player != nil {
 		player.LCK.Lock()
-		defer player.LCK.Unlock()
 
 		state := player.State
 
 		if state&OFFLINE != 0 && state&FREE != 0 {
 			player.State = int32(OFFLINE | RAID)
 			player.RaidStart = time.Now().Unix()
-			_raids[id] = player // add to being raided queue
+			player.LCK.Unlock()
+
+			_lock_raids.Lock()
+			_raids[id] = player // add to raid queue
+			_lock_raids.Unlock()
 			return true
 		}
+
+		player.LCK.Unlock()
 	}
 
 	return false
@@ -187,10 +192,19 @@ func Protect(id int32, until time.Time) bool {
 		if state&RAID != 0 {
 			player.State = int32(OFFLINE | PROTECTED)
 			player.ProtectTime = until.Unix()
-			delete(_raids, id)     // remove from raids
+			player.LCK.Unlock()
+
+			_lock_raids.Lock()
+			delete(_raids, id) // remove from raids
+			_lock_raids.Unlock()
+
+			_lock_protects.Lock()
 			_protects[id] = player // add to protects
+			_lock_protects.Unlock()
+
 			return true
 		}
+		player.LCK.Unlock()
 	}
 
 	return false
@@ -230,7 +244,7 @@ func Unprotect(id int32) bool {
 
 		if player.State&RAID != 0 {
 			player.State = int32(ONLINE | FREE)
-			delete(_protects, id) // remove from raids
+			delete(_protects, id) // remove from protects
 			return true
 		}
 	}
