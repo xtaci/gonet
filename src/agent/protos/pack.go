@@ -5,6 +5,7 @@ import (
 	"reflect"
 )
 
+//----------------------------------------------- write-out struct fields with packet writer.
 func pack(tos uint16, tbl interface{}, writer *packet.Packet) []byte {
 	v := reflect.ValueOf(tbl)
 	count := v.NumField()
@@ -37,6 +38,7 @@ func pack(tos uint16, tbl interface{}, writer *packet.Packet) []byte {
 	return writer.Data()
 }
 
+//----------------------------------------------- test whether the field is primitive type
 func _is_primitive(f reflect.Value) bool {
 	switch f.Type().Kind() {
 	case reflect.Uint8,
@@ -55,6 +57,7 @@ func _is_primitive(f reflect.Value) bool {
 	return false
 }
 
+//----------------------------------------------- write a primitive field
 func _write_primitive(f reflect.Value, writer *packet.Packet) {
 	switch f.Type().Kind() {
 	case reflect.Uint8:
