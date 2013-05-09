@@ -8,6 +8,7 @@ import (
 	"strings"
 )
 
+//----------------------------------------------- parse & load a game data file into dictionary
 func parse(file *os.File) {
 	r := bufio.NewReader(file)
 
@@ -25,6 +26,7 @@ func parse(file *os.File) {
 		// split fields
 		fields := strings.Split(line, ",")
 
+		// the first line represents field names
 		if isLineOne {
 			names = make([]string, len(fields))
 			for k, v := range fields {
@@ -34,7 +36,7 @@ func parse(file *os.File) {
 			continue
 		}
 
-		// the first column is LEVEL
+		// the first column represents the level
 		lv, _ := strconv.Atoi(fields[0])
 
 		for i := 1; i < len(fields); i++ {
