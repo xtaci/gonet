@@ -5,7 +5,7 @@ type Record struct {
 	Fields map[string]interface{}
 }
 
-//----------------------------------------------- Building Upgrade Info 
+//----------------------------------------------- Numerical Table for a object
 type Table struct {
 	Records map[int]*Record
 }
