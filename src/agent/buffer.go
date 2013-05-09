@@ -5,35 +5,34 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"sync/atomic"
 	"strconv"
+	"sync/atomic"
 )
 
 import (
-	"misc/packet"
 	"cfg"
+	"misc/packet"
 )
 
-var	_BUFSIZE int32
+var _BUFSIZE int32
 var _MAXCHAN int32
 
 type _RawPacket struct {
-	size uint16 // payload size
 	data []byte // payload
 }
 
 type Buffer struct {
-	ctrl    chan string
+	ctrl    chan string      // receive "exit"
 	pending chan *_RawPacket // pending Packet
 	size    int32            // packet payload bytes count
 
 	conn net.Conn // connection
 }
 
-//--------------------------------------------------------- Send packet
+//------------------------------------------------ Send packet
 func (buf *Buffer) Send(data []byte) (err error) {
 	if buf.size <= _BUFSIZE {
-		rp := _RawPacket{size: uint16(len(data)), data: data}
+		rp := _RawPacket{data}
 		buf.pending <- &rp
 
 		atomic.AddInt32(&buf.size, int32(len(data)))
@@ -43,7 +42,7 @@ func (buf *Buffer) Send(data []byte) (err error) {
 	return errors.New(fmt.Sprintf("Send Buffer Overflow, send rejected, possible DoS attack. Remote: %v", buf.conn.RemoteAddr()))
 }
 
-//--------------------------------------------------------- packet sender goroutine
+//------------------------------------------------ packet sender goroutine
 func (buf *Buffer) Start() {
 	defer recover()
 
@@ -58,6 +57,7 @@ func (buf *Buffer) Start() {
 	}
 }
 
+//------------------------------------------------ send packet online
 func (buf *Buffer) raw_send(pkt *_RawPacket) {
 	headwriter := packet.Writer()
 	headwriter.WriteU16(uint16(len(pkt.data)))
@@ -77,6 +77,7 @@ func (buf *Buffer) raw_send(pkt *_RawPacket) {
 	return
 }
 
+//------------------------------------------------ create a new write buffer
 func NewBuffer(conn net.Conn, ctrl chan string) *Buffer {
 	buf := Buffer{conn: conn, size: 0}
 	buf.pending = make(chan *_RawPacket, _MAXCHAN)

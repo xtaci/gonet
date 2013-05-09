@@ -13,6 +13,7 @@ import (
 	"runtime"
 )
 
+//----------------------------------------------- client protocol handle proxy
 func UserRequestProxy(sess *Session, p []byte) []byte {
 	defer _ProxyError()
 
@@ -37,6 +38,7 @@ func UserRequestProxy(sess *Session, p []byte) []byte {
 	return nil
 }
 
+//----------------------------------------------- IPC proxy
 func IPCRequestProxy(sess *Session, p interface{}) []byte {
 	defer _ProxyError()
 

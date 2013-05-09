@@ -13,6 +13,7 @@ import (
 	. "types"
 )
 
+//----------------------------------------------- timer work
 func _timer(interval int, ch chan string) {
 	defer func() {
 		recover()
@@ -24,6 +25,7 @@ func _timer(interval int, ch chan string) {
 	}
 }
 
+//----------------------------------------------- Start Agent when a client is connected
 func StartAgent(in chan []byte, conn net.Conn) {
 	var sess Session
 	sess.MQ = make(chan interface{}, 128)
