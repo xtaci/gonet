@@ -5,7 +5,11 @@ import (
 	"hub/ranklist"
 )
 
-// load user table into memory
+func startup_work() {
+	load_ranklist()
+}
+
+//----------------------------------------------- load user table into memory
 func load_ranklist() {
 	uds := user_tbl.LoadAll()
 

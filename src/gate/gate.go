@@ -8,7 +8,11 @@ import "os"
 import "log"
 import "cfg"
 
+//----------------------------------------------- Game Server Start
 func main() {
+	log.Println("Starting the server")
+
+	// start logger
 	config := cfg.Get()
 	if config["logfile"] != "" {
 		f, err := os.OpenFile(config["logfile"], os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
@@ -23,20 +27,20 @@ func main() {
 		log.SetOutput(&r)
 	}
 
-	log.Println("Starting the server")
+	// start db
 	StartDB()
 
-	//	
+	// data init
+	startup_work()
+
+	// signal
+	go SignalProc()
+
+	// Listen
 	service := ":8080"
 	if config["service"] != "" {
 		service = config["service"]
 	}
-
-	// Load RankList
-	load_ranklist()
-
-	//
-	go SignalProc()
 
 	log.Println("Service:", service)
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", service)
@@ -55,6 +59,7 @@ func main() {
 	}
 }
 
+//----------------------------------------------- start a goroutine when a new connection is accepted
 func handleClient(conn net.Conn) {
 	defer conn.Close()
 
