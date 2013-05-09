@@ -20,11 +20,11 @@ func (p *Packet) Pos() uint {
 	return p.pos
 }
 
-//---------------------------------------------------------Reader
 func (p *Packet) Seek(n uint) {
 	p.pos += n
 }
 
+//=============================================== Readers
 func (p *Packet) ReadByte() (ret byte, err error) {
 	if p.pos >= uint(len(p.data)) {
 		err = errors.New("read byte failed")
@@ -133,7 +133,7 @@ func (p *Packet) ReadS64() (ret int64, err error) {
 	return
 }
 
-//---------------------------------------------------------Writer
+//================================================ Writers
 func (p *Packet) WriteZeros(n int) {
 	zeros := make([]byte, n)
 	p.data = append(p.data, zeros...)
