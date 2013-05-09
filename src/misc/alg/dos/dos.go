@@ -80,7 +80,7 @@ func (t *Tree) Count() int {
 }
 
 //--------------------------------------------------------- Lookup by score
-func (t *Tree) Score(score int) (n *Node, rank int) {
+func (t *Tree) ByScore(score int) (n *Node, rank int) {
 	n = t.root
 
 	if n == nil {
