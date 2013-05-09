@@ -41,18 +41,18 @@ type PlayerInfo struct {
 	RaidStart   int64 // unix time
 	Clan        int32 // clan info
 	Name        string
-	LCK sync.Mutex	// Record lock
+	LCK         sync.Mutex // Record lock
 }
 
 var (
-	_lock_players     sync.RWMutex	// lock players
-	_players  map[int32]*PlayerInfo // all players
+	_lock_players sync.RWMutex          // lock players
+	_players      map[int32]*PlayerInfo // all players
 
-	_lock_raids sync.Mutex		// lock raids
-	_raids    map[int32]*PlayerInfo // being raided
+	_lock_raids sync.Mutex            // lock raids
+	_raids      map[int32]*PlayerInfo // being raided
 
-	_lock_protects	 sync.Mutex	// lock protects
-	_protects map[int32]*PlayerInfo // protecting
+	_lock_protects sync.Mutex            // lock protects
+	_protects      map[int32]*PlayerInfo // protecting
 )
 
 func init() {
@@ -237,7 +237,6 @@ func Unprotect(id int32) bool {
 
 	return false
 }
-
 
 // State Readers
 func State(id int32) int32 {

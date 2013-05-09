@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	_ranklist dos.Tree // dynamic order statistics
+	_ranklist      dos.Tree // dynamic order statistics
 	_lock_ranklist sync.RWMutex
 )
 
