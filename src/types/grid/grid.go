@@ -1,4 +1,4 @@
-package types
+package grid
 
 const (
 	GRID_W = 40

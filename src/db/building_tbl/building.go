@@ -1,8 +1,9 @@
-package user_tbl
+package building_tbl
 
 import (
 	. "db"
 	. "types"
+	"types/grid"
 )
 
 import (
@@ -17,7 +18,7 @@ const (
 )
 
 //----------------------------------------------- Loading Building-List from db
-func Load(user_id int32) (list []Building, bitmap *Map, err error) {
+func Load(user_id int32) (list []Building, grid *grid.Grid, err error) {
 	stmt := "SELECT list, map FROM buildings where user_id ='%v' LIMIT 1"
 
 	db := <-DBCH
@@ -28,7 +29,7 @@ func Load(user_id int32) (list []Building, bitmap *Map, err error) {
 
 	if len(rows) > 0 {
 		list = _unpack(rows[0].Str(0))
-		bitmap = _decode_map(rows[0].Str(1))
+		grid.Bitset = _decode_map(rows[0].Str(1))
 	}
 
 	err = errors.New(fmt.Sprint("cannot find building belongs to id:%v", user_id))
@@ -37,9 +38,9 @@ func Load(user_id int32) (list []Building, bitmap *Map, err error) {
 }
 
 //----------------------------------------------- Store Building-List into db
-func Store(user_id int32, list []Building, bitmap *Map) {
+func Store(user_id int32, list []Building, grid *grid.Grid) {
 	str_list := _pack(list)
-	str_bitmap := _encode_map(bitmap.Bitset)
+	str_bitmap := _encode_map(grid.Bitset)
 
 	stmt := "UPDATE buildings SET list='%v', bitmap='%v' WHERE user_id = %v"
 
@@ -75,16 +76,14 @@ func _unpack(list_str string) []Building {
 }
 
 //----------------------------------------------- decode bitmap bits from base64
-func _decode_map(mapstr string) *Map {
-	bitmap := &Map{}
-	mapdata, err := base64.StdEncoding.DecodeString(mapstr)
-	bitmap.Bitset = mapdata
+func _decode_map(mapstr string) []byte {
+	bitset, err := base64.StdEncoding.DecodeString(mapstr)
 
 	if err != nil {
 		return nil
 	}
 
-	return bitmap
+	return bitset
 }
 
 //----------------------------------------------- encode bitmap bits into base64
