@@ -44,6 +44,21 @@ type PlayerInfo struct {
 	LCK         sync.Mutex // Record lock
 }
 
+/**********************************************************
+ * consider following deadlock situations. 
+ *
+ * A(B) means lock A,lock B, unlock B, unlock A
+ * A->B means lockA unlockA,then lockB, unlockB
+ *
+ * p:A(B), q:B(A), possible circular wait, deadlock!!!
+ * p:A(B), q:A(B), ok 
+ * p.A(B), q:B or A, ok
+ * p:A->B, q: B->A, ok 
+ *
+ * make sure acquiring the lock IN SEQUENCE. i.e.
+ * A: one of [players, raids, protects]
+ * B: playerinfo.LCK
+ **********************************************************/
 var (
 	_lock_players sync.RWMutex          // lock players
 	_players      map[int32]*PlayerInfo // all players
@@ -108,6 +123,7 @@ func _add_fsm(ud *User) {
 
 // The State Machine Of Player
 //----------------------------------------------- OFFLINE->ONLINE
+// A->B
 func Login(id int32) bool {
 	_lock_players.RLock()
 	player := _players[id]
@@ -128,6 +144,7 @@ func Login(id int32) bool {
 }
 
 //----------------------------------------------- ONLINE->OFFLINE
+// A->B
 func Logout(id int32) bool {
 	_lock_players.RLock()
 	player := _players[id]
@@ -149,6 +166,7 @@ func Logout(id int32) bool {
 }
 
 //----------------------------------------------- FREE->RAID
+// A->B->A
 func Raid(id int32) bool {
 	_lock_players.RLock()
 	player := _players[id]
@@ -177,15 +195,14 @@ func Raid(id int32) bool {
 }
 
 //----------------------------------------------- RAID->PROTECTED
+// A->B->A->A
 func Protect(id int32, until time.Time) bool {
 	_lock_raids.Lock()
-	defer _lock_raids.Unlock()
-
 	player := _raids[id]
+	_lock_raids.Unlock()
 
 	if player != nil {
 		player.LCK.Lock()
-		defer player.LCK.Unlock()
 
 		state := player.State
 
@@ -211,6 +228,7 @@ func Protect(id int32, until time.Time) bool {
 }
 
 //----------------------------------------------- RAID->FREE
+// A(B)
 func Free(id int32) bool {
 	_lock_raids.Lock()
 	defer _lock_raids.Unlock()
@@ -232,6 +250,7 @@ func Free(id int32) bool {
 }
 
 //----------------------------------------------- PROTECT->FREE
+// A(B)
 func Unprotect(id int32) bool {
 	_lock_protects.Lock()
 	defer _lock_protects.Unlock()
@@ -253,6 +272,7 @@ func Unprotect(id int32) bool {
 }
 
 // State Readers
+// A->B 
 func State(id int32) int32 {
 	_lock_players.RLock()
 	player := _players[id]
