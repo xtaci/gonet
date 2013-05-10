@@ -5,8 +5,12 @@ BEGIN { RS = ""; FS ="\n"
 print "var RCode map[uint16]string = map[uint16]string {"
 }
 {
+	name = ""
 	for (i=1;i<=NF;i++)
 	{
+		if ($i ~ /^#.*/) {
+			continue
+		}
 		split($i, a, ":")
 		if (a[1] == "packet_type") {
 			type = a[2]

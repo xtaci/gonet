@@ -1,0 +1,34 @@
+#用户登陆发包
+id=
+id integer
+===
+
+#改变分数
+changescore=
+id	integer
+oldscore integer
+newscore integer
+===
+
+#获取排行榜
+getlist=
+A integer
+B integer
+===
+
+getlist_result=
+items array intresult
+===
+
+#保护时间结果
+longresult=
+v long
+===
+
+stringresult=
+v string
+===
+
+intresult=
+v integer
+===

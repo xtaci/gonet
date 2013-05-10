@@ -10,8 +10,14 @@ print ""
 print "var Code map[string]uint16 = map[string]uint16 {"
 }
 {
+	name = ""
+
 	for (i=1;i<=NF;i++)
 	{
+		if ($i ~ /^#.*/) {
+			continue
+		}
+
 		split($i, a, ":")
 		if (a[1] == "packet_type") {
 			type = a[2]

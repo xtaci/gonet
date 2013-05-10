@@ -27,7 +27,7 @@ func _user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err erro
 	version, _ := strconv.Atoi(config["version"])
 
 	if tbl.F_client_version != int32(version) {
-		ret = pack(Code["user_login_faild_ack"], failed, writer)
+		ret = packet.Pack(Code["user_login_faild_ack"], failed, writer)
 		return
 	}
 
@@ -35,10 +35,10 @@ func _user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err erro
 		if user_tbl.LoginMAC(sess.User.Mac, &sess.User) {
 			online.Register(sess, sess.User.Id)
 			_fill_user_snapshot(&sess.User, &success)
-			ret = pack(Code["user_login_succeed_ack"], success, writer)
+			ret = packet.Pack(Code["user_login_succeed_ack"], success, writer)
 			return
 		} else {
-			ret = pack(Code["user_login_faild_ack"], failed, writer)
+			ret = packet.Pack(Code["user_login_faild_ack"], failed, writer)
 			return
 		}
 	} else {
@@ -51,10 +51,10 @@ func _user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err erro
 			online.Register(sess, sess.User.Id)
 			ranklist.AddUser(&sess.User)
 			_fill_user_snapshot(&sess.User, &success)
-			ret = pack(Code["user_login_succeed_ack"], success, writer)
+			ret = packet.Pack(Code["user_login_succeed_ack"], success, writer)
 			return
 		} else {
-			ret = pack(Code["user_login_faild_ack"], failed, writer)
+			ret = packet.Pack(Code["user_login_faild_ack"], failed, writer)
 			return
 		}
 	}

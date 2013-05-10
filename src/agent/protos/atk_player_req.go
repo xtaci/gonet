@@ -17,13 +17,13 @@ func _atk_player_req(sess *Session, reader *packet.Packet) (ret []byte, err erro
 		opponent, e := user_tbl.Load(tbl.F_id)
 		if e == nil {
 			_fill_user_snapshot(&opponent, &success)
-			ret = pack(Code["atk_player_succeed_ack"], success, writer)
+			ret = packet.Pack(Code["atk_player_succeed_ack"], success, writer)
 			return
 		}
 	}
 
 	// 
 	failed.F_rst = int32(ranklist.State(tbl.F_id))
-	ret = pack(Code["atk_player_faild_ack"], failed, writer)
+	ret = packet.Pack(Code["atk_player_faild_ack"], failed, writer)
 	return
 }

@@ -8,6 +8,7 @@ print "import \"misc/packet\"\n"
 }
 {
 
+	typeok = false
 	for (i=1;i<=NF;i++)
 	{
 		if ($i ~ /^#.*/ || $i ~ /^===/) {
@@ -23,6 +24,8 @@ print "import \"misc/packet\"\n"
 			print "\tF_"a[1] " string"
 		} else if (a[2] == "integer") {
 			print "\tF_"a[1] " int32"
+		} else if (a[2] == "long") {
+			print "\tF_"a[1] " int64"
 		} else if (a[2] == "boolean") {
 			print "\tF_"a[1] " byte"
 		} else if (a[2] == "float") {

@@ -1,7 +1,9 @@
 package protos
 
-import . "types"
-import "misc/packet"
+import (
+	. "types"
+	"misc/packet"
+)
 
 func _atk_monster_req(sess *Session, reader *packet.Packet) (ret []byte, err error) {
 	tbl, _ := pktread_command_id_pack(reader)
@@ -10,6 +12,6 @@ func _atk_monster_req(sess *Session, reader *packet.Packet) (ret []byte, err err
 
 	//
 	println(tbl.F_id)
-	ret = pack(Code["atk_monster_ack"], payload, writer)
+	ret = packet.Pack(Code["atk_monster_ack"], payload, writer)
 	return
 }

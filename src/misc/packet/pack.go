@@ -1,12 +1,11 @@
-package protos
+package packet
 
 import (
-	"misc/packet"
 	"reflect"
 )
 
 //----------------------------------------------- write-out struct fields with packet writer.
-func pack(tos uint16, tbl interface{}, writer *packet.Packet) []byte {
+func Pack(tos uint16, tbl interface{}, writer *Packet) []byte {
 	v := reflect.ValueOf(tbl)
 	count := v.NumField()
 
@@ -28,7 +27,7 @@ func pack(tos uint16, tbl interface{}, writer *packet.Packet) []byte {
 						_write_primitive(f.Index(a), writer)
 					} else {
 						elem := f.Index(a).Interface()
-						pack(65535, elem, writer)
+						Pack(65535, elem, writer)
 					}
 				}
 			}
@@ -58,7 +57,7 @@ func _is_primitive(f reflect.Value) bool {
 }
 
 //----------------------------------------------- write a primitive field
-func _write_primitive(f reflect.Value, writer *packet.Packet) {
+func _write_primitive(f reflect.Value, writer *Packet) {
 	switch f.Type().Kind() {
 	case reflect.Uint8:
 		writer.WriteByte(f.Interface().(byte))

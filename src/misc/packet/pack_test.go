@@ -1,8 +1,7 @@
-package protos
+package packet
 
 import "testing"
 import "fmt"
-import "misc/packet"
 
 type SUB struct {
 	H int16
@@ -15,7 +14,6 @@ type TEST struct {
 	D   uint32
 	F   []byte
 	Sub []SUB
-	m   int
 }
 
 func TestPack(t *testing.T) {
@@ -27,8 +25,8 @@ func TestPack(t *testing.T) {
 	test.Sub[1].H = 4096
 	test.Sub[1].I = 8192
 
-	writer := packet.Writer()
-	pack(test, writer)
+	writer := Writer()
+	Pack(128, test, writer)
 
 	fmt.Println(writer.Data())
 }

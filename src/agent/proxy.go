@@ -82,7 +82,7 @@ func init() {
 		os.Exit(1)
 	}
 
-	proto_logger = log.New(proto_logfile, "", 0)
+	proto_logger = log.New(proto_logfile, "", log.LstdFlags)
 
 	//
 	ipc_logfile, err := os.OpenFile(config["ipc_logfile"], os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
@@ -92,5 +92,5 @@ func init() {
 		os.Exit(1)
 	}
 
-	ipc_logger = log.New(ipc_logfile, "", 0)
+	ipc_logger = log.New(ipc_logfile, "", log.LstdFlags)
 }

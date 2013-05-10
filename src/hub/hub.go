@@ -1,50 +1,36 @@
 package main
 
 import (
-	. "agent"
-	. "db"
-	"cfg"
-)
-
-import (
 	"net"
 	"io"
 	"os"
 	"log"
 )
 
-//----------------------------------------------- Game Server Start
+import (
+	. "db"
+	"cfg"
+)
+
+//----------------------------------------------- HUB start
 func main() {
-	log.Println("Starting the server")
-
-	// start logger
-	config := cfg.Get()
-	if config["logfile"] != "" {
-		f, err := os.OpenFile(config["logfile"], os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
-
-		if err != nil {
-			log.Println("cannot open logfile %v\n", err)
-			os.Exit(1)
-		}
-		var r Repeater
-		r.Out1 = os.Stdout
-		r.Out2 = f
-		log.SetOutput(&r)
-	}
+	log.Println("Starting HUB")
 
 	// start db
 	StartDB()
 
-	// signal
-	go SignalProc()
+	// data init
+	startup_work()
 
 	// Listen
-	service := ":8080"
-	if config["service"] != "" {
-		service = config["service"]
+	service := ":9090"
+	config := cfg.Get()
+
+	if config["hub_service"] != "" {
+		service = config["hub_service"]
 	}
 
-	log.Println("Service:", service)
+	log.Println("Hub Service:", service)
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", service)
 	checkError(err)
 
@@ -61,14 +47,14 @@ func main() {
 	}
 }
 
-//----------------------------------------------- start a goroutine when a new connection is accepted
+//----------------------------------------------- handle logical server
 func handleClient(conn net.Conn) {
 	defer conn.Close()
 
 	header := make([]byte, 2)
 	ch := make(chan []byte, 100)
 
-	go StartAgent(ch, conn)
+	HubAgent(ch, conn)
 
 	for {
 		// header
