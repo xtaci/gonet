@@ -9,7 +9,7 @@ import (
 
 import (
 	"cfg"
-	"hub/online"
+	"agent/online"
 	. "types"
 )
 

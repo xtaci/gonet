@@ -10,6 +10,7 @@ import (
 import (
 	"cfg"
 	. "db"
+	"hub/protos"
 )
 
 //----------------------------------------------- HUB start
@@ -54,7 +55,7 @@ func handleClient(conn net.Conn) {
 	header := make([]byte, 2)
 	ch := make(chan []byte, 100)
 
-	HubAgent(ch, conn)
+	protos.HubAgent(ch, conn)
 
 	for {
 		// header

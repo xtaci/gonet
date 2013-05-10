@@ -27,6 +27,6 @@ func TestPack(t *testing.T) {
 
 	writer := Writer()
 	Pack(128, test, writer)
-
 	fmt.Println(writer.Data())
+	fmt.Println(Pack(128, test, nil))
 }

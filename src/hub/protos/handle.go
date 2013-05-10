@@ -34,14 +34,17 @@ func HandleRequest(p []byte) []byte {
 }
 
 func _login_req(pkt *packet.Packet) ([]byte, error) {
-	tbl, err := pktread_id(pkt)
+	tbl, _ := pktread_id(pkt)
+
 	if ranklist.Login(tbl.F_id) {
 		ret := intresult{F_v: 1}
+		return packet.Pack(Code["login_ack"], ret, nil), nil
 	} else {
 		ret := intresult{F_v: 0}
+		return packet.Pack(Code["login_ack"], ret, nil), nil
 	}
 
-	return
+	return nil, nil
 }
 
 func _logout_req(pkt *packet.Packet) ([]byte, error) {

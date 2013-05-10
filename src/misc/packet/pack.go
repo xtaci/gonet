@@ -6,6 +6,10 @@ import (
 
 //----------------------------------------------- write-out struct fields with packet writer.
 func Pack(tos uint16, tbl interface{}, writer *Packet) []byte {
+	if writer == nil {
+		writer = Writer()
+	}
+
 	v := reflect.ValueOf(tbl)
 	count := v.NumField()
 

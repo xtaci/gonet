@@ -8,7 +8,7 @@ import (
 import (
 	"cfg"
 	"db/user_tbl"
-	"hub/online"
+	"agent/online"
 	"hub/ranklist"
 	"misc/packet"
 	. "types"

@@ -6,7 +6,7 @@ import (
 )
 
 import (
-	"hub/online"
+	"agent/online"
 	. "types"
 )
 
