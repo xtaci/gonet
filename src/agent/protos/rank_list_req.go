@@ -15,7 +15,7 @@ func _rank_list_req(sess *Session, reader *packet.Packet) (ret []byte, err error
 	out := rank_list{}
 	out.F_items = make([]rank_list_item, len(id))
 
-	for k,v := range id {
+	for k, v := range id {
 		out.F_items[k].F_id = v
 		out.F_items[k].F_name = ranklist.Name(v)
 		out.F_items[k].F_rank = score[k]

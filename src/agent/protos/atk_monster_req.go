@@ -1,8 +1,8 @@
 package protos
 
 import (
-	. "types"
 	"misc/packet"
+	. "types"
 )
 
 func _atk_monster_req(sess *Session, reader *packet.Packet) (ret []byte, err error) {

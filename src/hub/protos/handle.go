@@ -1,14 +1,14 @@
 package protos
 
 import (
-	"misc/packet"
 	"hub/ranklist"
+	"misc/packet"
 )
 
 import (
+	"fmt"
 	"log"
 	"runtime"
-	"fmt"
 )
 
 func HandleRequest(p []byte) []byte {
@@ -33,55 +33,55 @@ func HandleRequest(p []byte) []byte {
 	return nil
 }
 
-func _login_req(pkt *packet.Packet)([]byte, error) {
+func _login_req(pkt *packet.Packet) ([]byte, error) {
 	tbl, err := pktread_id(pkt)
 	if ranklist.Login(tbl.F_id) {
-		ret := intresult{F_v:1}
+		ret := intresult{F_v: 1}
 	} else {
-		ret := intresult{F_v:0}
+		ret := intresult{F_v: 0}
 	}
 
-	return 
+	return
 }
 
-func _logout_req(pkt *packet.Packet)([]byte, error) {
-	return nil,nil
+func _logout_req(pkt *packet.Packet) ([]byte, error) {
+	return nil, nil
 }
 
-func _changescore_req(pkt *packet.Packet)([]byte, error) {
-	return nil,nil
+func _changescore_req(pkt *packet.Packet) ([]byte, error) {
+	return nil, nil
 }
 
-func _getlist_req(pkt *packet.Packet)([]byte, error) {
-	return nil,nil
+func _getlist_req(pkt *packet.Packet) ([]byte, error) {
+	return nil, nil
 }
 
-func _raid_req(pkt *packet.Packet)([]byte, error) {
-	return nil,nil
+func _raid_req(pkt *packet.Packet) ([]byte, error) {
+	return nil, nil
 }
 
-func _protect_req(pkt *packet.Packet)([]byte, error) {
-	return nil,nil
+func _protect_req(pkt *packet.Packet) ([]byte, error) {
+	return nil, nil
 }
 
-func _unprotect_req(pkt *packet.Packet)([]byte, error) {
-	return nil,nil
+func _unprotect_req(pkt *packet.Packet) ([]byte, error) {
+	return nil, nil
 }
 
-func _free_req(pkt *packet.Packet)([]byte, error) {
-	return nil,nil
+func _free_req(pkt *packet.Packet) ([]byte, error) {
+	return nil, nil
 }
 
-func _getstate_req(pkt *packet.Packet)([]byte, error) {
-	return nil,nil
+func _getstate_req(pkt *packet.Packet) ([]byte, error) {
+	return nil, nil
 }
 
-func _getprotecttime_req(pkt *packet.Packet)([]byte, error) {
-	return nil,nil
+func _getprotecttime_req(pkt *packet.Packet) ([]byte, error) {
+	return nil, nil
 }
 
-func _getname_req(pkt *packet.Packet)([]byte, error) {
-	return nil,nil
+func _getname_req(pkt *packet.Packet) ([]byte, error) {
+	return nil, nil
 }
 
 func checkErr(err error) {

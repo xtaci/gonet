@@ -1,13 +1,13 @@
 package main
 
 import (
-	"net"
 	"log"
+	"net"
 )
 
 import (
-	"misc/packet"
 	"hub/protos"
+	"misc/packet"
 )
 
 //--------------------------------------------------------- Hub processing
