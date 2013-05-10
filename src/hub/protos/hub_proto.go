@@ -17,8 +17,13 @@ type getlist struct {
 	F_B int32
 }
 
+type id_score struct {
+	F_id int32
+	F_score int32
+}
+
 type getlist_result struct {
-	F_items []intresult
+	F_items []id_score
 }
 
 type longresult struct {
@@ -57,12 +62,20 @@ func pktread_getlist(reader *packet.Packet)(tbl getlist, err error){
 	return
 }
 
+func pktread_id_score(reader *packet.Packet)(tbl id_score, err error){
+	tbl.F_id,err = reader.ReadS32()
+	checkErr(err)
+	tbl.F_score,err = reader.ReadS32()
+	checkErr(err)
+	return
+}
+
 func pktread_getlist_result(reader *packet.Packet)(tbl getlist_result, err error){
 	narr,err2 := reader.ReadU16()
 	checkErr(err2)
-	tbl.F_items=make([]intresult,narr)
+	tbl.F_items=make([]id_score,narr)
 	for i:=0;i<int(narr);i++ {
-		tbl.F_items[i], err = pktread_intresult(reader)
+		tbl.F_items[i], err = pktread_id_score(reader)
 	}
 	return
 }

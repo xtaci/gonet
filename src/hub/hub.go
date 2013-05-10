@@ -53,9 +53,9 @@ func handleClient(conn net.Conn) {
 	defer conn.Close()
 
 	header := make([]byte, 2)
-	ch := make(chan []byte, 100)
+	ch := make(chan []byte, 8192)
 
-	protos.HubAgent(ch, conn)
+	go protos.HubAgent(ch, conn)
 
 	for {
 		// header

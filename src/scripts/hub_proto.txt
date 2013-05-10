@@ -16,8 +16,13 @@ A integer
 B integer
 ===
 
+id_score=
+id integer
+score integer
+===
+
 getlist_result=
-items array intresult
+items array id_score
 ===
 
 #保护时间结果
