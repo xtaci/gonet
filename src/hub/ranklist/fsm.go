@@ -40,6 +40,7 @@ type PlayerInfo struct {
 	ProtectTime int64 // unix time
 	RaidStart   int64 // unix time
 	Clan        int32 // clan info
+	Host		int32 // host
 	Name        string
 	LCK         sync.Mutex // Record lock
 }
@@ -124,7 +125,7 @@ func _add_fsm(ud *User) {
 // The State Machine Of Player
 //----------------------------------------------- OFFLINE->ONLINE
 // A->B
-func Login(id int32) bool {
+func Login(id, host int32) bool {
 	_lock_players.RLock()
 	player := _players[id]
 	_lock_players.RUnlock()
@@ -136,6 +137,7 @@ func Login(id int32) bool {
 
 		if state&OFFLINE != 0 && state&RAID == 0 {
 			player.State = int32(ONLINE | (state & LOMASK))
+			player.Host = host
 			return true
 		}
 	}
@@ -304,4 +306,26 @@ func Name(id int32) string {
 	defer player.LCK.Unlock()
 
 	return player.Name
+}
+
+func Host(id int32) int32 {
+	_lock_players.RLock()
+	player := _players[id]
+	_lock_players.RUnlock()
+
+	player.LCK.Lock()
+	defer player.LCK.Unlock()
+
+	return player.Host
+}
+
+func Clan(id int32) int32 {
+	_lock_players.RLock()
+	player := _players[id]
+	_lock_players.RUnlock()
+
+	player.LCK.Lock()
+	defer player.LCK.Unlock()
+
+	return player.Clan
 }

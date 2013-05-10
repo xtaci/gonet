@@ -11,7 +11,7 @@ import (
 	"runtime"
 )
 
-func HandleRequest(p []byte) []byte {
+func HandleRequest(hostid int32, p []byte) []byte {
 	defer _HandleError()
 
 	reader := packet.Reader(p)
@@ -23,7 +23,7 @@ func HandleRequest(p []byte) []byte {
 
 	handle := ProtoHandler[b]
 	if handle != nil {
-		ret, err := handle(reader)
+		ret, err := handle(hostid, reader)
 		fmt.Println(ret)
 		if err == nil {
 			return ret
@@ -33,10 +33,10 @@ func HandleRequest(p []byte) []byte {
 	return nil
 }
 
-func _login_req(pkt *packet.Packet) ([]byte, error) {
+func _login_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	tbl, _ := pktread_id(pkt)
 
-	if ranklist.Login(tbl.F_id) {
+	if ranklist.Login(tbl.F_id, hostid) {
 		ret := intresult{F_v: 1}
 		return packet.Pack(Code["login_ack"], ret, nil), nil
 	} else {
@@ -47,43 +47,43 @@ func _login_req(pkt *packet.Packet) ([]byte, error) {
 	return nil, nil
 }
 
-func _logout_req(pkt *packet.Packet) ([]byte, error) {
+func _logout_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	return nil, nil
 }
 
-func _changescore_req(pkt *packet.Packet) ([]byte, error) {
+func _changescore_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	return nil, nil
 }
 
-func _getlist_req(pkt *packet.Packet) ([]byte, error) {
+func _getlist_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	return nil, nil
 }
 
-func _raid_req(pkt *packet.Packet) ([]byte, error) {
+func _raid_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	return nil, nil
 }
 
-func _protect_req(pkt *packet.Packet) ([]byte, error) {
+func _protect_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	return nil, nil
 }
 
-func _unprotect_req(pkt *packet.Packet) ([]byte, error) {
+func _unprotect_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	return nil, nil
 }
 
-func _free_req(pkt *packet.Packet) ([]byte, error) {
+func _free_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	return nil, nil
 }
 
-func _getstate_req(pkt *packet.Packet) ([]byte, error) {
+func _getstate_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	return nil, nil
 }
 
-func _getprotecttime_req(pkt *packet.Packet) ([]byte, error) {
+func _getprotecttime_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	return nil, nil
 }
 
-func _getname_req(pkt *packet.Packet) ([]byte, error) {
+func _getname_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	return nil, nil
 }
 

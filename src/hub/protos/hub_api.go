@@ -52,7 +52,7 @@ var RCode map[uint16]string = map[uint16]string{
 	1011: "getname_ack",
 }
 
-var ProtoHandler map[uint16]func(*packet.Packet) ([]byte, error) = map[uint16]func(*packet.Packet) ([]byte, error){
+var ProtoHandler map[uint16]func(int32, *packet.Packet) ([]byte, error) = map[uint16]func(int32, *packet.Packet) ([]byte, error){
 	1:  _login_req,
 	2:  _logout_req,
 	3:  _changescore_req,
