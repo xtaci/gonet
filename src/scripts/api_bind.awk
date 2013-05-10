@@ -1,10 +1,7 @@
 ###########################################################
 ## Scripts for generate ProtoHandler map binding code
 ##
-BEGIN { RS = ""; FS ="\n" 
-print ""
-print "var ProtoHandler map[uint16]func(*Session, *packet.Packet) ([]byte, error) = map[uint16]func(*Session, *packet.Packet)([]byte, error){"
-}
+BEGIN { RS = ""; FS ="\n" }
 {
 	name = type=""
 	for (i=1;i<=NF;i++)
@@ -23,7 +20,4 @@ print "var ProtoHandler map[uint16]func(*Session, *packet.Packet) ([]byte, error
 	if (name != "" && type !="") {
 		print "\t"type":_"name","
 	}
-}
-END {
-print "}"	
 }

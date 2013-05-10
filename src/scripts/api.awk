@@ -2,11 +2,6 @@
 ## Scripts for generate protocol string->code(uint16)
 ##
 BEGIN { RS = ""; FS ="\n" 
-print "package protos"
-print ""
-print "import \"misc/packet\"\n"
-print "import . \"types\"\n"
-print ""
 print "var Code map[string]uint16 = map[string]uint16 {"
 }
 {
