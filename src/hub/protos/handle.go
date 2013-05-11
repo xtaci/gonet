@@ -21,6 +21,7 @@ func HandleRequest(hostid int32, p []byte) []byte {
 		log.Println("read protocol error")
 	}
 
+	fmt.Println("proto: ",b)
 	handle := ProtoHandler[b]
 	if handle != nil {
 		ret, err := handle(hostid, reader)
@@ -31,6 +32,27 @@ func HandleRequest(hostid int32, p []byte) []byte {
 	}
 
 	return nil
+}
+
+func _forward_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
+	tbl, _ := pktread_msg(pkt)
+
+	// if user is online, send to the user, or else send to redis 
+	state := ranklist.State(tbl.F_id)
+	host :=  ranklist.Host(tbl.F_id)
+
+	fmt.Println(tbl.F_id, tbl.F_data)
+	if state & ranklist.ONLINE !=0 {
+		_server_lock.RLock()
+		ch := _servers[host]
+		_server_lock.RUnlock()
+
+		ch <- tbl.F_data
+	} else {
+		// TODO : add redis
+	}
+
+	return nil,nil
 }
 
 func _login_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
@@ -48,7 +70,7 @@ func _logout_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	tbl, _ := pktread_id(pkt)
 	ret := intresult{F_v: 0}
 
-	if ranklist.Login(tbl.F_id, hostid) {
+	if ranklist.Logout(tbl.F_id) {
 		ret.F_v = 1
 	}
 
@@ -82,31 +104,68 @@ func _getlist_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 }
 
 func _raid_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
-	return nil, nil
+	tbl, _ := pktread_id(pkt)
+	ret := intresult{F_v: 0}
+
+	if ranklist.Raid(tbl.F_id) {
+		ret.F_v = 1
+	}
+
+	return packet.Pack(Code["raid_ack"], ret, nil), nil
 }
 
 func _protect_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
-	return nil, nil
+	tbl, _ := pktread_id(pkt)
+	ret := intresult{F_v: 0}
+
+	if ranklist.Raid(tbl.F_id) {
+		ret.F_v = 1
+	}
+
+	return packet.Pack(Code["protect_ack"], ret, nil), nil
 }
 
 func _unprotect_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
-	return nil, nil
+	tbl, _ := pktread_id(pkt)
+	ret := intresult{F_v: 0}
+
+	if ranklist.Unprotect(tbl.F_id) {
+		ret.F_v = 1
+	}
+
+	return packet.Pack(Code["unprotect_ack"], ret, nil), nil
 }
 
 func _free_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
-	return nil, nil
+	tbl, _ := pktread_id(pkt)
+	ret := intresult{F_v: 0}
+
+	if ranklist.Free(tbl.F_id) {
+		ret.F_v = 1
+	}
+
+	return packet.Pack(Code["free_ack"], ret, nil), nil
 }
 
 func _getstate_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
-	return nil, nil
+	tbl, _ := pktread_id(pkt)
+	ret := intresult{}
+	ret.F_v = ranklist.State(tbl.F_id)
+	return packet.Pack(Code["getstate_ack"], ret, nil), nil
 }
 
 func _getprotecttime_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
-	return nil, nil
+	tbl, _ := pktread_id(pkt)
+	ret := longresult{}
+	ret.F_v = ranklist.ProtectTime(tbl.F_id)
+	return packet.Pack(Code["getprotecttime_ack"], ret, nil), nil
 }
 
 func _getname_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
-	return nil, nil
+	tbl, _ := pktread_id(pkt)
+	ret := stringresult{}
+	ret.F_v = ranklist.Name(tbl.F_id)
+	return packet.Pack(Code["getname_ack"], ret, nil), nil
 }
 
 func checkErr(err error) {
@@ -116,7 +175,7 @@ func checkErr(err error) {
 			log.Printf("ERR:%v,[func:%v,file:%v,line:%v]\n", err, runtime.FuncForPC(funcName).Name(), file, line)
 		}
 
-		panic("error occured in protocol module")
+		panic("error occured in HUB ipc module")
 	}
 }
 

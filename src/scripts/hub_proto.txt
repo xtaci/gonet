@@ -1,3 +1,9 @@
+# 转发消息
+msg=
+id integer
+data []byte
+===
+
 #用户登陆发包
 id=
 id integer

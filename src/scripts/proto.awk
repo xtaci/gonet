@@ -32,6 +32,8 @@ print "import \"misc/packet\"\n"
 			print "\tF_"a[1] " float32"
 		} else if (a[2] == "array") {
 			print "\tF_"a[1]" []"a[3]
+		} else {
+			print "\tF_"a[1] " "a[2]
 		}
 	}
 

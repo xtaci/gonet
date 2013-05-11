@@ -3,8 +3,7 @@ package types
 import "time"
 
 type Session struct {
-	MQ   chan interface{} // ASYNC
-	CALL chan interface{} // SYNC
+	MQ   chan interface{} // Player's Internal Message Queue
 
 	User      User
 	Bitmap    []byte

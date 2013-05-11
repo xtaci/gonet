@@ -2,6 +2,11 @@ package protos
 
 import "misc/packet"
 
+type msg struct {
+	F_id int32
+	F_data []byte
+}
+
 type id struct {
 	F_id int32
 }
@@ -36,6 +41,14 @@ type stringresult struct {
 
 type intresult struct {
 	F_v int32
+}
+
+func pktread_msg(reader *packet.Packet)(tbl msg, err error){
+	tbl.F_id,err = reader.ReadS32()
+	checkErr(err)
+	tbl.F_data,err = reader.ReadBytes()
+	checkErr(err)
+	return
 }
 
 func pktread_id(reader *packet.Packet)(tbl id, err error){
@@ -86,6 +99,7 @@ func pktread_longresult(reader *packet.Packet)(tbl longresult, err error){
 
 func pktread_stringresult(reader *packet.Packet)(tbl stringresult, err error){
 	tbl.F_v,err = reader.ReadString()
+	checkErr(err)
 	return
 }
 

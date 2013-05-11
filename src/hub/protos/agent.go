@@ -15,10 +15,10 @@ const (
 	MAXCHAN	= 65536
 )
 
-//----------------------------------------------- logical game server
+//----------------------------------------------- logical game server chans
 var _host_genid int32
 var _servers map[int32]chan []byte
-var _lock sync.RWMutex
+var _server_lock sync.RWMutex
 
 func init() {
 	log.SetPrefix("[HUB]")
@@ -30,16 +30,16 @@ func HubAgent(in chan []byte, conn net.Conn) {
 	hostid := atomic.AddInt32(&_host_genid, 1)
 	MQ := make(chan []byte, MAXCHAN)
 
-	_lock.Lock()
+	_server_lock.Lock()
 	_servers[hostid] = MQ
-	_lock.Unlock()
+	_server_lock.Unlock()
 
 	log.Printf("server id:%v connected\n", hostid)
 
 	defer func() {
-		_lock.Lock()
+		_server_lock.Lock()
 		delete(_servers, hostid)
-		_lock.Unlock()
+		_server_lock.Unlock()
 
 		log.Printf("server id:%v disconnected\n", hostid)
 	}()

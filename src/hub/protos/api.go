@@ -3,6 +3,7 @@ package protos
 import "misc/packet"
 
 var Code map[string]uint16 = map[string]uint16 {
+	"forward_req":0,	// payload:msg 消息转发
 	"login_req":1,	// payload:id 登陆
 	"login_ack":1001,	// payload:command_result_pack 
 	"logout_req":2,	// payload:id 登出
@@ -28,6 +29,7 @@ var Code map[string]uint16 = map[string]uint16 {
 }
 
 var RCode map[uint16]string = map[uint16]string {
+	0:"forward_req",
 	1:"login_req",
 	1001:"login_ack",
 	2:"logout_req",
@@ -53,6 +55,7 @@ var RCode map[uint16]string = map[uint16]string {
 }
 
 var ProtoHandler map[uint16]func(int32, *packet.Packet) ([]byte, error) = map[uint16]func(int32, *packet.Packet)([]byte, error){
+	0:_forward_req,
 	1:_login_req,
 	2:_logout_req,
 	3:_changescore_req,

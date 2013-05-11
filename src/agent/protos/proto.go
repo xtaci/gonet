@@ -67,11 +67,13 @@ type atk_monster_rst_req struct {
 
 func pktread_user_login_info(reader *packet.Packet)(tbl user_login_info, err error){
 	tbl.F_mac_addr,err = reader.ReadString()
+	checkErr(err)
 	tbl.F_client_version,err = reader.ReadS32()
 	checkErr(err)
 	tbl.F_new_user,err = reader.ReadByte()
 	checkErr(err)
 	tbl.F_user_name,err = reader.ReadString()
+	checkErr(err)
 	return
 }
 
@@ -79,9 +81,11 @@ func pktread_user_snapshot(reader *packet.Packet)(tbl user_snapshot, err error){
 	tbl.F_id,err = reader.ReadS32()
 	checkErr(err)
 	tbl.F_name,err = reader.ReadString()
+	checkErr(err)
 	tbl.F_rank,err = reader.ReadS32()
 	checkErr(err)
 	tbl.F_archives,err = reader.ReadString()
+	checkErr(err)
 	tbl.F_protect_time,err = reader.ReadS32()
 	checkErr(err)
 	tbl.F_last_save_time,err = reader.ReadS32()
@@ -101,6 +105,7 @@ func pktread_user_archives_info(reader *packet.Packet)(tbl user_archives_info, e
 	tbl.F_id,err = reader.ReadS32()
 	checkErr(err)
 	tbl.F_archives,err = reader.ReadString()
+	checkErr(err)
 	return
 }
 
@@ -108,6 +113,7 @@ func pktread_rank_list_item(reader *packet.Packet)(tbl rank_list_item, err error
 	tbl.F_id,err = reader.ReadS32()
 	checkErr(err)
 	tbl.F_name,err = reader.ReadString()
+	checkErr(err)
 	tbl.F_rank,err = reader.ReadS32()
 	checkErr(err)
 	tbl.F_state,err = reader.ReadS32()
@@ -131,6 +137,7 @@ func pktread_pve_list_item(reader *packet.Packet)(tbl pve_list_item, err error){
 	tbl.F_id,err = reader.ReadS32()
 	checkErr(err)
 	tbl.F_name,err = reader.ReadString()
+	checkErr(err)
 	tbl.F_rank,err = reader.ReadS32()
 	checkErr(err)
 	tbl.F_state,err = reader.ReadS32()

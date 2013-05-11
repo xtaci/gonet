@@ -275,57 +275,70 @@ func Unprotect(id int32) bool {
 
 // State Readers
 // A->B 
-func State(id int32) int32 {
+func State(id int32) (ret int32) {
 	_lock_players.RLock()
 	player := _players[id]
 	_lock_players.RUnlock()
 
-	player.LCK.Lock()
-	defer player.LCK.Unlock()
-
-	return player.State
+	if player != nil {
+		player.LCK.Lock()
+		ret = player.State
+		player.LCK.Unlock()
+	}
+	return
 }
 
-func ProtectTime(id int32) int64 {
+func ProtectTime(id int32) (ret int64) {
 	_lock_players.RLock()
 	player := _players[id]
 	_lock_players.RUnlock()
 
-	player.LCK.Lock()
-	defer player.LCK.Unlock()
+	if player != nil {
+		player.LCK.Lock()
+		ret = player.ProtectTime
+		player.LCK.Unlock()
+	}
 
-	return player.ProtectTime
+	return
 }
 
-func Name(id int32) string {
+func Name(id int32) (ret string) {
 	_lock_players.RLock()
 	player := _players[id]
 	_lock_players.RUnlock()
 
-	player.LCK.Lock()
-	defer player.LCK.Unlock()
-
-	return player.Name
+	if player != nil {
+		player.LCK.Lock()
+		ret = player.Name
+		player.LCK.Unlock()
+	}
+	return
 }
 
-func Host(id int32) int32 {
+func Host(id int32) (ret int32) {
 	_lock_players.RLock()
 	player := _players[id]
 	_lock_players.RUnlock()
 
-	player.LCK.Lock()
-	defer player.LCK.Unlock()
+	if player != nil {
+		player.LCK.Lock()
+		ret = player.Host
+		player.LCK.Unlock()
+	}
 
-	return player.Host
+	return
 }
 
-func Clan(id int32) int32 {
+func Clan(id int32) (ret int32) {
 	_lock_players.RLock()
 	player := _players[id]
 	_lock_players.RUnlock()
 
-	player.LCK.Lock()
-	defer player.LCK.Unlock()
+	if player != nil {
+		player.LCK.Lock()
+		ret = player.Clan
+		player.LCK.Unlock()
+	}
 
-	return player.Clan
+	return
 }

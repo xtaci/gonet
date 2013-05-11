@@ -16,6 +16,10 @@ BEGIN { RS = ""; FS ="\n" }
 			typeok = "true"
 		} else if (a[2] == "string") {
 			print "\ttbl.F_"a[1]",err = reader.ReadString()"
+			print "\tcheckErr(err)"
+		} else if (a[2] == "[]byte") {
+			print "\ttbl.F_"a[1]",err = reader.ReadBytes()"
+			print "\tcheckErr(err)"
 		} else if (a[2] == "integer") {
 			print "\ttbl.F_"a[1]",err = reader.ReadS32()"
 			print "\tcheckErr(err)"

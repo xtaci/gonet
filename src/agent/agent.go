@@ -29,7 +29,6 @@ func _timer(interval int, ch chan string) {
 func StartAgent(in chan []byte, conn net.Conn) {
 	var sess Session
 	sess.MQ = make(chan interface{}, 128)
-	sess.CALL = make(chan interface{})
 
 	config := cfg.Get()
 
@@ -52,7 +51,6 @@ func StartAgent(in chan []byte, conn net.Conn) {
 		online.Unregister(sess.User.Id)
 		close(timer_ch_session)
 		close(sess.MQ)
-		close(sess.CALL)
 		bufctrl <- "exit"
 		conn.Close()
 	}()
@@ -74,19 +72,6 @@ func StartAgent(in chan []byte, conn net.Conn) {
 			}
 
 		case msg, ok := <-sess.MQ: // async
-			if !ok {
-				return
-			}
-
-			if result := IPCRequestProxy(&sess, msg); result != nil {
-				fmt.Println(result)
-				err := buf.Send(result)
-				if err != nil {
-					return
-				}
-			}
-
-		case msg, ok := <-sess.CALL: // sync
 			if !ok {
 				return
 			}

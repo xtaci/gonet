@@ -36,6 +36,22 @@ func (p *Packet) ReadByte() (ret byte, err error) {
 	return
 }
 
+func (p *Packet) ReadBytes() (ret []byte, err error) {
+	if p.pos+2 > uint(len(p.data)) {
+		err = errors.New("read bytes header failed")
+		return
+	}
+	size, _ := p.ReadU16()
+	if p.pos+uint(size) > uint(len(p.data)) {
+		err = errors.New("read bytes data failed")
+		return
+	}
+
+	ret = p.data[p.pos : p.pos+uint(size)]
+	p.pos += uint(size)
+	return
+}
+
 func (p *Packet) ReadString() (ret string, err error) {
 	if p.pos+2 > uint(len(p.data)) {
 		err = errors.New("read string header failed")
@@ -141,6 +157,11 @@ func (p *Packet) WriteZeros(n int) {
 
 func (p *Packet) WriteByte(v byte) {
 	p.data = append(p.data, v)
+}
+
+func (p *Packet) WriteBytes(v []byte) {
+	p.WriteU16(uint16(len(v)))
+	p.data = append(p.data, v...)
 }
 
 func (p *Packet) WriteString(v string) {
