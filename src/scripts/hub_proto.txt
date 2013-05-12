@@ -1,45 +1,44 @@
 # 转发消息
-msg=
+MSG=
 id integer
 data []byte
 ===
 
 #用户登陆发包
-id=
+ID=
 id integer
 ===
 
 #改变分数
-changescore=
+CHGSCORE=
 id	integer
 oldscore integer
 newscore integer
 ===
 
 #获取排行榜
-getlist=
+GETLIST=
 A integer
 B integer
 ===
 
-id_score=
+ID_SCORE=
 id integer
 score integer
 ===
 
-getlist_result=
-items array id_score
+LIST=
+items array ID_SCORE
 ===
 
-#保护时间结果
-longresult=
+LONG=
 v long
 ===
 
-stringresult=
+STRING=
 v string
 ===
 
-intresult=
+INT=
 v integer
 ===

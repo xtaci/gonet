@@ -31,7 +31,7 @@ func UserRequestProxy(sess *Session, p []byte) []byte {
 		log.Println("read protocol error")
 	}
 
-	proto_logger.Printf("tos:%v,user:%v\n", b, sess.User.Id)
+	proto_logger.Printf("code:%v,user:%v\n", b, sess.User.Id)
 
 	handle := protos.ProtoHandler[b]
 	if handle != nil {
@@ -53,9 +53,7 @@ func IPCRequestProxy(sess *Session, p interface{}) []byte {
 	ipc_logger.Printf("ipc:%v,user:%v\n", msg.Code, sess.User.Id)
 
 	if handle != nil {
-		ipc, client := handle(sess, msg.Params)
-		msg.CH <- ipc
-		return client
+		return handle(sess, msg.Data)
 	}
 
 	return nil

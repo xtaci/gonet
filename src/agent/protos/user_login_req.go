@@ -17,7 +17,7 @@ import (
 var EPOCH = time.Unix(0, 0)
 
 func _user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err error) {
-	tbl, _ := pktread_user_login_info(reader)
+	tbl, _ := PKT_user_login_info(reader)
 	writer := packet.Writer()
 	failed := command_result_pack{F_rst: 0}
 	success := user_snapshot{}

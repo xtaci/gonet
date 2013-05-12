@@ -6,7 +6,7 @@ import (
 )
 
 func _atk_monster_req(sess *Session, reader *packet.Packet) (ret []byte, err error) {
-	tbl, _ := pktread_command_id_pack(reader)
+	tbl, _ := PKT_command_id_pack(reader)
 	writer := packet.Writer()
 	payload := command_result_pack{}
 

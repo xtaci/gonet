@@ -8,7 +8,7 @@ import (
 )
 
 func _atk_player_req(sess *Session, reader *packet.Packet) (ret []byte, err error) {
-	tbl, _ := pktread_command_id_pack(reader)
+	tbl, _ := PKT_command_id_pack(reader)
 	writer := packet.Writer()
 	success := user_snapshot{}
 	failed := command_result_pack{}

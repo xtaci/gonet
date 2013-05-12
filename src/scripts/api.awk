@@ -2,7 +2,7 @@
 ## Scripts for generate protocol string->code(uint16)
 ##
 BEGIN { RS = ""; FS ="\n" 
-print "var Code map[string]uint16 = map[string]uint16 {"
+print "var Code map[string]int16 = map[string]int16 {"
 }
 {
 	name = ""

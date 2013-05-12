@@ -3,7 +3,7 @@ package protos
 import "misc/packet"
 import . "types"
 
-var Code map[string]uint16 = map[string]uint16 {
+var Code map[string]int16 = map[string]int16 {
 	"heart_beat_req":0,	// payload:null 心跳包..
 	"user_login_req":1,	// payload:user_login_info 客户端发送用户登陆请求包
 	"user_login_succeed_ack":2,	// payload:user_snapshot 登陆成功
@@ -22,7 +22,7 @@ var Code map[string]uint16 = map[string]uint16 {
 	"atk_monster_rst_req":15,	// payload:atk_monster_rst_req 攻击怪物结果存档
 }
 
-var RCode map[uint16]string = map[uint16]string {
+var RCode map[int16]string = map[int16]string {
 	0:"heart_beat_req",
 	1:"user_login_req",
 	2:"user_login_succeed_ack",

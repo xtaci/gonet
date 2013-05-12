@@ -12,7 +12,7 @@ BEGIN { RS = ""; FS ="\n" }
 		split($i, a, " ")
 		if (a[1] ~ /[A-Za-z_]+=/) {
 			name = substr(a[1],1, match(a[1],/=/)-1)
-			print "func pktread_"name"(reader *packet.Packet)(tbl "name", err error){"
+			print "func PKT_"name"(reader *packet.Packet)(tbl "name", err error){"
 			typeok = "true"
 		} else if (a[2] == "string") {
 			print "\ttbl.F_"a[1]",err = reader.ReadString()"
@@ -34,7 +34,7 @@ BEGIN { RS = ""; FS ="\n" }
 			print "\tcheckErr(err2)"
 			print "\ttbl.F_"a[1]"=make([]"a[3]",narr)"
 			print "\tfor i:=0;i<int(narr);i++ {"
-			print "\t\ttbl.F_"a[1]"[i], err = pktread_"a[3]"(reader)"
+			print "\t\ttbl.F_"a[1]"[i], err = PKT_"a[3]"(reader)"
 			print "\t}"
 		}
 	}

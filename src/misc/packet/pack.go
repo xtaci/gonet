@@ -5,7 +5,7 @@ import (
 )
 
 //----------------------------------------------- write-out struct fields with packet writer.
-func Pack(tos uint16, tbl interface{}, writer *Packet) []byte {
+func Pack(tos int16, tbl interface{}, writer *Packet) []byte {
 	if writer == nil {
 		writer = Writer()
 	}
@@ -14,8 +14,8 @@ func Pack(tos uint16, tbl interface{}, writer *Packet) []byte {
 	count := v.NumField()
 
 	// write code
-	if tos != 65535 {
-		writer.WriteU16(tos)
+	if tos != -1{
+		writer.WriteU16(uint16(tos))
 	}
 
 	for i := 0; i < count; i++ {
@@ -31,7 +31,7 @@ func Pack(tos uint16, tbl interface{}, writer *Packet) []byte {
 						_write_primitive(f.Index(a), writer)
 					} else {
 						elem := f.Index(a).Interface()
-						Pack(65535, elem, writer)
+						Pack(-1, elem, writer)
 					}
 				}
 			}
