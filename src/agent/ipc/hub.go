@@ -11,6 +11,7 @@ import (
 	"cfg"
 	"hub/protos"
 	"misc/packet"
+	"sync"
 )
 
 var _conn net.Conn
@@ -42,7 +43,13 @@ func SendHub(id int32, tos int16, data []byte) (err error) {
 	return _send(packet.Pack(protos.Code["forward"], msg, nil), _conn)
 }
 
+var _seq_lock sync.Mutex
+
+//---------------------------------------------------------- IPC send should be seqential.
 func _send(data []byte, conn net.Conn) (err error) {
+	_seq_lock.Lock()
+	defer _seq_lock.Unlock()
+
 	headwriter := packet.Writer()
 	headwriter.WriteU16(uint16(len(data)))
 
