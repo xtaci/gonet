@@ -1,4 +1,4 @@
-package main
+package start
 
 import (
 	"io"
@@ -14,7 +14,7 @@ import (
 )
 
 //----------------------------------------------- HUB start
-func main() {
+func HubStart() {
 	log.Println("Starting HUB")
 
 	// start db
