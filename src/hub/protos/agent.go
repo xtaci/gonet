@@ -28,10 +28,10 @@ func init() {
 //------------------------------------------------ Hub processing
 func HubAgent(incoming chan []byte, conn net.Conn) {
 	hostid := atomic.AddInt32(&_host_genid, 1)
-	output := make(chan []byte, MAXCHAN)
+	pushmq := make(chan[]byte)
 
 	_server_lock.Lock()
-	_servers[hostid] = output // send to this chan for _send() to GS 
+	_servers[hostid] = pushmq // message pushing to client
 	_server_lock.Unlock()
 
 	log.Printf("server id:%v connected\n", hostid)
@@ -51,24 +51,28 @@ func HubAgent(incoming chan []byte, conn net.Conn) {
 				return
 			}
 
-			if result := HandleRequest(hostid, msg); result != nil {
-				_send(result, conn)
-			}
-		case msg, ok := <-output:
-			if !ok {
-				return
+			reader := packet.Reader(msg)
+			seqid, err := reader.ReadU32()	// read seqid 
+			if err != nil {
+				log.Printf("Read Sequence Id failed.")
+				continue
 			}
 
-			_send(msg, conn)
+			if result := HandleRequest(hostid, reader); result != nil {
+				_send(seqid, result, conn)
+			}
+		case msg := <-pushmq:
+			_send(0, msg, conn)
 		}
 	}
 
 }
 
 //--------------------------------------------------------- send to Game Server
-func _send(data []byte, conn net.Conn) {
+func _send(seqid uint32, data []byte, conn net.Conn) {
 	headwriter := packet.Writer()
-	headwriter.WriteU16(uint16(len(data)))
+	headwriter.WriteU16(uint16(len(data))+4)
+	headwriter.WriteU32(seqid)
 
 	_, err := conn.Write(headwriter.Data())
 	if err != nil {

@@ -177,6 +177,10 @@ func (p *Packet) WriteU16(v uint16) {
 	p.data = append(p.data, buf...)
 }
 
+func (p *Packet) WriteS16(v int16) {
+	p.WriteU16(uint16(v))
+}
+
 func (p *Packet) WriteU24(v uint32) {
 	buf := make([]byte, 3)
 	buf[0] = byte(v >> 16)
@@ -194,6 +198,10 @@ func (p *Packet) WriteU32(v uint32) {
 	p.data = append(p.data, buf...)
 }
 
+func (p *Packet) WriteS32(v int32) {
+	p.WriteU32(uint32(v))
+}
+
 func (p *Packet) WriteU64(v uint64) {
 	buf := make([]byte, 8)
 	for i := range buf {
@@ -201,6 +209,10 @@ func (p *Packet) WriteU64(v uint64) {
 	}
 
 	p.data = append(p.data, buf...)
+}
+
+func (p *Packet) WriteS64(v int64) {
+	p.WriteU64(uint64(v))
 }
 
 func (p *Packet) WriteFloat32(f float32) {

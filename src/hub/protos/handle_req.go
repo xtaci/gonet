@@ -11,10 +11,9 @@ import (
 	"runtime"
 )
 
-func HandleRequest(hostid int32, p []byte) []byte {
+func HandleRequest(hostid int32, reader *packet.Packet) []byte {
 	defer _HandleError()
 
-	reader := packet.Reader(p)
 	b, err := reader.ReadU16()
 
 	if err != nil {
