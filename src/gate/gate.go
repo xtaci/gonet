@@ -2,15 +2,16 @@ package main
 
 import (
 	. "agent"
-	. "db"
+	"agent/ipc"
 	"cfg"
+	. "db"
 )
 
 import (
-	"net"
 	"io"
-	"os"
 	"log"
+	"net"
+	"os"
 )
 
 //----------------------------------------------- Game Server Start
@@ -34,6 +35,9 @@ func main() {
 
 	// start db
 	StartDB()
+
+	// dial HUB
+	ipc.DialHub()
 
 	// signal
 	go SignalProc()

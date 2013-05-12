@@ -18,6 +18,6 @@ BEGIN { RS = ""; FS ="\n" }
 		}
 	}
 	if (name != "" && type !="") {
-		print "\t"type":_"name","
+		print "\t"type":P_"name","
 	}
 }

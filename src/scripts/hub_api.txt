@@ -5,6 +5,10 @@ name:forward_req
 payload:msg
 desc:消息转发
 
+packet_type:1000
+name:forward_ack
+payload:command_result_pack
+
 packet_type:1
 name:login_req
 payload:id

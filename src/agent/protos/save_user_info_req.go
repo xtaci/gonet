@@ -5,6 +5,6 @@ import (
 	. "types"
 )
 
-func _save_user_info_req(sess *Session, reader *packet.Packet) (ret []byte, err error) {
+func P_save_user_info_req(sess *Session, reader *packet.Packet) (ret []byte, err error) {
 	return
 }

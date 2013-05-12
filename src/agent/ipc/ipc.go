@@ -7,8 +7,8 @@ import (
 
 import (
 	"agent/online"
-	. "types"
 	"misc/packet"
+	. "types"
 )
 
 const (
@@ -17,13 +17,13 @@ const (
 )
 
 type RequestType struct {
-	Sender	int32		// player id
-	Code int16
-	Data []byte
+	Sender int32 // player id
+	Code   int16
+	Data   []byte
 }
 
 //--------------------------------------------------------- return to ipc && bytes to client
-var RequestHandler map[int16]func(*Session, []byte) ([]byte) = map[int16]func(*Session, []byte) ([]byte){}
+var RequestHandler map[int16]func(*Session, []byte) []byte = map[int16]func(*Session, []byte) []byte{}
 
 //--------------------------------------------------------- Non-Blocking Send
 func Send(id int32, tos int16, data []byte) (err error) {
@@ -45,7 +45,7 @@ func Send(id int32, tos int16, data []byte) (err error) {
 		}
 		return
 	} else { // delivery to hub
-		return SendHub(id, tos, packet.Pack(-1,req,nil))
+		return ForwardHub(id, packet.Pack(-1, req, nil))
 	}
 
 	return

@@ -7,7 +7,7 @@ import (
 	. "types"
 )
 
-func _atk_player_req(sess *Session, reader *packet.Packet) (ret []byte, err error) {
+func P_atk_player_req(sess *Session, reader *packet.Packet) (ret []byte, err error) {
 	tbl, _ := PKT_command_id_pack(reader)
 	writer := packet.Writer()
 	success := user_snapshot{}

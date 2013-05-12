@@ -3,8 +3,8 @@ package protos
 import (
 	"log"
 	"net"
-	"sync/atomic"
 	"sync"
+	"sync/atomic"
 )
 
 import (
@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	MAXCHAN	= 65536
+	MAXCHAN = 65536
 )
 
 //----------------------------------------------- logical game server chans
@@ -26,12 +26,12 @@ func init() {
 }
 
 //------------------------------------------------ Hub processing
-func HubAgent(in chan []byte, conn net.Conn) {
+func HubAgent(incoming chan []byte, conn net.Conn) {
 	hostid := atomic.AddInt32(&_host_genid, 1)
-	MQ := make(chan []byte, MAXCHAN)
+	output := make(chan []byte, MAXCHAN)
 
 	_server_lock.Lock()
-	_servers[hostid] = MQ
+	_servers[hostid] = output // send to this chan for _send() to GS 
 	_server_lock.Unlock()
 
 	log.Printf("server id:%v connected\n", hostid)
@@ -46,7 +46,7 @@ func HubAgent(in chan []byte, conn net.Conn) {
 
 	for {
 		select {
-		case msg, ok := <-in:
+		case msg, ok := <-incoming:
 			if !ok {
 				return
 			}
@@ -54,7 +54,7 @@ func HubAgent(in chan []byte, conn net.Conn) {
 			if result := HandleRequest(hostid, msg); result != nil {
 				_send(result, conn)
 			}
-		case msg, ok := <-MQ:
+		case msg, ok := <-output:
 			if !ok {
 				return
 			}
@@ -65,6 +65,7 @@ func HubAgent(in chan []byte, conn net.Conn) {
 
 }
 
+//--------------------------------------------------------- send to Game Server
 func _send(data []byte, conn net.Conn) {
 	headwriter := packet.Writer()
 	headwriter.WriteU16(uint16(len(data)))

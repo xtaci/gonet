@@ -10,7 +10,7 @@ import (
 	. "types"
 )
 
-func _rank_list_req(sess *Session, reader *packet.Packet) (ret []byte, err error) {
+func P_rank_list_req(sess *Session, reader *packet.Packet) (ret []byte, err error) {
 	id, score := ranklist.GetList(1, -1)
 	out := rank_list{}
 	out.F_items = make([]rank_list_item, len(id))

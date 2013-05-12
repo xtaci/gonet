@@ -15,7 +15,7 @@ awk -f api.awk api.txt >> api.go
 awk -f api_rcode.awk api.txt >> api.go 
 
 printf "var ProtoHandler map[uint16]func(*Session, *packet.Packet) ([]byte, error) = map[uint16]func(*Session, *packet.Packet)([]byte, error){\n" >> api.go
-awk -f api_bind.awk api.txt >> api.go 
+awk -f api_bind_req.awk api.txt >> api.go 
 printf "}" >> api.go
 
 mv proto.go ../agent/protos
@@ -35,7 +35,7 @@ awk -f api.awk hub_api.txt >> api.go
 awk -f api_rcode.awk hub_api.txt >> api.go 
 
 printf "var ProtoHandler map[uint16]func(int32, *packet.Packet) ([]byte, error) = map[uint16]func(int32, *packet.Packet)([]byte, error){\n" >> api.go
-awk -f api_bind.awk hub_api.txt >> api.go 
+awk -f api_bind_req.awk hub_api.txt >> api.go 
 printf "}" >> api.go
 
 #### move #################

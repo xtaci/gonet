@@ -6,9 +6,9 @@ import (
 )
 
 import (
+	"agent/online"
 	"cfg"
 	"db/user_tbl"
-	"agent/online"
 	"hub/ranklist"
 	"misc/packet"
 	. "types"
@@ -16,7 +16,7 @@ import (
 
 var EPOCH = time.Unix(0, 0)
 
-func _user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err error) {
+func P_user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err error) {
 	tbl, _ := PKT_user_login_info(reader)
 	writer := packet.Writer()
 	failed := command_result_pack{F_rst: 0}

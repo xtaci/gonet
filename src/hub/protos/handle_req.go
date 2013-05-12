@@ -21,7 +21,7 @@ func HandleRequest(hostid int32, p []byte) []byte {
 		log.Println("read protocol error")
 	}
 
-	fmt.Println("proto: ",b)
+	fmt.Println("proto: ", b)
 	handle := ProtoHandler[b]
 	if handle != nil {
 		ret, err := handle(hostid, reader)
@@ -34,17 +34,23 @@ func HandleRequest(hostid int32, p []byte) []byte {
 	return nil
 }
 
-func _forward_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
+func P_forward_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
+	defer func() {
+		if x := recover(); x != nil {
+			log.Println("forward packet error")
+		}
+	}()
+
 	tbl, _ := PKT_MSG(pkt)
 
 	// if user is online, send to the user, or else send to redis 
 	state := ranklist.State(tbl.F_id)
-	host :=  ranklist.Host(tbl.F_id)
+	host := ranklist.Host(tbl.F_id)
 
 	fmt.Println(tbl.F_id, tbl.F_data)
-	if state & ranklist.ONLINE !=0 {
+	if state&ranklist.ONLINE != 0 {
 		_server_lock.RLock()
-		ch := _servers[host]
+		ch := _servers[host] // forwarding request
 		_server_lock.RUnlock()
 
 		ch <- tbl.F_data
@@ -52,10 +58,10 @@ func _forward_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 		// TODO : add redis
 	}
 
-	return nil,nil
+	return nil, nil
 }
 
-func _login_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
+func P_login_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	tbl, _ := PKT_ID(pkt)
 	ret := INT{F_v: 0}
 
@@ -66,7 +72,7 @@ func _login_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	return packet.Pack(Code["login_ack"], ret, nil), nil
 }
 
-func _logout_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
+func P_logout_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	tbl, _ := PKT_ID(pkt)
 	ret := INT{F_v: 0}
 
@@ -77,7 +83,7 @@ func _logout_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	return packet.Pack(Code["logout_ack"], ret, nil), nil
 }
 
-func _changescore_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
+func P_changescore_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	tbl, _ := PKT_CHGSCORE(pkt)
 	ret := INT{F_v: 0}
 
@@ -88,12 +94,12 @@ func _changescore_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	return packet.Pack(Code["changescore_ack"], ret, nil), nil
 }
 
-func _getlist_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
+func P_getlist_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	tbl, _ := PKT_GETLIST(pkt)
 	ret := LIST{}
 
 	ids, scores := ranklist.GetList(int(tbl.F_A), int(tbl.F_B))
-	ret.F_items=make([]ID_SCORE,len(ids))
+	ret.F_items = make([]ID_SCORE, len(ids))
 
 	for k := range ids {
 		ret.F_items[k].F_id = ids[k]
@@ -103,7 +109,7 @@ func _getlist_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	return packet.Pack(Code["getlist_ack"], ret, nil), nil
 }
 
-func _raid_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
+func P_raid_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	tbl, _ := PKT_ID(pkt)
 	ret := INT{F_v: 0}
 
@@ -114,7 +120,7 @@ func _raid_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	return packet.Pack(Code["raid_ack"], ret, nil), nil
 }
 
-func _protect_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
+func P_protect_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	tbl, _ := PKT_ID(pkt)
 	ret := INT{F_v: 0}
 
@@ -125,7 +131,7 @@ func _protect_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	return packet.Pack(Code["protect_ack"], ret, nil), nil
 }
 
-func _unprotect_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
+func P_unprotect_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	tbl, _ := PKT_ID(pkt)
 	ret := INT{F_v: 0}
 
@@ -136,7 +142,7 @@ func _unprotect_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	return packet.Pack(Code["unprotect_ack"], ret, nil), nil
 }
 
-func _free_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
+func P_free_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	tbl, _ := PKT_ID(pkt)
 	ret := INT{F_v: 0}
 
@@ -147,21 +153,21 @@ func _free_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	return packet.Pack(Code["free_ack"], ret, nil), nil
 }
 
-func _getstate_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
+func P_getstate_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	tbl, _ := PKT_ID(pkt)
 	ret := INT{}
 	ret.F_v = ranklist.State(tbl.F_id)
 	return packet.Pack(Code["getstate_ack"], ret, nil), nil
 }
 
-func _getprotecttime_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
+func P_getprotecttime_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	tbl, _ := PKT_ID(pkt)
 	ret := LONG{}
 	ret.F_v = ranklist.ProtectTime(tbl.F_id)
 	return packet.Pack(Code["getprotecttime_ack"], ret, nil), nil
 }
 
-func _getname_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
+func P_getname_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	tbl, _ := PKT_ID(pkt)
 	ret := STRING{}
 	ret.F_v = ranklist.Name(tbl.F_id)
