@@ -147,22 +147,25 @@ var _wait_ack_lock sync.Mutex
 func _call(data []byte) (ret []byte) {
 	seq_id := atomic.AddUint64(&_seq_id, 1)
 
-	_seq_lock.Lock()
 	headwriter := packet.Writer()
 	headwriter.WriteU16(uint16(len(data)) + 8) // data + seq id
 	headwriter.WriteU64(seq_id)
 
+	_seq_lock.Lock()
 	_, err := _conn.Write(headwriter.Data())
 	if err != nil {
 		log.Println("Error send packet header:", err.Error())
+		_seq_lock.Unlock()
 		return nil
 	}
 
 	_, err = _conn.Write(data)
 	if err != nil {
 		log.Println("Error send packet data:", err.Error())
+		_seq_lock.Unlock()
 		return nil
 	}
+
 	_seq_lock.Unlock()
 
 	// wait ack
