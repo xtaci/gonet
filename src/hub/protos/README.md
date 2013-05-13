@@ -1,1 +1,3 @@
-protocals for communication of hub <---> game server
+GS <---> HUB 
+
+通信协议
