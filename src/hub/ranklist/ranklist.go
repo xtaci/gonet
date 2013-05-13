@@ -88,7 +88,7 @@ func GetList(A, B int) (id []int32, score []int32) {
 
 //------------------------------------------------ get score 
 func Score(id int32) (ret int32) {
-	_lock_ranklist.Lock()
-	defer _lock_ranklist.Unlock()
+	_lock_ranklist.RLock()
+	defer _lock_ranklist.RUnlock()
 	return _id_score[id]
 }
