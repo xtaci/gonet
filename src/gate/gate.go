@@ -101,7 +101,7 @@ func handleClient(conn net.Conn) {
 
 func checkError(err error) {
 	if err != nil {
-		log.Println("Fatal error: %s", err.Error())
+		log.Println("Fatal error: %v", err)
 		os.Exit(1)
 	}
 }

@@ -154,14 +154,14 @@ func _call(data []byte) (ret []byte) {
 	_seq_lock.Lock()
 	_, err := _conn.Write(headwriter.Data())
 	if err != nil {
-		log.Println("Error send packet header:", err.Error())
+		log.Println("Error send packet header:", err)
 		_seq_lock.Unlock()
 		return nil
 	}
 
 	_, err = _conn.Write(data)
 	if err != nil {
-		log.Println("Error send packet data:", err.Error())
+		log.Println("Error send packet data:", err)
 		_seq_lock.Unlock()
 		return nil
 	}

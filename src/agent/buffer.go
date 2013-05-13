@@ -64,13 +64,13 @@ func (buf *Buffer) raw_send(pkt *_RawPacket) {
 
 	_, err := buf.conn.Write(headwriter.Data())
 	if err != nil {
-		log.Println("Error send reply header:", err.Error())
+		log.Println("Error send reply header:", err)
 		return
 	}
 
 	_, err = buf.conn.Write(pkt.data)
 	if err != nil {
-		log.Println("Error send reply msg:", err.Error())
+		log.Println("Error send reply msg:", err)
 		return
 	}
 

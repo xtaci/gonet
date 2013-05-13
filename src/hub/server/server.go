@@ -54,7 +54,7 @@ func HubAgent(incoming chan []byte, conn net.Conn) {
 			reader := packet.Reader(msg)
 			seqid, err := reader.ReadU64()	// read seqid 
 			if err != nil {
-				log.Printf("Read Sequence Id failed.")
+				log.Println("Read Sequence Id failed.", err)
 				continue
 			}
 
@@ -76,13 +76,13 @@ func _send(seqid uint64, data []byte, conn net.Conn) {
 
 	_, err := conn.Write(headwriter.Data())
 	if err != nil {
-		log.Println("Error send reply header:", err.Error())
+		log.Println("Error send reply header:", err)
 		return
 	}
 
 	_, err = conn.Write(data)
 	if err != nil {
-		log.Println("Error send reply msg:", err.Error())
+		log.Println("Error send reply msg:", err)
 		return
 	}
 }
