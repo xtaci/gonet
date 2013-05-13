@@ -33,7 +33,7 @@ BEGIN
 	REPEAT
 		SET @x = @x + 1;
 		SET @name = CONCAT('user', @x);
-		INSERT INTO users(name, mac) VALUES(@name, 'AABBCCDDEEFF');
+		INSERT INTO users(name, mac) VALUES(@name, @name);
 	UNTIL @x > MAX END REPEAT;
 END
 //
