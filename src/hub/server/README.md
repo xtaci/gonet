@@ -4,7 +4,7 @@ GS <---> HUB
 
 |LENGTH|SEQNUM|PROTO|PAYLOAD|
 
-|16|32|16|...|
+|16|64|16|...|
 
 包测试：
 
