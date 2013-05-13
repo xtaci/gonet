@@ -92,7 +92,7 @@ func HubReceiver(conn net.Conn) {
 							log.Println("forward to MQ failed, the user is so lucky")
 						}
 					}()
-					sess.MQ <- data[reader.Pos()+1:]
+					sess.MQ <- data[reader.Pos():]	// the payload is the message
 				}()
 			}
 		} else {
