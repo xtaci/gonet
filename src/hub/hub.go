@@ -1,4 +1,4 @@
-package start
+package main
 
 import (
 	"io"
@@ -87,4 +87,9 @@ func checkError(err error) {
 		log.Println("Fatal error: %s", err.Error())
 		os.Exit(1)
 	}
+}
+
+
+func main() {
+	HubStart()
 }

@@ -1,4 +1,4 @@
-package start
+package main
 
 import (
 	"db/user_tbl"
