@@ -52,14 +52,14 @@ func HubAgent(incoming chan []byte, conn net.Conn) {
 			}
 
 			reader := packet.Reader(msg)
-			seqid, err := reader.ReadU32()	// read seqid 
+			seqid, err := reader.ReadU64()	// read seqid 
 			if err != nil {
 				log.Printf("Read Sequence Id failed.")
 				continue
 			}
 
 			if result := HandleRequest(hostid, reader); result != nil {
-				_send(uint64(seqid), result, conn)
+				_send(seqid, result, conn)
 			}
 		case msg := <-forward:
 			_send(0, msg, conn)
