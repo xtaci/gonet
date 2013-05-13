@@ -10,7 +10,7 @@ HUB只处理两类消息：
 
 1. 来自Game Server 的Call请求(request & ack)
 
-2. 消息Forward
+2. Game Server 间的消息Forward
 
 
 
