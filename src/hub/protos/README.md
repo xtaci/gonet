@@ -1,3 +1,7 @@
 GS <---> HUB 
 
 通信协议
+
+|LENGTH|SEQNUM|PROTO|PAYLOAD|
+
+|16|32|16|...|
