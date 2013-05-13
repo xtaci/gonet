@@ -7,9 +7,9 @@ import (
 
 import (
 	"agent/online"
+	"agent/ipc"
 	"cfg"
 	"db/user_tbl"
-	"hub/ranklist"
 	"misc/packet"
 	. "types"
 )
@@ -49,7 +49,8 @@ func P_user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err err
 
 		if user_tbl.New(&sess.User) {
 			online.Register(sess, sess.User.Id)
-			ranklist.AddUser(&sess.User)
+			// TODO: add user
+			//ranklist.AddUser(&sess.User)
 			_fill_user_snapshot(&sess.User, &success)
 			ret = packet.Pack(Code["user_login_succeed_ack"], success, writer)
 			return
@@ -67,7 +68,8 @@ func _fill_user_snapshot(user *User, snapshot *user_snapshot) {
 	snapshot.F_name = user.Name
 	snapshot.F_rank = user.Score
 
-	pt := ranklist.ProtectTime(user.Id) - time.Now().Unix()
+	info, _:= ipc.GetInfo(user.Id)
+	pt := info.ProtectTime - time.Now().Unix()
 	if pt > 0 {
 		snapshot.F_protect_time = int32(pt)
 	} else {

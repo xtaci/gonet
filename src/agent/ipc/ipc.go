@@ -1,8 +1,9 @@
 package ipc
 
 import (
-	"errors"
 	"time"
+	"errors"
+	"fmt"
 )
 
 import (
@@ -29,7 +30,7 @@ var RequestHandler map[int16]func(*Session, []byte) []byte = map[int16]func(*Ses
 func Send(id int32, tos int16, data []byte) (err error) {
 	defer func() {
 		if x := recover(); x != nil {
-			err = errors.New("ipc.Send() failed")
+			err = errors.New(fmt.Sprint(x))
 		}
 	}()
 

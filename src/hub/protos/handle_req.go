@@ -152,25 +152,16 @@ func P_free_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	return packet.Pack(Code["free_ack"], ret, nil), nil
 }
 
-func P_getstate_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
+func P_getinfo_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	tbl, _ := PKT_ID(pkt)
-	ret := INT{}
-	ret.F_v = ranklist.State(tbl.F_id)
-	return packet.Pack(Code["getstate_ack"], ret, nil), nil
-}
-
-func P_getprotecttime_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
-	tbl, _ := PKT_ID(pkt)
-	ret := LONG{}
-	ret.F_v = ranklist.ProtectTime(tbl.F_id)
-	return packet.Pack(Code["getprotecttime_ack"], ret, nil), nil
-}
-
-func P_getname_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
-	tbl, _ := PKT_ID(pkt)
-	ret := STRING{}
-	ret.F_v = ranklist.Name(tbl.F_id)
-	return packet.Pack(Code["getname_ack"], ret, nil), nil
+	ret := INFO{}
+	ret.F_id = tbl.F_id
+	ret.F_state = ranklist.State(tbl.F_id)
+	ret.F_score = ranklist.Score(tbl.F_id)
+	ret.F_clan = ranklist.Score(tbl.F_id)
+	ret.F_protecttime = ranklist.ProtectTime(tbl.F_id)
+	ret.F_name = ranklist.Name(tbl.F_id)
+	return packet.Pack(Code["getinfo_ack"], ret, nil), nil
 }
 
 func checkErr(err error) {

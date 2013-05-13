@@ -21,12 +21,8 @@ var Code map[string]int16 = map[string]int16 {
 	"unprotect_ack":1007,	// payload:command_result_pack 撤销保护
 	"free_req":8,	// payload:id 结束攻击
 	"free_ack":1008,	// payload:command_result_pack 结束攻击
-	"getstate_req":9,	// payload:id 读取状态
-	"getstate_ack":1009,	// payload:command_result_pack 读取状态
-	"getprotecttime_req":10,	// payload:id 获取保护时间截止
-	"getprotecttime_ack":1010,	// payload:timeresult 获取保护时间截止
-	"getname_req":11,	// payload:id 获取玩家名字
-	"getname_ack":1011,	// payload:stringresult 获取玩家名字
+	"getinfo_req":9,	// payload:id 读取玩家信息
+	"getinfo_ack":1009,	// payload:info 读取玩家信息
 }
 
 var RCode map[int16]string = map[int16]string {
@@ -48,12 +44,8 @@ var RCode map[int16]string = map[int16]string {
 	1007:"unprotect_ack",
 	8:"free_req",
 	1008:"free_ack",
-	9:"getstate_req",
-	1009:"getstate_ack",
-	10:"getprotecttime_req",
-	1010:"getprotecttime_ack",
-	11:"getname_req",
-	1011:"getname_ack",
+	9:"getinfo_req",
+	1009:"getinfo_ack",
 }
 
 var ProtoHandler map[uint16]func(int32, *packet.Packet) ([]byte, error) = map[uint16]func(int32, *packet.Packet)([]byte, error){
@@ -66,7 +58,5 @@ var ProtoHandler map[uint16]func(int32, *packet.Packet) ([]byte, error) = map[ui
 	6:P_protect_req,
 	7:P_unprotect_req,
 	8:P_free_req,
-	9:P_getstate_req,
-	10:P_getprotecttime_req,
-	11:P_getname_req,
+	9:P_getinfo_req,
 }

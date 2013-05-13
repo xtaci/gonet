@@ -7,14 +7,15 @@ import (
 	"net"
 	"os"
 	"time"
+	"sync"
+	"sync/atomic"
 )
 
 import (
 	"cfg"
 	"hub/protos"
 	"misc/packet"
-	"sync"
-	"sync/atomic"
+	"agent/online"
 )
 
 var _conn net.Conn
@@ -74,15 +75,38 @@ func HubReceiver(conn net.Conn) {
 			break
 		}
 
-		_wait_ack_lock.Lock()
-		if ack, ok := _wait_ack[seqval]; ok {
-			ack <- data
-			delete(_wait_ack, seqval)
-		} else {
-			log.Println("Illegal packet sequence number from HuB")
-		}
-		_wait_ack_lock.Unlock()
+		if seqval == 0 {		// packet forwarding, deliver to MQ
+			reader := packet.Reader(data)
+			forward_id, err := reader.ReadS32()
+			if err != nil {
+				log.Println("packet forwarding error")
+				goto L
+			}
 
+			sess := online.Query(forward_id)
+			if sess == nil {
+				log.Println("forward failed, maybe user is offline?")
+			} else {
+				func() {
+					defer func() {
+						if x := recover(); x != nil {
+							log.Println("forward to MQ failed, the user is so lucky")
+						}
+					}()
+					sess.MQ <- data[reader.Pos()+1:]
+				}()
+			}
+		} else {
+			_wait_ack_lock.Lock()
+			if ack, ok := _wait_ack[seqval]; ok {
+				ack <- data
+				delete(_wait_ack, seqval)
+			} else {
+				log.Println("Illegal packet sequence number from HUB")
+			}
+			_wait_ack_lock.Unlock()
+		}
+L:
 	}
 }
 
@@ -98,7 +122,7 @@ func ForwardHub(id int32, data []byte) (err error) {
 	msg := protos.MSG{}
 	msg.F_id = id
 	msg.F_data = data
-	ack := _call(packet.Pack(protos.Code["forward"], msg, nil), _conn)
+	ack := _call(packet.Pack(protos.Code["forward"], msg, nil))
 	if ack != nil {
 		panic("ForwardHub failed or timed-out")
 	}
@@ -117,7 +141,7 @@ var _wait_ack map[uint32]chan []byte
 var _wait_ack_lock sync.Mutex
 
 //------------------------------------------------ IPC send should be seqential
-func _call(data []byte, conn net.Conn) (ret []byte) {
+func _call(data []byte) (ret []byte) {
 	seq_id := atomic.AddUint32(&_seq_id, 1)
 
 	_seq_lock.Lock()
@@ -125,13 +149,13 @@ func _call(data []byte, conn net.Conn) (ret []byte) {
 	headwriter.WriteU16(uint16(len(data)) + 4) // data + seq id
 	headwriter.WriteU32(seq_id)
 
-	_, err := conn.Write(headwriter.Data())
+	_, err := _conn.Write(headwriter.Data())
 	if err != nil {
 		log.Println("Error send packet header:", err.Error())
 		return nil
 	}
 
-	_, err = conn.Write(data)
+	_, err = _conn.Write(data)
 	if err != nil {
 		log.Println("Error send packet data:", err.Error())
 		return nil

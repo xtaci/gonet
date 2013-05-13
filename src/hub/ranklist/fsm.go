@@ -342,3 +342,4 @@ func Clan(id int32) (ret int32) {
 
 	return
 }
+

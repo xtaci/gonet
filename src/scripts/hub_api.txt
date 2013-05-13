@@ -96,32 +96,10 @@ payload:command_result_pack
 ####
 
 packet_type:9
-name:getstate_req
+name:getinfo_req
 payload:id
-desc:读取状态
+desc:读取玩家信息
 
 packet_type:1009
-name:getstate_ack
-payload:command_result_pack
-
-###
-
-packet_type:10
-name:getprotecttime_req
-payload:id
-desc:获取保护时间截止
-
-packet_type:1010
-name:getprotecttime_ack
-payload:timeresult
-
-###
-
-packet_type:11
-name:getname_req
-payload:id
-desc:获取玩家名字
-
-packet_type:1011
-name:getname_ack
-payload:stringresult
+name:getinfo_ack
+payload:info

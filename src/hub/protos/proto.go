@@ -11,6 +11,15 @@ type ID struct {
 	F_id int32
 }
 
+type INFO struct {
+	F_id int32
+	F_state int32
+	F_score int32
+	F_clan int32
+	F_protecttime int64
+	F_name string
+}
+
 type CHGSCORE struct {
 	F_id int32
 	F_oldscore int32
@@ -53,6 +62,20 @@ func PKT_MSG(reader *packet.Packet)(tbl MSG, err error){
 
 func PKT_ID(reader *packet.Packet)(tbl ID, err error){
 	tbl.F_id,err = reader.ReadS32()
+	checkErr(err)
+	return
+}
+
+func PKT_INFO(reader *packet.Packet)(tbl INFO, err error){
+	tbl.F_id,err = reader.ReadS32()
+	checkErr(err)
+	tbl.F_state,err = reader.ReadS32()
+	checkErr(err)
+	tbl.F_score,err = reader.ReadS32()
+	checkErr(err)
+	tbl.F_clan,err = reader.ReadS32()
+	checkErr(err)
+	tbl.F_name,err = reader.ReadString()
 	checkErr(err)
 	return
 }

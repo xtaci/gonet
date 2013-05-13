@@ -9,6 +9,16 @@ ID=
 id integer
 ===
 
+#玩家信息
+INFO=
+id integer
+state integer
+score integer
+clan integer
+protecttime long
+name string
+===
+
 #改变分数
 CHGSCORE=
 id	integer

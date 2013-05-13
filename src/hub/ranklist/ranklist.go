@@ -11,8 +11,13 @@ import (
 
 var (
 	_ranklist      dos.Tree // dynamic order statistics
+	_id_score	map[int32]int32
 	_lock_ranklist sync.RWMutex
 )
+
+func init() {
+	_id_score = make(map[int32]int32)
+}
 
 //------------------------------------------------ add a user to rank list
 func _add_rank(ud *User) {
@@ -77,4 +82,9 @@ func GetList(A, B int) (id []int32, score []int32) {
 	}
 
 	return
+}
+
+//------------------------------------------------ get score 
+func Score(id int32) (ret int32) {
+	return _id_score[id]
 }

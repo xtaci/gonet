@@ -2,7 +2,7 @@ package protos
 
 import (
 	"db/user_tbl"
-	"hub/ranklist"
+	"agent/ipc"
 	"misc/packet"
 	. "types"
 )
@@ -13,7 +13,7 @@ func P_atk_player_req(sess *Session, reader *packet.Packet) (ret []byte, err err
 	success := user_snapshot{}
 	failed := command_result_pack{}
 
-	if ranklist.Raid(tbl.F_id) {
+	if ipc.Raid(tbl.F_id) {
 		opponent, e := user_tbl.Load(tbl.F_id)
 		if e == nil {
 			_fill_user_snapshot(&opponent, &success)
@@ -23,7 +23,8 @@ func P_atk_player_req(sess *Session, reader *packet.Packet) (ret []byte, err err
 	}
 
 	// 
-	failed.F_rst = int32(ranklist.State(tbl.F_id))
+	info, err := ipc.GetInfo(tbl.F_id)
+	failed.F_rst = info.Id
 	ret = packet.Pack(Code["atk_player_faild_ack"], failed, writer)
 	return
 }
