@@ -1,0 +1,54 @@
+# 转发消息
+MSG=
+id integer
+data []byte
+===
+
+#用户登陆发包
+ID=
+id integer
+===
+
+#玩家信息
+INFO=
+id integer
+state integer
+score integer
+clan integer
+protecttime long
+name string
+===
+
+#改变分数
+CHGSCORE=
+id	integer
+oldscore integer
+newscore integer
+===
+
+#获取排行榜
+GETLIST=
+A integer
+B integer
+===
+
+ID_SCORE=
+id integer
+score integer
+===
+
+LIST=
+items array ID_SCORE
+===
+
+LONG=
+v long
+===
+
+STRING=
+v string
+===
+
+INT=
+v integer
+===
