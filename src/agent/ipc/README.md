@@ -1,9 +1,11 @@
-Interprocess Communcation for : 
+IPC 通信类型：
 
-A. Player to Player, P2P Message Delivery.
+A. 玩家到玩家
 
-B. Player to Hub (Request).
+B. 玩家到HUB请求信息
 
-only the above situations are needed.
+首先检查玩家是否在本服务器上线， 如果上线，直接投递消息。如果不在线，forward到HUB。
 
-we push messages to online user directly.
+玩家请求/变更玩家状态信息，是通过HUB协议进行， 例如获取排名，分数信息，发起攻击等。
+
+
