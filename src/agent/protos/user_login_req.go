@@ -6,7 +6,6 @@ import (
 )
 
 import (
-	"agent/online"
 	"agent/ipc"
 	"cfg"
 	"db/user_tbl"
@@ -33,7 +32,7 @@ func P_user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err err
 
 	if tbl.F_new_user == 0 {
 		if user_tbl.LoginMAC(sess.User.Mac, &sess.User) {
-			online.Register(sess, sess.User.Id)
+			ipc.Register(sess, sess.User.Id)
 			_fill_user_snapshot(&sess.User, &success)
 			ret = packet.Pack(Code["user_login_succeed_ack"], success, writer)
 			return

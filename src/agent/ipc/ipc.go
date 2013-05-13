@@ -7,7 +7,6 @@ import (
 )
 
 import (
-	"agent/online"
 	"misc/packet"
 	. "types"
 )
@@ -34,7 +33,7 @@ func Send(id int32, tos int16, data []byte) (err error) {
 		}
 	}()
 
-	peer := online.Query(id)
+	peer := Query(id)
 	req := &RequestType{Code: tos}
 	req.Data = data
 

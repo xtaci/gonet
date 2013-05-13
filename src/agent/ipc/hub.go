@@ -15,7 +15,6 @@ import (
 	"cfg"
 	"hub/protos"
 	"misc/packet"
-	"agent/online"
 )
 
 var _conn net.Conn
@@ -83,7 +82,7 @@ func HubReceiver(conn net.Conn) {
 				goto L
 			}
 
-			sess := online.Query(forward_id)
+			sess := Query(forward_id)
 			if sess == nil {
 				log.Println("forward failed, maybe user is offline?")
 			} else {

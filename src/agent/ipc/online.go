@@ -1,4 +1,4 @@
-package online
+package ipc
 
 import "sync"
 import . "types"

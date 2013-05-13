@@ -6,4 +6,4 @@ B. Player to Hub (Request).
 
 only the above situations are needed.
 
-
+we push messages to online user directly.

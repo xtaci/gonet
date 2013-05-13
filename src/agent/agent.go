@@ -9,7 +9,7 @@ import (
 
 import (
 	"cfg"
-	"agent/online"
+	"agent/ipc"
 	. "types"
 )
 
@@ -48,7 +48,7 @@ func StartAgent(in chan []byte, conn net.Conn) {
 
 	// cleanup work
 	defer func() {
-		online.Unregister(sess.User.Id)
+		ipc.Unregister(sess.User.Id)
 		close(timer_ch_session)
 		close(sess.MQ)
 		bufctrl <- "exit"
