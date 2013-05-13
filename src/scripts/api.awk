@@ -6,6 +6,8 @@ print "var Code map[string]int16 = map[string]int16 {"
 }
 {
 	name = ""
+	payload= ""
+	desc =""
 
 	for (i=1;i<=NF;i++)
 	{
@@ -25,7 +27,7 @@ print "var Code map[string]int16 = map[string]int16 {"
 		}
 	}
 	if (name!= "") {
-		print "\t\""name"\":"type",\t// payload:"payload" "desc
+		print "\t\""name"\":"type",\t// " desc
 	}
 }
 END {

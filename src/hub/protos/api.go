@@ -3,26 +3,26 @@ package protos
 import "misc/packet"
 
 var Code map[string]int16 = map[string]int16 {
-	"forward_req":0,	// payload:msg 消息转发
-	"forward_ack":1000,	// payload:command_result_pack 消息转发
-	"login_req":1,	// payload:id 登陆
-	"login_ack":1001,	// payload:command_result_pack 
-	"logout_req":2,	// payload:id 登出
-	"logout_ack":1002,	// payload:command_result_pack 登出
-	"changescore_req":3,	// payload:changescore 改变分数
-	"changescore_ack":1003,	// payload:command_result_pack 改变分数
-	"getlist_req":4,	// payload:getlist 获取列表
-	"getlist_ack":1004,	// payload:getlist_result 获取列表
-	"raid_req":5,	// payload:id 攻击
-	"raid_ack":1005,	// payload:command_result_pack 攻击
-	"protect_req":6,	// payload:id 加保护
-	"protect_ack":1006,	// payload:command_result_pack 加保护
-	"unprotect_req":7,	// payload:id 撤销保护
-	"unprotect_ack":1007,	// payload:command_result_pack 撤销保护
-	"free_req":8,	// payload:id 结束攻击
-	"free_ack":1008,	// payload:command_result_pack 结束攻击
-	"getinfo_req":9,	// payload:id 读取玩家信息
-	"getinfo_ack":1009,	// payload:info 读取玩家信息
+	"forward_req":0,	// 消息转发
+	"forward_ack":1000,	// 
+	"login_req":1,	// 登陆
+	"login_ack":1001,	// 
+	"logout_req":2,	// 登出
+	"logout_ack":1002,	// 
+	"changescore_req":3,	// 改变分数
+	"changescore_ack":1003,	// 
+	"getlist_req":4,	// 获取列表
+	"getlist_ack":1004,	// 
+	"raid_req":5,	// 攻击
+	"raid_ack":1005,	// 
+	"protect_req":6,	// 加保护
+	"protect_ack":1006,	// 
+	"unprotect_req":7,	// 撤销保护
+	"unprotect_ack":1007,	// 
+	"free_req":8,	// 结束攻击
+	"free_ack":1008,	// 
+	"getinfo_req":9,	// 读取玩家信息
+	"getinfo_ack":1009,	// 
 }
 
 var RCode map[int16]string = map[int16]string {

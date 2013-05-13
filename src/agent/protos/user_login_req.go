@@ -47,7 +47,7 @@ func P_user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err err
 		sess.User.CreatedAt = time.Now()
 
 		if user_tbl.New(&sess.User) {
-			online.Register(sess, sess.User.Id)
+			ipc.Register(sess, sess.User.Id)
 			// TODO: add user
 			//ranklist.AddUser(&sess.User)
 			_fill_user_snapshot(&sess.User, &success)

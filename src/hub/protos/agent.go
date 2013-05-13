@@ -28,10 +28,10 @@ func init() {
 //------------------------------------------------ Hub processing
 func HubAgent(incoming chan []byte, conn net.Conn) {
 	hostid := atomic.AddInt32(&_host_genid, 1)
-	pushmq := make(chan[]byte)
+	forward := make(chan[]byte)
 
 	_server_lock.Lock()
-	_servers[hostid] = pushmq // message pushing to client
+	_servers[hostid] = forward // message chan for forwarding to client
 	_server_lock.Unlock()
 
 	log.Printf("server id:%v connected\n", hostid)
@@ -61,7 +61,7 @@ func HubAgent(incoming chan []byte, conn net.Conn) {
 			if result := HandleRequest(hostid, reader); result != nil {
 				_send(seqid, result, conn)
 			}
-		case msg := <-pushmq:
+		case msg := <-forward:
 			_send(0, msg, conn)
 		}
 	}
