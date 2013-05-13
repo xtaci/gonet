@@ -13,7 +13,7 @@ import (
 
 import (
 	"cfg"
-	"hub/protos"
+	"hub/server"
 	"misc/packet"
 )
 

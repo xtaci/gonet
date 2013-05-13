@@ -6,7 +6,7 @@ import (
 )
 
 import (
-	"hub/protos"
+	"hub/server"
 	"misc/packet"
 )
 

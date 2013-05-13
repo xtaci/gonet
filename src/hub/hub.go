@@ -10,7 +10,7 @@ import (
 import (
 	"cfg"
 	. "db"
-	"hub/protos"
+	"hub/server"
 )
 
 //----------------------------------------------- HUB start
