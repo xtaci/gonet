@@ -41,7 +41,7 @@ func HubReceiver(conn net.Conn) {
 	defer conn.Close()
 
 	header := make([]byte, 2)
-	seq_id := make([]byte, 4)
+	seq_id := make([]byte, 8)
 
 	for {
 		// header
@@ -62,10 +62,14 @@ func HubReceiver(conn net.Conn) {
 			break
 		}
 
-		seqval := uint32(seq_id[0])<<24 | uint32(seq_id[1])<<16 | uint32(seq_id[2])<<8 | uint32(seq_id[3])
+		seqval := uint64(0)
+
+		for k,v := range seq_id {
+			seqval |= uint64(v) << uint((7-k)*8)
+		}
 
 		// data
-		size := int(header[0])<<8 | int(header[1]) - 4
+		size := int(header[0])<<8 | int(header[1]) - 8
 		data := make([]byte, size)
 		n, err = io.ReadFull(conn, data)
 
@@ -133,20 +137,20 @@ func ForwardHub(id int32, data []byte) (err error) {
 var _seq_lock sync.Mutex
 
 // packet sequence number generator
-var _seq_id uint32
+var _seq_id uint64
 
 // waiting ACK queue.
-var _wait_ack map[uint32]chan []byte
+var _wait_ack map[uint64]chan []byte
 var _wait_ack_lock sync.Mutex
 
 //------------------------------------------------ IPC send should be seqential
 func _call(data []byte) (ret []byte) {
-	seq_id := atomic.AddUint32(&_seq_id, 1)
+	seq_id := atomic.AddUint64(&_seq_id, 1)
 
 	_seq_lock.Lock()
 	headwriter := packet.Writer()
-	headwriter.WriteU16(uint16(len(data)) + 4) // data + seq id
-	headwriter.WriteU32(seq_id)
+	headwriter.WriteU16(uint16(len(data)) + 8) // data + seq id
+	headwriter.WriteU64(seq_id)
 
 	_, err := _conn.Write(headwriter.Data())
 	if err != nil {
@@ -177,5 +181,5 @@ func _call(data []byte) (ret []byte) {
 }
 
 func init() {
-	_wait_ack = make(map[uint32]chan []byte)
+	_wait_ack = make(map[uint64]chan []byte)
 }

@@ -59,7 +59,7 @@ func HubAgent(incoming chan []byte, conn net.Conn) {
 			}
 
 			if result := HandleRequest(hostid, reader); result != nil {
-				_send(seqid, result, conn)
+				_send(uint64(seqid), result, conn)
 			}
 		case msg := <-forward:
 			_send(0, msg, conn)
@@ -69,10 +69,10 @@ func HubAgent(incoming chan []byte, conn net.Conn) {
 }
 
 //--------------------------------------------------------- send to Game Server
-func _send(seqid uint32, data []byte, conn net.Conn) {
+func _send(seqid uint64, data []byte, conn net.Conn) {
 	headwriter := packet.Writer()
-	headwriter.WriteU16(uint16(len(data))+4)
-	headwriter.WriteU32(seqid)
+	headwriter.WriteU16(uint16(len(data))+8)
+	headwriter.WriteU64(seqid)		// piggyback seq id
 
 	_, err := conn.Write(headwriter.Data())
 	if err != nil {
