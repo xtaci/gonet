@@ -1,1 +1,1 @@
-The Clan Manager
+联盟管理
