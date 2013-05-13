@@ -65,7 +65,7 @@ func HubReceiver(conn net.Conn) {
 		seqval := uint32(seq_id[0])<<24 | uint32(seq_id[1])<<16 | uint32(seq_id[2])<<8 | uint32(seq_id[3])
 
 		// data
-		size := int(header[0])<<8 | int(header[1])
+		size := int(header[0])<<8 | int(header[1]) - 4
 		data := make([]byte, size)
 		n, err = io.ReadFull(conn, data)
 
