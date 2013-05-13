@@ -10,6 +10,8 @@ sh$cd src/scripts;./proto_gen.sh
 
 sh$go install gate
 
+sh$hub
+
 sh$gate
 
 

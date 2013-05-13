@@ -24,6 +24,7 @@ func _add_rank(ud *User) {
 	_lock_ranklist.Lock()
 	defer _lock_ranklist.Unlock()
 	_ranklist.Insert(int(ud.Score), ud.Id)
+	_id_score[ud.Id] = ud.Score
 }
 
 // ----------------------------------------------- update score of a player
@@ -48,6 +49,7 @@ func ChangeScore(id, oldscore, newscore int32) bool {
 		if n.Data().(int32) == id {
 			_ranklist.DeleteNode(n)
 			_ranklist.Insert(int(newscore), id)
+			_id_score[id] = newscore
 			return true
 		} else {
 			// temporary delete 
@@ -86,5 +88,7 @@ func GetList(A, B int) (id []int32, score []int32) {
 
 //------------------------------------------------ get score 
 func Score(id int32) (ret int32) {
+	_lock_ranklist.Lock()
+	defer _lock_ranklist.Unlock()
 	return _id_score[id]
 }
