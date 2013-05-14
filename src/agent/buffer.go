@@ -59,22 +59,15 @@ func (buf *Buffer) Start() {
 
 //------------------------------------------------ send packet online
 func (buf *Buffer) raw_send(pkt *_RawPacket) {
-	headwriter := packet.Writer()
-	headwriter.WriteU16(uint16(len(pkt.data)))
+	writer := packet.Writer()
+	writer.WriteU16(uint16(len(pkt.data)))
+	writer.WriteRawBytes(pkt.data)
 
-	_, err := buf.conn.Write(headwriter.Data())
+	_, err := buf.conn.Write(writer.Data())
 	if err != nil {
-		log.Println("Error send reply header:", err)
+		log.Println("Error send reply :", err)
 		return
 	}
-
-	_, err = buf.conn.Write(pkt.data)
-	if err != nil {
-		log.Println("Error send reply msg:", err)
-		return
-	}
-
-	return
 }
 
 //------------------------------------------------ create a new write buffer
