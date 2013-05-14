@@ -9,7 +9,6 @@ import (
 
 import (
 	"cfg"
-	"agent/ipc"
 	. "types"
 )
 
@@ -48,7 +47,7 @@ func StartAgent(in chan []byte, conn net.Conn) {
 
 	// cleanup work
 	defer func() {
-		ipc.Unregister(sess.User.Id)
+		close_work(&sess)
 		close(timer_ch_session)
 		close(sess.MQ)
 		bufctrl <- "exit"

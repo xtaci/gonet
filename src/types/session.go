@@ -9,4 +9,5 @@ type Session struct {
 	Bitmap    []byte
 	Buildings []byte
 	HeartBeat time.Time
+	IsLoggedOut bool	// represents user logout or connection failure
 }

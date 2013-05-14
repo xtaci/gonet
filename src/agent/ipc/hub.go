@@ -122,7 +122,7 @@ func ForwardHub(id int32, data []byte) (err error) {
 	}()
 
 	// HUB protocol forwarding
-	msg := protos.MSG{}
+	msg := protos.FORWARDMSG{}
 	msg.F_id = id
 	msg.F_data = data
 	ack := _call(packet.Pack(protos.Code["forward"], msg, nil))
