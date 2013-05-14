@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"log"
 	"runtime"
+	"net"
 )
 
 var _redis redis.Client
@@ -18,26 +19,45 @@ func init() {
 	_redis.Addr = "127.0.0.1:6379"
 }
 
-func HandleRequest(hostid int32, reader *packet.Packet) []byte {
+//--------------------------------------------------------- send to Game Server
+func _send(seqid uint64, data []byte, conn net.Conn) {
+	writer := packet.Writer()
+	writer.WriteU16(uint16(len(data))+8)
+	writer.WriteU64(seqid)		// piggyback seq id
+	writer.WriteRawBytes(data)
+
+	_, err := conn.Write(writer.Data())	// write operation is assumed to be atomic
+	if err != nil {
+		log.Println("Error send reply to GS:", err)
+	}
+}
+
+func HandleRequest(hostid int32, reader *packet.Packet, conn net.Conn) {
 	defer _HandleError()
 
-	b, err := reader.ReadU16()
+	seqid, err := reader.ReadU64()	// read seqid 
+	if err != nil {
+		log.Println("Read Sequence Id failed.", err)
+		return
+	}
 
+	b, err := reader.ReadU16()
 	if err != nil {
 		log.Println("read protocol error")
+		return
 	}
 
 	fmt.Println("proto: ", b)
 	handle := ProtoHandler[b]
 	if handle != nil {
 		ret, err := handle(hostid, reader)
-		fmt.Println("ret:", ret)
 		if err == nil {
-			return ret
+			_send(seqid, ret, conn)
+		} else {
+			log.Println(ret)
 		}
 	}
 
-	return nil
 }
 
 func P_forward_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
@@ -62,9 +82,7 @@ func P_forward_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 		ch <- tbl.F_data
 	} else {
 		// send to redis
-		go func() {
-			_redis.Rpush(fmt.Sprintf("MSG#%v", tbl.F_id), tbl.F_data)
-		}()
+		_redis.Rpush(fmt.Sprintf("MSG#%v", tbl.F_id), tbl.F_data)
 	}
 
 	return nil, nil
@@ -191,9 +209,7 @@ func P_getofflinemsg_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	}
 
 	// remove messages
-	go func() {
-		_redis.Del(fmt.Sprintf("MSG#%v", tbl.F_id))
-	}()
+	_redis.Del(fmt.Sprintf("MSG#%v", tbl.F_id))
 
 	return packet.Pack(Code["getofflinemsg_ack"],ret, nil), nil
 }

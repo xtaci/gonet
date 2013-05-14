@@ -164,6 +164,10 @@ func (p *Packet) WriteBytes(v []byte) {
 	p.data = append(p.data, v...)
 }
 
+func (p *Packet) WriteRawBytes(v []byte) {
+	p.data = append(p.data, v...)
+}
+
 func (p *Packet) WriteString(v string) {
 	bytes := []byte(v)
 	p.WriteU16(uint16(len(bytes)))
