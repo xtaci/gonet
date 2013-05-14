@@ -62,7 +62,7 @@ func HubAgent(incoming chan []byte, conn net.Conn) {
 			reader := packet.Reader(msg)
 			go HandleRequest(hostid,reader,output)
 		case msg := <-forward:
-			go _send(0, msg, output)
+			_send(0, msg, output)
 		}
 	}
 
