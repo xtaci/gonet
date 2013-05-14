@@ -62,7 +62,9 @@ func P_forward_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 		ch <- tbl.F_data
 	} else {
 		// send to redis
-		_redis.Rpush(fmt.Sprintf("MSG#%v", tbl.F_id), tbl.F_data)
+		go func() {
+			_redis.Rpush(fmt.Sprintf("MSG#%v", tbl.F_id), tbl.F_data)
+		}()
 	}
 
 	return nil, nil
@@ -189,7 +191,9 @@ func P_getofflinemsg_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	}
 
 	// remove messages
-	_redis.Del(fmt.Sprintf("MSG#%v", tbl.F_id))
+	go func() {
+		_redis.Del(fmt.Sprintf("MSG#%v", tbl.F_id))
+	}()
 
 	return packet.Pack(Code["getofflinemsg_ack"],ret, nil), nil
 }
