@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"log"
 	"runtime"
-	"net"
 )
 
 var _redis redis.Client
@@ -19,20 +18,8 @@ func init() {
 	_redis.Addr = "127.0.0.1:6379"
 }
 
-//--------------------------------------------------------- send to Game Server
-func _send(seqid uint64, data []byte, conn net.Conn) {
-	writer := packet.Writer()
-	writer.WriteU16(uint16(len(data))+8)
-	writer.WriteU64(seqid)		// piggyback seq id
-	writer.WriteRawBytes(data)
 
-	_, err := conn.Write(writer.Data())	// write operation is assumed to be atomic
-	if err != nil {
-		log.Println("Error send reply to GS:", err)
-	}
-}
-
-func HandleRequest(hostid int32, reader *packet.Packet, conn net.Conn) {
+func HandleRequest(hostid int32, reader *packet.Packet, output chan[]byte) {
 	defer _HandleError()
 
 	seqid, err := reader.ReadU64()	// read seqid 
@@ -52,7 +39,7 @@ func HandleRequest(hostid int32, reader *packet.Packet, conn net.Conn) {
 	if handle != nil {
 		ret, err := handle(hostid, reader)
 		if err == nil {
-			_send(seqid, ret, conn)
+			_send(seqid, ret, output)
 		} else {
 			log.Println(ret)
 		}
