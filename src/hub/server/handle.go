@@ -3,6 +3,7 @@ package protos
 import (
 	"hub/ranklist"
 	"misc/packet"
+	"github.com/hoisie/redis"
 )
 
 import (
@@ -10,6 +11,12 @@ import (
 	"log"
 	"runtime"
 )
+
+var _redis redis.Client
+
+func init() {
+	_redis.Addr = "127.0.0.1:6379"
+}
 
 func HandleRequest(hostid int32, reader *packet.Packet) []byte {
 	defer _HandleError()
@@ -24,7 +31,7 @@ func HandleRequest(hostid int32, reader *packet.Packet) []byte {
 	handle := ProtoHandler[b]
 	if handle != nil {
 		ret, err := handle(hostid, reader)
-		fmt.Println(ret)
+		fmt.Println("ret:", ret)
 		if err == nil {
 			return ret
 		}
@@ -54,7 +61,8 @@ func P_forward_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 
 		ch <- tbl.F_data
 	} else {
-		// TODO : add redis
+		// send to redis
+		_redis.Rpush(fmt.Sprintf("MSG#%v", tbl.F_id), tbl.F_data)
 	}
 
 	return nil, nil
