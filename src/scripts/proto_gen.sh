@@ -18,8 +18,8 @@ printf "var ProtoHandler map[uint16]func(*Session, *packet.Packet) ([]byte, erro
 awk -f api_bind_req.awk api.txt >> api.go 
 printf "}" >> api.go
 
-mv proto.go ../agent/protos
-mv api.go ../agent/protos
+mv -f proto.go ../agent/protos
+mv -f api.go ../agent/protos
 
 #### hub proto
 awk -f proto.awk hub_proto.txt > proto.go 
@@ -39,5 +39,5 @@ awk -f api_bind_req.awk hub_api.txt >> api.go
 printf "}" >> api.go
 
 #### move #################
-mv proto.go ../hub/protos
-mv api.go ../hub/protos
+mv -f proto.go ../hub/server
+mv -f api.go ../hub/server

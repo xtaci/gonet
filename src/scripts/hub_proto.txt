@@ -1,7 +1,15 @@
 # 转发消息
-MSG=
+FORWARDMSG=
 id integer
 data []byte
+===
+
+PLAINMSG=
+msg []byte
+===
+
+OFFLINEMSG=
+msgs array PLAINMSG
 ===
 
 #用户登陆发包

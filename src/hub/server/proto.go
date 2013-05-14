@@ -2,9 +2,17 @@ package protos
 
 import "misc/packet"
 
-type MSG struct {
+type FORWARDMSG struct {
 	F_id int32
 	F_data []byte
+}
+
+type PLAINMSG struct {
+	F_msg []byte
+}
+
+type OFFLINEMSG struct {
+	F_msgs []PLAINMSG
 }
 
 type ID struct {
@@ -52,11 +60,27 @@ type INT struct {
 	F_v int32
 }
 
-func PKT_MSG(reader *packet.Packet)(tbl MSG, err error){
+func PKT_FORWARDMSG(reader *packet.Packet)(tbl FORWARDMSG, err error){
 	tbl.F_id,err = reader.ReadS32()
 	checkErr(err)
 	tbl.F_data,err = reader.ReadBytes()
 	checkErr(err)
+	return
+}
+
+func PKT_PLAINMSG(reader *packet.Packet)(tbl PLAINMSG, err error){
+	tbl.F_msg,err = reader.ReadBytes()
+	checkErr(err)
+	return
+}
+
+func PKT_OFFLINEMSG(reader *packet.Packet)(tbl OFFLINEMSG, err error){
+	narr,err2 := reader.ReadU16()
+	checkErr(err2)
+	tbl.F_msgs=make([]PLAINMSG,narr)
+	for i:=0;i<int(narr);i++ {
+		tbl.F_msgs[i], err = PKT_PLAINMSG(reader)
+	}
 	return
 }
 

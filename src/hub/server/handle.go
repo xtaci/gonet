@@ -47,7 +47,7 @@ func P_forward_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 		}
 	}()
 
-	tbl, _ := PKT_MSG(pkt)
+	tbl, _ := PKT_FORWARDMSG(pkt)
 
 	// if user is online, send to the user, or else send to redis 
 	state := ranklist.State(tbl.F_id)
@@ -170,6 +170,28 @@ func P_getinfo_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	ret.F_protecttime = ranklist.ProtectTime(tbl.F_id)
 	ret.F_name = ranklist.Name(tbl.F_id)
 	return packet.Pack(Code["getinfo_ack"], ret, nil), nil
+}
+
+func P_getofflinemsg_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
+	tbl, _ := PKT_ID(pkt)
+	ret := OFFLINEMSG{}
+	// get all message from redis
+	msgs,err := _redis.Lrange(fmt.Sprintf("MSG#%v", tbl.F_id), 0, -1)
+
+	if err!=nil {
+		return nil, err
+	}
+
+	ret.F_msgs = make([]PLAINMSG, len(msgs))
+
+	for k := range msgs {
+		ret.F_msgs[k].F_msg = msgs[k]
+	}
+
+	// remove messages
+	_redis.Del(fmt.Sprintf("MSG#%v", tbl.F_id))
+
+	return packet.Pack(Code["getofflinemsg_ack"],ret, nil), nil
 }
 
 func checkErr(err error) {

@@ -2,7 +2,7 @@
 
 packet_type:0
 name:forward_req
-payload:msg
+payload:forwardmsg
 desc:消息转发
 
 packet_type:1000
@@ -103,3 +103,13 @@ desc:读取玩家信息
 packet_type:1009
 name:getinfo_ack
 payload:info
+
+#####
+packet_type:10
+name:getofflinemsg_req
+payload:id
+desc:获取离线信息
+
+packet_type:1010
+name:getofflinemsg_ack
+payload:offlinemsg
