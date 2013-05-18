@@ -1,4 +1,4 @@
-package types
+package defense
 
 type Building struct {
 	TYPE uint8

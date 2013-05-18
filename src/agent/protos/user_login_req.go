@@ -31,7 +31,7 @@ func P_user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err err
 		return
 	}
 
-	// if not a new user, register to db & online user
+	// if new user, register to db & online user
 	// or else do a login procedure
 	if tbl.F_new_user == 0 {
 		if user_tbl.LoginMAC(sess.User.Mac, &sess.User) {

@@ -51,3 +51,5 @@ func Get(tblname string, row int, fieldname string) interface{} {
 
 	return rec.Fields[fieldname]
 }
+
+//TODO : GetAsXXX 
