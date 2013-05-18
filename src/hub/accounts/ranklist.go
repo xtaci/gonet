@@ -1,4 +1,4 @@
-package ranklist
+package accounts
 
 import (
 	"sync"
@@ -27,7 +27,7 @@ func _add_rank(ud *User) {
 	_id_score[ud.Id] = ud.Score
 }
 
-// ----------------------------------------------- update score of a player
+//------------------------------------------------ update score of a player
 func ChangeScore(id, oldscore, newscore int32) bool {
 	_lock_ranklist.Lock()
 	defer _lock_ranklist.Unlock()

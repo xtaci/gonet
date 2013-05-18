@@ -1,4 +1,4 @@
-package ranklist
+package accounts
 
 import (
 	"sync"

@@ -1,7 +1,7 @@
 package protos
 
 import (
-	"hub/ranklist"
+	"hub/accounts"
 	"misc/packet"
 	"github.com/hoisie/redis"
 )
@@ -57,11 +57,11 @@ func P_forward_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	tbl, _ := PKT_FORWARDMSG(pkt)
 
 	// if user is online, send to the user, or else send to redis 
-	state := ranklist.State(tbl.F_id)
-	host := ranklist.Host(tbl.F_id)
+	state := accounts.State(tbl.F_id)
+	host := accounts.Host(tbl.F_id)
 
 	fmt.Println(tbl.F_id, tbl.F_data)
-	if state&ranklist.ONLINE != 0 {
+	if state&accounts.ONLINE != 0 {
 		_server_lock.RLock()
 		ch := _servers[host] // forwarding request
 		_server_lock.RUnlock()
@@ -79,7 +79,7 @@ func P_login_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	tbl, _ := PKT_ID(pkt)
 	ret := INT{F_v: 0}
 
-	if ranklist.Login(tbl.F_id, hostid) {
+	if accounts.Login(tbl.F_id, hostid) {
 		ret.F_v = 1
 	}
 
@@ -90,7 +90,7 @@ func P_logout_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	tbl, _ := PKT_ID(pkt)
 	ret := INT{F_v: 0}
 
-	if ranklist.Logout(tbl.F_id) {
+	if accounts.Logout(tbl.F_id) {
 		ret.F_v = 1
 	}
 
@@ -101,7 +101,7 @@ func P_changescore_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	tbl, _ := PKT_CHGSCORE(pkt)
 	ret := INT{F_v: 0}
 
-	if ranklist.ChangeScore(tbl.F_id, tbl.F_oldscore, tbl.F_newscore) {
+	if accounts.ChangeScore(tbl.F_id, tbl.F_oldscore, tbl.F_newscore) {
 		ret.F_v = 1
 	}
 
@@ -112,7 +112,7 @@ func P_getlist_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	tbl, _ := PKT_GETLIST(pkt)
 	ret := LIST{}
 
-	ids, scores := ranklist.GetList(int(tbl.F_A), int(tbl.F_B))
+	ids, scores := accounts.GetList(int(tbl.F_A), int(tbl.F_B))
 	ret.F_items = make([]ID_SCORE, len(ids))
 
 	for k := range ids {
@@ -127,7 +127,7 @@ func P_raid_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	tbl, _ := PKT_ID(pkt)
 	ret := INT{F_v: 0}
 
-	if ranklist.Raid(tbl.F_id) {
+	if accounts.Raid(tbl.F_id) {
 		ret.F_v = 1
 	}
 
@@ -138,7 +138,7 @@ func P_protect_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	tbl, _ := PKT_ID(pkt)
 	ret := INT{F_v: 0}
 
-	if ranklist.Raid(tbl.F_id) {
+	if accounts.Raid(tbl.F_id) {
 		ret.F_v = 1
 	}
 
@@ -149,7 +149,7 @@ func P_unprotect_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	tbl, _ := PKT_ID(pkt)
 	ret := INT{F_v: 0}
 
-	if ranklist.Unprotect(tbl.F_id) {
+	if accounts.Unprotect(tbl.F_id) {
 		ret.F_v = 1
 	}
 
@@ -160,7 +160,7 @@ func P_free_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	tbl, _ := PKT_ID(pkt)
 	ret := INT{F_v: 0}
 
-	if ranklist.Free(tbl.F_id) {
+	if accounts.Free(tbl.F_id) {
 		ret.F_v = 1
 	}
 
@@ -171,11 +171,11 @@ func P_getinfo_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	tbl, _ := PKT_ID(pkt)
 	ret := INFO{}
 	ret.F_id = tbl.F_id
-	ret.F_state = ranklist.State(tbl.F_id)
-	ret.F_score = ranklist.Score(tbl.F_id)
-	ret.F_clan = ranklist.Score(tbl.F_id)
-	ret.F_protecttime = ranklist.ProtectTime(tbl.F_id)
-	ret.F_name = ranklist.Name(tbl.F_id)
+	ret.F_state = accounts.State(tbl.F_id)
+	ret.F_score = accounts.Score(tbl.F_id)
+	ret.F_clan = accounts.Score(tbl.F_id)
+	ret.F_protecttime = accounts.ProtectTime(tbl.F_id)
+	ret.F_name = accounts.Name(tbl.F_id)
 	return packet.Pack(Code["getinfo_ack"], ret, nil), nil
 }
 

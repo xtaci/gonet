@@ -2,7 +2,7 @@ package main
 
 import (
 	"db/user_tbl"
-	"hub/ranklist"
+	"hub/accounts"
 )
 
 func startup_work() {
@@ -14,8 +14,8 @@ func load_ranklist() {
 	uds := user_tbl.LoadAll()
 
 	for i := range uds {
-		ranklist.AddUser(&uds[i])
+		accounts.AddUser(&uds[i])
 	}
 
-	go ranklist.ExpireRoutine()
+	go accounts.ExpireRoutine()
 }
