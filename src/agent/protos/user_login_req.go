@@ -3,6 +3,7 @@ package protos
 import (
 	"strconv"
 	"time"
+	"log"
 )
 
 import (
@@ -30,6 +31,8 @@ func P_user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err err
 		return
 	}
 
+	// if not a new user, register to db & online user
+	// or else do a login procedure
 	if tbl.F_new_user == 0 {
 		if user_tbl.LoginMAC(sess.User.Mac, &sess.User) {
 			ipc.RegisterOnline(sess, sess.User.Id)
@@ -41,18 +44,20 @@ func P_user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err err
 			return
 		}
 	} else {
-		// register to db & online user
 		sess.User.Name = tbl.F_user_name
 		sess.User.Mac = tbl.F_mac_addr
 		sess.User.CreatedAt = time.Now()
 
 		if user_tbl.New(&sess.User) {
-			ipc.RegisterOnline(sess, sess.User.Id)
-			// TODO: add user
-			//ranklist.AddUser(&sess.User)
-			_fill_user_snapshot(&sess.User, &success)
-			ret = packet.Pack(Code["user_login_succeed_ack"], success, writer)
-			return
+			if ipc.AddUser(sess.User.Id) {
+				_fill_user_snapshot(&sess.User, &success)
+				ret = packet.Pack(Code["user_login_succeed_ack"], success, writer)
+				return
+			} else {
+				ret = packet.Pack(Code["user_login_faild_ack"], failed, writer)
+				log.Println("ipc AddUser failed!!!\n")
+				return
+			}
 		} else {
 			ret = packet.Pack(Code["user_login_faild_ack"], failed, writer)
 			return

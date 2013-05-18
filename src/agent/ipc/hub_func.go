@@ -151,6 +151,21 @@ func GetList(A,B int32) (ids, scores []int32, err error) {
 	return ids, scores, _err
 }
 
+func AddUser(id int32) bool {
+	defer _hub_err()
+	req := hub.ID{}
+	req.F_id = id
+	ret := _call(packet.Pack(hub.Code["adduser_req"], req, nil))
+	reader := packet.Reader(ret)
+	tbl, err := hub.PKT_INT(reader)
+
+	if err != nil || tbl.F_v==0 {
+		return false
+	}
+
+	return true
+}
+
 func _hub_err() {
 	if x := recover(); x != nil {
 		log.Println(x)
