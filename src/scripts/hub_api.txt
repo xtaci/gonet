@@ -113,3 +113,13 @@ desc:获取离线信息
 packet_type:1010
 name:getofflinemsg_ack
 payload:offlinemsg
+
+#####
+packet_type:11
+name:adduser_req
+payload:id
+desc:注册一个新注册的玩家
+
+packet_type:1011
+name:adduser_ack
+payload:command_result_pack

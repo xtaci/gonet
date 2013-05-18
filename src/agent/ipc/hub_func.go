@@ -6,7 +6,7 @@ import (
 )
 
 import (
-	"hub/server"
+	hub "hub/protos"
 	"misc/packet"
 )
 
@@ -21,11 +21,11 @@ type Info struct {
 
 func Login(id int32) bool {
 	defer _hub_err()
-	req := protos.ID{}
+	req := hub.ID{}
 	req.F_id = id
-	ret := _call(packet.Pack(protos.Code["login_req"], req, nil))
+	ret := _call(packet.Pack(hub.Code["login_req"], req, nil))
 	reader := packet.Reader(ret)
-	tbl, err := protos.PKT_INT(reader)
+	tbl, err := hub.PKT_INT(reader)
 
 	if err != nil || tbl.F_v==0 {
 		return false
@@ -36,11 +36,11 @@ func Login(id int32) bool {
 
 func Logout(id int32) bool {
 	defer _hub_err()
-	req := protos.ID{}
+	req := hub.ID{}
 	req.F_id = id
-	ret := _call(packet.Pack(protos.Code["logout_req"], req, nil))
+	ret := _call(packet.Pack(hub.Code["logout_req"], req, nil))
 	reader := packet.Reader(ret)
-	tbl, err := protos.PKT_INT(reader)
+	tbl, err := hub.PKT_INT(reader)
 
 	if err != nil || tbl.F_v==0 {
 		return false
@@ -52,11 +52,11 @@ func Logout(id int32) bool {
 func Raid(id int32) bool {
 	defer _hub_err()
 
-	req := protos.ID{}
+	req := hub.ID{}
 	req.F_id = id
-	ret := _call(packet.Pack(protos.Code["raid_req"], req, nil))
+	ret := _call(packet.Pack(hub.Code["raid_req"], req, nil))
 	reader := packet.Reader(ret)
-	tbl, err := protos.PKT_INT(reader)
+	tbl, err := hub.PKT_INT(reader)
 
 	if err != nil || tbl.F_v==0 {
 		return false
@@ -68,11 +68,11 @@ func Raid(id int32) bool {
 func Protect(id int32, until time.Time) bool {
 	defer _hub_err()
 
-	req := protos.ID{}
+	req := hub.ID{}
 	req.F_id = id
-	ret := _call(packet.Pack(protos.Code["protect_req"], req, nil))
+	ret := _call(packet.Pack(hub.Code["protect_req"], req, nil))
 	reader := packet.Reader(ret)
-	tbl, err := protos.PKT_INT(reader)
+	tbl, err := hub.PKT_INT(reader)
 
 	if err != nil || tbl.F_v==0 {
 		return false
@@ -84,11 +84,11 @@ func Protect(id int32, until time.Time) bool {
 func Free(id int32) bool {
 	defer _hub_err()
 
-	req := protos.ID{}
+	req := hub.ID{}
 	req.F_id = id
-	ret := _call(packet.Pack(protos.Code["free_req"], req, nil))
+	ret := _call(packet.Pack(hub.Code["free_req"], req, nil))
 	reader := packet.Reader(ret)
-	tbl, err := protos.PKT_INT(reader)
+	tbl, err := hub.PKT_INT(reader)
 
 	if err != nil || tbl.F_v==0 {
 		return false
@@ -100,11 +100,11 @@ func Free(id int32) bool {
 func Unprotect(id int32) bool {
 	defer _hub_err()
 
-	req := protos.ID{}
+	req := hub.ID{}
 	req.F_id = id
-	ret := _call(packet.Pack(protos.Code["unprotect_req"], req, nil))
+	ret := _call(packet.Pack(hub.Code["unprotect_req"], req, nil))
 	reader := packet.Reader(ret)
-	tbl, err := protos.PKT_INT(reader)
+	tbl, err := hub.PKT_INT(reader)
 
 	if err != nil || tbl.F_v==0 {
 		return false
@@ -116,11 +116,11 @@ func Unprotect(id int32) bool {
 func GetInfo(id int32) (info Info,err error) {
 	defer _hub_err()
 
-	req := protos.ID{}
+	req := hub.ID{}
 	req.F_id = id
-	ret := _call(packet.Pack(protos.Code["getinfo_req"], req, nil))
+	ret := _call(packet.Pack(hub.Code["getinfo_req"], req, nil))
 	reader := packet.Reader(ret)
-	tbl, _err := protos.PKT_INFO(reader)
+	tbl, _err := hub.PKT_INFO(reader)
 	info.Id = tbl.F_id
 	info.State = tbl.F_state
 	info.Score = tbl.F_score
@@ -134,12 +134,12 @@ func GetInfo(id int32) (info Info,err error) {
 func GetList(A,B int32) (ids, scores []int32, err error) {
 	defer _hub_err()
 
-	req := protos.GETLIST{}
+	req := hub.GETLIST{}
 	req.F_A = A
 	req.F_B = B
-	ret := _call(packet.Pack(protos.Code["getlist_req"], req, nil))
+	ret := _call(packet.Pack(hub.Code["getlist_req"], req, nil))
 	reader := packet.Reader(ret)
-	tbl, _err := protos.PKT_LIST(reader)
+	tbl, _err := hub.PKT_LIST(reader)
 	ids = make([]int32, len(ids))
 	scores = make([]int32, len(scores))
 

@@ -25,6 +25,8 @@ var Code map[string]int16 = map[string]int16 {
 	"getinfo_ack":1009,	// 
 	"getofflinemsg_req":10,	// 获取离线信息
 	"getofflinemsg_ack":1010,	// 
+	"adduser_req":11,	// 注册一个新注册的玩家
+	"adduser_ack":1011,	// 
 }
 
 var RCode map[int16]string = map[int16]string {
@@ -50,6 +52,8 @@ var RCode map[int16]string = map[int16]string {
 	1009:"getinfo_ack",
 	10:"getofflinemsg_req",
 	1010:"getofflinemsg_ack",
+	11:"adduser_req",
+	1011:"adduser_ack",
 }
 
 var ProtoHandler map[uint16]func(int32, *packet.Packet) ([]byte, error) = map[uint16]func(int32, *packet.Packet)([]byte, error){
@@ -64,4 +68,5 @@ var ProtoHandler map[uint16]func(int32, *packet.Packet) ([]byte, error) = map[ui
 	8:P_free_req,
 	9:P_getinfo_req,
 	10:P_getofflinemsg_req,
+	11:P_adduser_req,
 }

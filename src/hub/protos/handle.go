@@ -216,6 +216,18 @@ func P_getofflinemsg_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	return packet.Pack(Code["getofflinemsg_ack"],ret, nil), nil
 }
 
+func P_adduser_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
+	tbl, _ := PKT_ID(pkt)
+	ret := INT{F_v: 0}
+
+	if accounts.LoadUser(tbl.F_id) {
+		accounts.Login(tbl.F_id, hostid)
+		ret.F_v = 1
+	}
+
+	return packet.Pack(Code["adduser_ack"], ret, nil), nil
+}
+
 func checkErr(err error) {
 	if err != nil {
 		funcName, file, line, ok := runtime.Caller(1)

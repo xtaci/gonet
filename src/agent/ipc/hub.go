@@ -13,7 +13,7 @@ import (
 
 import (
 	"cfg"
-	"hub/server"
+	hub "hub/protos"
 	"misc/packet"
 )
 
@@ -122,10 +122,10 @@ func ForwardHub(id int32, data []byte) (err error) {
 	}()
 
 	// HUB protocol forwarding
-	msg := protos.FORWARDMSG{}
+	msg := hub.FORWARDMSG{}
 	msg.F_id = id
 	msg.F_data = data
-	ack := _call(packet.Pack(protos.Code["forward"], msg, nil))
+	ack := _call(packet.Pack(hub.Code["forward_req"], msg, nil))
 	if ack != nil {
 		panic("ForwardHub failed or timed-out")
 	}
