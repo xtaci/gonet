@@ -10,14 +10,29 @@ import (
 	"fmt"
 	"log"
 	"runtime"
+	"sync"
 )
 
 var _redis redis.Client
 
+var (
+	Servers map[int32]chan []byte
+	ServerLock sync.RWMutex
+)
+
 func init() {
+	Servers = make(map[int32]chan []byte)
 	_redis.Addr = "127.0.0.1:6379"
 }
 
+//--------------------------------------------------------- send
+func _send(seqid uint64, data []byte, output chan[]byte) {
+	writer := packet.Writer()
+	writer.WriteU16(uint16(len(data))+8)
+	writer.WriteU64(seqid)		// piggyback seq id
+	writer.WriteRawBytes(data)
+	output <- writer.Data()
+}
 
 func HandleRequest(hostid int32, reader *packet.Packet, output chan[]byte) {
 	defer _HandleError()
@@ -56,15 +71,15 @@ func P_forward_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 
 	tbl, _ := PKT_FORWARDMSG(pkt)
 
-	// if user is online, send to the user, or else send to redis 
+	// if user is online, send to the server, or else send to redis 
 	state := accounts.State(tbl.F_id)
 	host := accounts.Host(tbl.F_id)
 
 	fmt.Println(tbl.F_id, tbl.F_data)
 	if state&accounts.ONLINE != 0 {
-		_server_lock.RLock()
-		ch := _servers[host] // forwarding request
-		_server_lock.RUnlock()
+		ServerLock.RLock()
+		ch := Servers[host] // forwarding request
+		ServerLock.RUnlock()
 
 		ch <- tbl.F_data
 	} else {

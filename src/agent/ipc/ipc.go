@@ -33,7 +33,7 @@ func Send(id int32, tos int16, data []byte) (err error) {
 		}
 	}()
 
-	peer := Query(id)
+	peer := QueryOnline(id)
 	req := &RequestType{Code: tos}
 	req.Data = data
 

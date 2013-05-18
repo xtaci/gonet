@@ -32,7 +32,7 @@ func P_user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err err
 
 	if tbl.F_new_user == 0 {
 		if user_tbl.LoginMAC(sess.User.Mac, &sess.User) {
-			ipc.Register(sess, sess.User.Id)
+			ipc.RegisterOnline(sess, sess.User.Id)
 			_fill_user_snapshot(&sess.User, &success)
 			ret = packet.Pack(Code["user_login_succeed_ack"], success, writer)
 			return
@@ -47,7 +47,7 @@ func P_user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err err
 		sess.User.CreatedAt = time.Now()
 
 		if user_tbl.New(&sess.User) {
-			ipc.Register(sess, sess.User.Id)
+			ipc.RegisterOnline(sess, sess.User.Id)
 			// TODO: add user
 			//ranklist.AddUser(&sess.User)
 			_fill_user_snapshot(&sess.User, &success)

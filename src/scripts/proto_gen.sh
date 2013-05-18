@@ -39,5 +39,5 @@ awk -f api_bind_req.awk hub_api.txt >> api.go
 printf "}" >> api.go
 
 #### move #################
-mv -f proto.go ../hub/server
-mv -f api.go ../hub/server
+mv -f proto.go ../hub/protos
+mv -f api.go ../hub/protos

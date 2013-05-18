@@ -1,14 +1,14 @@
-package protos
+package main
 
 import (
 	"log"
 	"net"
-	"sync"
 	"sync/atomic"
 )
 
 import (
 	"misc/packet"
+	"hub/protos"
 )
 
 const (
@@ -17,12 +17,18 @@ const (
 
 //----------------------------------------------- logical game server chans
 var _host_genid int32
-var _servers map[int32]chan []byte
-var _server_lock sync.RWMutex
 
 func init() {
 	log.SetPrefix("[HUB]")
-	_servers = make(map[int32]chan []byte)
+}
+
+//--------------------------------------------------------- send
+func _send(seqid uint64, data []byte, output chan[]byte) {
+	writer := packet.Writer()
+	writer.WriteU16(uint16(len(data))+8)
+	writer.WriteU64(seqid)		// piggyback seq id
+	writer.WriteRawBytes(data)
+	output <- writer.Data()
 }
 
 //------------------------------------------------ Hub processing
@@ -33,18 +39,18 @@ func HubAgent(incoming chan []byte, conn net.Conn) {
 	// output buffer
 	output := make(chan[]byte, MAXCHAN)
 
-	_server_lock.Lock()
-	_servers[hostid] = forward // message chan for forwarding to client
-	_server_lock.Unlock()
+	protos.ServerLock.Lock()
+	protos.Servers[hostid] = forward // message chan for forwarding to client
+	protos.ServerLock.Unlock()
 
 	log.Printf("server id:%v connected\n", hostid)
 
 	go _write_routine(output, conn)
 
 	defer func() {
-		_server_lock.Lock()
-		delete(_servers, hostid)
-		_server_lock.Unlock()
+		protos.ServerLock.Lock()
+		delete(protos.Servers, hostid)
+		protos.ServerLock.Unlock()
 
 		close(forward)
 		close(output)
@@ -60,7 +66,7 @@ func HubAgent(incoming chan []byte, conn net.Conn) {
 			}
 
 			reader := packet.Reader(msg)
-			go HandleRequest(hostid,reader,output)
+			go protos.HandleRequest(hostid,reader,output)
 		case msg := <-forward:
 			_send(0, msg, output)
 		}
@@ -83,11 +89,4 @@ func _write_routine(output chan[]byte, conn net.Conn) {
 	}
 }
 
-//--------------------------------------------------------- send to Game Server
-func _send(seqid uint64, data []byte, output chan[]byte) {
-	writer := packet.Writer()
-	writer.WriteU16(uint16(len(data))+8)
-	writer.WriteU64(seqid)		// piggyback seq id
-	writer.WriteRawBytes(data)
-	output <- writer.Data()
-}
+

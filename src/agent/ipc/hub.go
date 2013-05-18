@@ -86,7 +86,7 @@ func HubReceiver(conn net.Conn) {
 				goto L
 			}
 
-			sess := Query(forward_id)
+			sess := QueryOnline(forward_id)
 			if sess == nil {
 				log.Println("forward failed, maybe user is offline?")
 			} else {

@@ -7,7 +7,7 @@ var _active map[int32]*Session
 var _lock sync.RWMutex
 
 //----------------------------------------------- register a user as online user
-func Register(sess *Session, id int32) {
+func RegisterOnline(sess *Session, id int32) {
 	defer _lock.Unlock()
 	_lock.Lock()
 
@@ -15,7 +15,7 @@ func Register(sess *Session, id int32) {
 }
 
 //----------------------------------------------- unregister a user from online users
-func Unregister(id int32) {
+func UnregisterOnline(id int32) {
 	defer _lock.Unlock()
 	_lock.Lock()
 
@@ -23,7 +23,7 @@ func Unregister(id int32) {
 }
 
 //----------------------------------------------- query a online user
-func Query(id int32) *Session {
+func QueryOnline(id int32) *Session {
 	defer _lock.RUnlock()
 	_lock.RLock()
 
