@@ -33,11 +33,11 @@ func init() {
 
 	_eventqueue = make(map[uint32]*Event)
 
-	go TimerRoutine()
+	go _timer()
 }
 
 //------------------------------------------------ Timer Routine
-func TimerRoutine() {
+func _timer() {
 	timer_count := uint32(0)
 
 	for {
