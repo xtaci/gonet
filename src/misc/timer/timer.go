@@ -32,6 +32,8 @@ func init() {
 	}
 
 	_eventqueue = make(map[uint32]*Event)
+
+	go TimerRoutine()
 }
 
 //------------------------------------------------ Timer Routine
