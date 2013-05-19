@@ -6,11 +6,12 @@ import (
 )
 
 import (
+	"misc/timer"
 	. "types"
 )
 
-// OFFLINE|RAID, OFFLINE|PROTECTED , OFFLINE |FREE
-// ONLINE|PROTECTED , ONLINE|FREE
+// OFFLINE|RAID, OFFLINE|PROTECTED , OFFLINE
+// ONLINE|PROTECTED , ONLINE
 const (
 	HISHIFT = 16
 
@@ -19,9 +20,8 @@ const (
 	ONLINE  = 1 << 1 << HISHIFT
 
 	// battle status
-	RAID      = 1 << 2
-	PROTECTED = 1 << 3
-	FREE      = 1 << 4
+	RAID      = 1
+	PROTECTED = 1 << 1
 
 	LOMASK = 0xFFFF
 	HIMASK = 0xFFFF0000
@@ -29,20 +29,21 @@ const (
 
 const (
 	RAID_TIME = 300 // seconds
+	EVENT_MAX = 4096
 )
 
 var _raidtime_max int64
 
 //--------------------------------------------------------- player info 
 type PlayerInfo struct {
-	Id          int32
-	State       int32
-	ProtectTime int64 // unix time
-	RaidStart   int64 // unix time
-	Clan        int32 // clan info
-	Host		int32 // host
-	Name        string
-	LCK         sync.Mutex // Record lock
+	Id             int32
+	State          int32
+	ProtectTimeout int64 // unix time
+	RaidTimeout    int64 // unix time
+	Clan           int32 // clan info
+	Host           int32 // host
+	Name           string
+	LCK            sync.Mutex // Record lock
 }
 
 /**********************************************************
@@ -57,65 +58,66 @@ type PlayerInfo struct {
  * p:A->B, q: B->A, ok 
  *
  * make sure acquiring the lock IN SEQUENCE. i.e.
- * A: one of [players, raids, protects]
+ * A: players
  * B: playerinfo.LCK
  **********************************************************/
 var (
 	_lock_players sync.RWMutex          // lock players
 	_players      map[int32]*PlayerInfo // all players
 
-	_lock_raids sync.Mutex            // lock raids
-	_raids      map[int32]*PlayerInfo // being raided
+	_protects     map[uint32]*PlayerInfo
+	_protectslock sync.Mutex
+	_protects_ch  chan uint32
 
-	_lock_protects sync.Mutex            // lock protects
-	_protects      map[int32]*PlayerInfo // protecting
+	_raids     map[uint32]*PlayerInfo
+	_raidslock sync.Mutex
+	_raids_ch  chan uint32
 )
 
 func init() {
 	_players = make(map[int32]*PlayerInfo)
-	_raids = make(map[int32]*PlayerInfo)
-	_protects = make(map[int32]*PlayerInfo)
-	_raidtime_max = RAID_TIME
+	_protects = make(map[uint32]*PlayerInfo)
+	_protects_ch = make(chan uint32, EVENT_MAX)
+	_raids = make(map[uint32]*PlayerInfo)
+	_raids_ch = make(chan uint32, EVENT_MAX)
+
+	go _expire()
 }
 
 //--------------------------------------------------------- expires
-func ExpireRoutine() {
+func _expire() {
 	for {
+		select {
+		case event_id := <-_protects_ch:
+			_protectslock.Lock()
+			player := _protects[event_id]
+			delete(_protects, event_id)
+			_protectslock.Unlock()
 
-		_lock_protects.Lock()
-		now := time.Now().Unix()
-		for k, v := range _protects {
-			v.LCK.Lock()
-			if v.ProtectTime < now {
-				// PROTECTED->FREE
-				v.State = v.State&(^PROTECTED) | FREE
-				delete(_protects, k)
+			player.LCK.Lock()
+			if player.ProtectTimeout <= time.Now().Unix() { // double validation
+				player.State = player.State & (^PROTECTED)
 			}
-			v.LCK.Unlock()
+			player.LCK.Unlock()
 
-		}
-		_lock_protects.Unlock()
+		case event_id := <-_raids_ch:
+			_raidslock.Lock()
+			player := _raids[event_id]
+			delete(_raids, event_id)
+			_raidslock.Unlock()
 
-		_lock_raids.Lock()
-		for k, v := range _raids {
-			v.LCK.Lock()
-			if now-v.RaidStart > _raidtime_max {
-				// RAID->FREE
-				v.State = v.State&(^RAID) | FREE
-				delete(_raids, k)
+			player.LCK.Lock()
+			if player.RaidTimeout <= time.Now().Unix() {
+				player.State = player.State & (^RAID)
 			}
-			v.LCK.Unlock()
-
+			player.LCK.Unlock()
 		}
-		_lock_raids.Unlock()
-
-		time.Sleep(time.Minute)
 	}
 }
 
 //------------------------------------------------ add a user to finite state machine manager
 func _add_fsm(ud *User) {
-	info := &PlayerInfo{Id: ud.Id, Name: ud.Name, State: OFFLINE | FREE}
+	info := &PlayerInfo{Id: ud.Id, Name: ud.Name, State: OFFLINE}
 
 	_lock_players.Lock()
 	_players[ud.Id] = info
@@ -135,7 +137,7 @@ func Login(id, host int32) bool {
 		defer player.LCK.Unlock()
 		state := player.State
 
-		if state&OFFLINE != 0 && state&RAID == 0 {
+		if state&OFFLINE != 0 && state&RAID == 0 { // when offline & not being raid
 			player.State = int32(ONLINE | (state & LOMASK))
 			player.Host = host
 			return true
@@ -158,7 +160,7 @@ func Logout(id int32) bool {
 
 		state := player.State
 
-		if state&ONLINE != 0 {
+		if state&ONLINE != 0 { // when online
 			player.State = int32(OFFLINE | (state & LOMASK))
 			return true
 		}
@@ -167,7 +169,7 @@ func Logout(id int32) bool {
 	return false
 }
 
-//----------------------------------------------- FREE->RAID
+//----------------------------------------------- (OFFLINE|FREE)->RAID
 // A->B->A
 func Raid(id int32) bool {
 	_lock_players.RLock()
@@ -179,50 +181,20 @@ func Raid(id int32) bool {
 
 		state := player.State
 
-		if state&OFFLINE != 0 && state&FREE != 0 {
+		if state&OFFLINE != 0 && state&(RAID|PROTECTED) == 0 { // when offline and free
+			timeout := time.Now().Unix() + RAID_TIME
 			player.State = int32(OFFLINE | RAID)
-			player.RaidStart = time.Now().Unix()
+			player.RaidTimeout = timeout
 			player.LCK.Unlock()
 
-			_lock_raids.Lock()
-			_raids[id] = player // add to raid queue
-			_lock_raids.Unlock()
+			// add to raids timeout event queue
+			event_id := timer.Add(timeout, _raids_ch)
+			_raidslock.Lock()
+			_raids[event_id] = player
+			_raidslock.Unlock()
 			return true
 		}
 
-		player.LCK.Unlock()
-	}
-
-	return false
-}
-
-//----------------------------------------------- RAID->PROTECTED
-// A->B->A->A
-func Protect(id int32, until time.Time) bool {
-	_lock_raids.Lock()
-	player := _raids[id]
-	_lock_raids.Unlock()
-
-	if player != nil {
-		player.LCK.Lock()
-
-		state := player.State
-
-		if state&RAID != 0 {
-			player.State = int32(OFFLINE | PROTECTED)
-			player.ProtectTime = until.Unix()
-			player.LCK.Unlock()
-
-			_lock_raids.Lock()
-			delete(_raids, id) // remove from raids
-			_lock_raids.Unlock()
-
-			_lock_protects.Lock()
-			_protects[id] = player // add to protects
-			_lock_protects.Unlock()
-
-			return true
-		}
 		player.LCK.Unlock()
 	}
 
@@ -230,20 +202,18 @@ func Protect(id int32, until time.Time) bool {
 }
 
 //----------------------------------------------- RAID->FREE
-// A(B)
+// A->B
 func Free(id int32) bool {
-	_lock_raids.Lock()
-	defer _lock_raids.Unlock()
-
-	player := _raids[id]
+	_lock_players.RLock()
+	player := _players[id]
+	_lock_players.RUnlock()
 
 	if player != nil {
 		player.LCK.Lock()
 		defer player.LCK.Unlock()
 
-		if player.State&RAID != 0 {
-			player.State = int32(OFFLINE | FREE)
-			delete(_raids, id) // remove from raids
+		if player.State&RAID != 0 { // when being raid
+			player.State = int32(OFFLINE)
 			return true
 		}
 	}
@@ -251,23 +221,48 @@ func Free(id int32) bool {
 	return false
 }
 
-//----------------------------------------------- PROTECT->FREE
-// A(B)
-func Unprotect(id int32) bool {
-	_lock_protects.Lock()
-	defer _lock_protects.Unlock()
-
-	player := _protects[id]
+//----------------------------------------------- PROTECT
+// A->B->A
+func Protect(id int32, until time.Time) bool {
+	_lock_players.RLock()
+	player := _players[id]
+	_lock_players.RUnlock()
 
 	if player != nil {
 		player.LCK.Lock()
-		defer player.LCK.Unlock()
+		if player.State&RAID == 0 { // when not being raid
+			player.State |= PROTECTED
+			player.ProtectTimeout = until.Unix()
+			player.LCK.Unlock()
 
-		if player.State&RAID != 0 {
-			player.State = int32(ONLINE | FREE)
-			delete(_protects, id) // remove from protects
+			// add to protects timeout event queue
+			event_id := timer.Add(until.Unix(), _raids_ch)
+			_protectslock.Lock()
+			_protects[event_id] = player
+			_protectslock.Unlock()
 			return true
 		}
+		player.LCK.Unlock()
+	}
+
+	return false
+}
+
+//----------------------------------------------- UNPROTECT
+// A->B->A
+func UnProtect(id int32) bool {
+	_lock_players.RLock()
+	player := _players[id]
+	_lock_players.RUnlock()
+
+	if player != nil {
+		player.LCK.Lock()
+		if player.State&PROTECTED != 0 {
+			player.State &= ^PROTECTED
+			player.LCK.Unlock()
+			return true
+		}
+		player.LCK.Unlock()
 	}
 
 	return false
@@ -288,14 +283,14 @@ func State(id int32) (ret int32) {
 	return
 }
 
-func ProtectTime(id int32) (ret int64) {
+func ProtectTimeout(id int32) (ret int64) {
 	_lock_players.RLock()
 	player := _players[id]
 	_lock_players.RUnlock()
 
 	if player != nil {
 		player.LCK.Lock()
-		ret = player.ProtectTime
+		ret = player.ProtectTimeout
 		player.LCK.Unlock()
 	}
 
@@ -342,4 +337,3 @@ func Clan(id int32) (ret int32) {
 
 	return
 }
-

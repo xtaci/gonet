@@ -14,9 +14,9 @@ func TestTimer(t *testing.T) {
 	Add(now+4, ch)
 	Add(now+5, ch)
 
-	count :=0
+	count := 0
 	for {
-		fmt.Println("timer event :",<-ch)
+		fmt.Println("timer event :", <-ch)
 		count++
 		if count == 5 {
 			break

@@ -1,9 +1,9 @@
 package protos
 
 import (
+	"github.com/hoisie/redis"
 	"hub/accounts"
 	"misc/packet"
-	"github.com/hoisie/redis"
 )
 
 import (
@@ -16,7 +16,7 @@ import (
 var _redis redis.Client
 
 var (
-	Servers map[int32]chan []byte
+	Servers    map[int32]chan []byte
 	ServerLock sync.RWMutex
 )
 
@@ -26,18 +26,18 @@ func init() {
 }
 
 //--------------------------------------------------------- send
-func _send(seqid uint64, data []byte, output chan[]byte) {
+func _send(seqid uint64, data []byte, output chan []byte) {
 	writer := packet.Writer()
-	writer.WriteU16(uint16(len(data))+8)
-	writer.WriteU64(seqid)		// piggyback seq id
+	writer.WriteU16(uint16(len(data)) + 8)
+	writer.WriteU64(seqid) // piggyback seq id
 	writer.WriteRawBytes(data)
 	output <- writer.Data()
 }
 
-func HandleRequest(hostid int32, reader *packet.Packet, output chan[]byte) {
+func HandleRequest(hostid int32, reader *packet.Packet, output chan []byte) {
 	defer _HandleError()
 
-	seqid, err := reader.ReadU64()	// read seqid 
+	seqid, err := reader.ReadU64() // read seqid 
 	if err != nil {
 		log.Println("Read Sequence Id failed.", err)
 		return
@@ -164,7 +164,7 @@ func P_unprotect_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	tbl, _ := PKT_ID(pkt)
 	ret := INT{F_v: 0}
 
-	if accounts.Unprotect(tbl.F_id) {
+	if accounts.UnProtect(tbl.F_id) {
 		ret.F_v = 1
 	}
 
@@ -189,7 +189,7 @@ func P_getinfo_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	ret.F_state = accounts.State(tbl.F_id)
 	ret.F_score = accounts.Score(tbl.F_id)
 	ret.F_clan = accounts.Score(tbl.F_id)
-	ret.F_protecttime = accounts.ProtectTime(tbl.F_id)
+	ret.F_protecttime = accounts.ProtectTimeout(tbl.F_id)
 	ret.F_name = accounts.Name(tbl.F_id)
 	return packet.Pack(Code["getinfo_ack"], ret, nil), nil
 }
@@ -198,9 +198,9 @@ func P_getofflinemsg_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	tbl, _ := PKT_ID(pkt)
 	ret := OFFLINEMSG{}
 	// get all message from redis
-	msgs,err := _redis.Lrange(fmt.Sprintf("MSG#%v", tbl.F_id), 0, -1)
+	msgs, err := _redis.Lrange(fmt.Sprintf("MSG#%v", tbl.F_id), 0, -1)
 
-	if err!=nil {
+	if err != nil {
 		return nil, err
 	}
 
@@ -213,7 +213,7 @@ func P_getofflinemsg_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	// remove messages
 	_redis.Del(fmt.Sprintf("MSG#%v", tbl.F_id))
 
-	return packet.Pack(Code["getofflinemsg_ack"],ret, nil), nil
+	return packet.Pack(Code["getofflinemsg_ack"], ret, nil), nil
 }
 
 func P_adduser_req(hostid int32, pkt *packet.Packet) ([]byte, error) {

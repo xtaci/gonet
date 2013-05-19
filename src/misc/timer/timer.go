@@ -1,28 +1,28 @@
 package timer
 
 import (
-	"sync/atomic"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
 type Event struct {
-	Timeout int64		// timeout
-	CH	chan uint32		// event trigger channel
+	Timeout int64       // timeout
+	CH      chan uint32 // event trigger channel
 }
 
 const (
-	TIMER_LEVEL = uint(10)		// num of time intervals, 10 means max 2^10 seconds
+	TIMER_LEVEL = uint(10) // num of time intervals, 10 means max 2^10 seconds
 )
 
 var (
-	_incr uint32		// event id generator
-	_eventlist [TIMER_LEVEL]map[uint32]*Event	// 2^n based time interval
+	_incr      uint32                         // event id generator
+	_eventlist [TIMER_LEVEL]map[uint32]*Event // 2^n based time interval
 
-	_eventqueue map[uint32]*Event	// add queue
+	_eventqueue      map[uint32]*Event // add queue
 	_eventqueue_lock sync.Mutex
 
-	_cancelqueue []uint32		// cancel queue
+	_cancelqueue      []uint32 // cancel queue
 	_cancelqueue_lock sync.Mutex
 )
 
@@ -47,14 +47,14 @@ func _timer() {
 		// add pending events
 		now := time.Now().Unix()
 		_eventqueue_lock.Lock()
-		for k,v := range _eventqueue {
+		for k, v := range _eventqueue {
 			diff := v.Timeout - now
-			if diff <= 0 {	// in case of very near event
+			if diff <= 0 { // in case of very near event
 				diff = 1
 			}
 
-			for i:= TIMER_LEVEL-1;i>=0;i-- {
-				if diff >= 1 << i {
+			for i := TIMER_LEVEL - 1; i >= 0; i-- {
+				if diff >= 1<<i {
 					_eventlist[i][k] = v
 					break
 				}
@@ -65,19 +65,19 @@ func _timer() {
 
 		// cancelqueue
 		_cancelqueue_lock.Lock()
-		for _,v := range _cancelqueue {
-			for i:= TIMER_LEVEL-1;i>=0;i-- {
+		for _, v := range _cancelqueue {
+			for i := TIMER_LEVEL - 1; i >= 0; i-- {
 				list := _eventlist[i]
-				delete(list,v)
+				delete(list, v)
 			}
 		}
 		_cancelqueue = nil
 		_cancelqueue_lock.Unlock()
 
 		// triggers
-		for i:= TIMER_LEVEL-1;i>0;i-- {
-			mask := (uint32(1) << i)-1
-			if timer_count & mask == 0 {
+		for i := TIMER_LEVEL - 1; i > 0; i-- {
+			mask := (uint32(1) << i) - 1
+			if timer_count&mask == 0 {
 				_trigger(i)
 			}
 		}
@@ -90,8 +90,8 @@ func _trigger(level uint) {
 	now := time.Now().Unix()
 	list := _eventlist[level]
 
-	for k,v := range list {
-		if v.Timeout - now < 1 << level {
+	for k, v := range list {
+		if v.Timeout-now < 1<<level {
 			// move to one closer timer or just removal
 			if level == 0 {
 				v.CH <- k
@@ -106,8 +106,8 @@ func _trigger(level uint) {
 
 //------------------------------------------------ add a timeout event
 func Add(timeout int64, ch chan uint32) uint32 {
-	event_id:= atomic.AddUint32(&_incr, 1)
-	event := &Event{CH:ch, Timeout:timeout}
+	event_id := atomic.AddUint32(&_incr, 1)
+	event := &Event{CH: ch, Timeout: timeout}
 
 	_eventqueue_lock.Lock()
 	_eventqueue[event_id] = event

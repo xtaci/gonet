@@ -11,7 +11,7 @@ import (
 
 var (
 	_ranklist      dos.Tree // dynamic order statistics
-	_id_score	map[int32]int32
+	_id_score      map[int32]int32
 	_lock_ranklist sync.RWMutex
 )
 

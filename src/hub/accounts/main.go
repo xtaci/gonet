@@ -1,8 +1,8 @@
 package accounts
 
 import (
-	. "types"
 	"db/user_tbl"
+	. "types"
 )
 
 //----------------------------------------------- Add a single user

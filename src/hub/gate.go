@@ -7,8 +7,8 @@ import (
 )
 
 import (
-	"misc/packet"
 	"hub/protos"
+	"misc/packet"
 )
 
 const (
@@ -23,10 +23,10 @@ func init() {
 }
 
 //--------------------------------------------------------- send
-func _send(seqid uint64, data []byte, output chan[]byte) {
+func _send(seqid uint64, data []byte, output chan []byte) {
 	writer := packet.Writer()
-	writer.WriteU16(uint16(len(data))+8)
-	writer.WriteU64(seqid)		// piggyback seq id
+	writer.WriteU16(uint16(len(data)) + 8)
+	writer.WriteU64(seqid) // piggyback seq id
 	writer.WriteRawBytes(data)
 	output <- writer.Data()
 }
@@ -35,9 +35,9 @@ func _send(seqid uint64, data []byte, output chan[]byte) {
 func HubAgent(incoming chan []byte, conn net.Conn) {
 	hostid := atomic.AddInt32(&_host_genid, 1)
 	// forward buffer
-	forward := make(chan[]byte, MAXCHAN)
+	forward := make(chan []byte, MAXCHAN)
 	// output buffer
-	output := make(chan[]byte, MAXCHAN)
+	output := make(chan []byte, MAXCHAN)
 
 	protos.ServerLock.Lock()
 	protos.Servers[hostid] = forward // message chan for forwarding to client
@@ -66,7 +66,7 @@ func HubAgent(incoming chan []byte, conn net.Conn) {
 			}
 
 			reader := packet.Reader(msg)
-			go protos.HandleRequest(hostid,reader,output)
+			go protos.HandleRequest(hostid, reader, output)
 		case msg := <-forward:
 			_send(0, msg, output)
 		}
@@ -75,18 +75,16 @@ func HubAgent(incoming chan []byte, conn net.Conn) {
 }
 
 //----------------------------------------------- to gs write buffer 
-func _write_routine(output chan[]byte, conn net.Conn) {
+func _write_routine(output chan []byte, conn net.Conn) {
 	for {
 		msg, ok := <-output
 		if !ok {
 			break
 		}
 
-		_, err := conn.Write(msg)	// write operation is assumed to be atomic
+		_, err := conn.Write(msg) // write operation is assumed to be atomic
 		if err != nil {
 			log.Println("Error send reply to GS:", err)
 		}
 	}
 }
-
-
