@@ -1,4 +1,4 @@
-package production
+package timer
 
 import (
 	"sync/atomic"
@@ -7,22 +7,22 @@ import (
 )
 
 type Event struct {
-	User int32
-	Timeout int64
+	Timeout int64		// timeout
+	CH	chan uint32		// event trigger channel
 }
 
 const (
-	TIMER_LEVEL = uint(10)
+	TIMER_LEVEL = uint(10)		// num of time intervals, 10 means max 2^10 seconds
 )
 
 var (
-	_incr uint32
-	_eventlist [TIMER_LEVEL]map[uint32]*Event
+	_incr uint32		// event id generator
+	_eventlist [TIMER_LEVEL]map[uint32]*Event	// 2^n based time interval
 
-	_eventqueue map[uint32]*Event
+	_eventqueue map[uint32]*Event	// add queue
 	_eventqueue_lock sync.Mutex
 
-	_cancelqueue []uint32
+	_cancelqueue []uint32		// cancel queue
 	_cancelqueue_lock sync.Mutex
 )
 
@@ -34,6 +34,7 @@ func init() {
 	_eventqueue = make(map[uint32]*Event)
 }
 
+//------------------------------------------------ Timer Routine
 func TimerRoutine() {
 	timer_count := uint32(0)
 
@@ -41,8 +42,8 @@ func TimerRoutine() {
 		time.Sleep(time.Second)
 		timer_count++
 
-		now := time.Now().Unix()
 		// add pending events
+		now := time.Now().Unix()
 		_eventqueue_lock.Lock()
 		for k,v := range _eventqueue {
 			diff := v.Timeout - now
@@ -61,12 +62,15 @@ func TimerRoutine() {
 		_eventqueue_lock.Unlock()
 
 		// cancelqueue
+		_cancelqueue_lock.Lock()
 		for _,v := range _cancelqueue {
 			for i:= TIMER_LEVEL-1;i>=0;i-- {
 				list := _eventlist[i]
 				delete(list,v)
 			}
 		}
+		_cancelqueue = nil
+		_cancelqueue_lock.Unlock()
 
 		// triggers
 		for i:= TIMER_LEVEL-1;i>0;i-- {
@@ -88,18 +92,20 @@ func _trigger(level uint) {
 		if v.Timeout - now < 1 << level {
 			// move to one closer timer or just removal
 			if level == 0 {
+				v.CH <- k
 			} else {
 				_eventlist[level-1][k] = v
-				delete(list, k)
 			}
+
+			delete(list, k)
 		}
 	}
 }
 
-//----------------------------------------------- add a timeout for user
-func Add(user_id int32, timeout int64) uint32 {
+//------------------------------------------------ add a timeout event
+func Add(timeout int64, ch chan uint32) uint32 {
 	event_id:= atomic.AddUint32(&_incr, 1)
-	event := &Event{User:user_id, Timeout:timeout}
+	event := &Event{CH:ch, Timeout:timeout}
 
 	_eventqueue_lock.Lock()
 	_eventqueue[event_id] = event
@@ -107,6 +113,7 @@ func Add(user_id int32, timeout int64) uint32 {
 	return event_id
 }
 
+//------------------------------------------------ cancel an event
 func Cancel(event_id uint32) {
 	_cancelqueue_lock.Lock()
 	_cancelqueue = append(_cancelqueue, event_id)
