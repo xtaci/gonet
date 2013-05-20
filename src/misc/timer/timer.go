@@ -72,7 +72,6 @@ func _timer() {
 		_cancelqueue_lock.Unlock()
 
 		// triggers
-		time.Sleep(100 * time.Millisecond)
 		now := time.Now().Unix()
 		nsecs := now - last // num of seconds passed since last trigger
 		last = now
@@ -93,6 +92,8 @@ func _timer() {
 
 			_trigger(0)
 		}
+
+		time.Sleep(100 * time.Millisecond)
 	}
 }
 
