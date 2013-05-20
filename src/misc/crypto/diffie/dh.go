@@ -1,7 +1,7 @@
 /*
 Diffie–Hellman key exchange
 */
-package main
+package diffie
 
 import "math/big"
 import "math/rand"
