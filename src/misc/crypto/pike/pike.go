@@ -9,7 +9,7 @@ type ff_addikey struct {
 	buffer [64]uint32
 }
 
-type FF_CTX struct {
+type Pike struct {
 	sd      uint32
 	index   int
 	addikey [3]ff_addikey
@@ -20,14 +20,45 @@ const (
 	GENIUS_NUMBER = 0x05027919
 )
 
-/*! 参见<<应用密码学>>中的线性反馈移位寄存器算法*/
-func linearity(key *uint32) {
-	*key = ((((*key >> 31) ^ (*key >> 6) ^ (*key >> 4) ^ (*key >> 2) ^ (*key >> 1) ^ *key) & 0x00000001) << 31) | (*key >> 1)
+//----------------------------------------------- Encode a given buffer
+func (ctx *Pike) Encode(data []byte) {
+	LEN := len(data)
+	if LEN == 0 {
+		return
+	}
+
+	idx := 0
+
+	for {
+		remnant := 4096 - ctx.index
+		if remnant <= 0 {
+			_generate(ctx)
+			continue
+		}
+
+		if remnant > LEN {
+			remnant = LEN
+		}
+
+		LEN -= remnant
+		base := ctx.index
+
+		for i := 0; i < remnant; i++ {
+			data[idx] ^= ctx.buffer[base+idx]
+			idx++
+		}
+
+		ctx.index += remnant
+
+		if LEN <= 0 {
+			break
+		}
+	}
 }
 
 //----------------------------------------------- Create New Pike
-func NewCtx(sd uint32) (ctx *FF_CTX) {
-	ctx = &FF_CTX{}
+func NewCtx(sd uint32) (ctx *Pike) {
+	ctx = &Pike{}
 	ctx.sd = sd ^ GENIUS_NUMBER
 
 	ctx.addikey[0].sd = ctx.sd
@@ -62,6 +93,11 @@ func NewCtx(sd uint32) (ctx *FF_CTX) {
 	return
 }
 
+/*! 参见<<应用密码学>>中的线性反馈移位寄存器算法*/
+func linearity(key *uint32) {
+	*key = ((((*key >> 31) ^ (*key >> 6) ^ (*key >> 4) ^ (*key >> 2) ^ (*key >> 1) ^ *key) & 0x00000001) << 31) | (*key >> 1)
+}
+
 func _addikey_next(addikey *ff_addikey) {
 	tmp := addikey.index + 1
 	addikey.index = tmp & 0x03F
@@ -78,7 +114,7 @@ func _addikey_next(addikey *ff_addikey) {
 	}
 }
 
-func _generate(ctx *FF_CTX) {
+func _generate(ctx *Pike) {
 	for i := uint(0); i < 1024; i++ {
 		carry := ctx.addikey[0].carry + ctx.addikey[1].carry + ctx.addikey[2].carry
 
@@ -109,40 +145,4 @@ func _generate(ctx *FF_CTX) {
 	}
 
 	ctx.index = 0
-}
-
-//----------------------------------------------- Encode a given buffer
-func Encode(ctx *FF_CTX, data []byte) {
-	LEN := len(data)
-	if LEN == 0 {
-		return
-	}
-
-	idx := 0
-
-	for {
-		remnant := 4096 - ctx.index
-		if remnant <= 0 {
-			_generate(ctx)
-			continue
-		}
-
-		if remnant > LEN {
-			remnant = LEN
-		}
-
-		LEN -= remnant
-		base := ctx.index
-
-		for i := 0; i < remnant; i++ {
-			data[idx] ^= ctx.buffer[base+idx]
-			idx++
-		}
-
-		ctx.index += remnant
-
-		if LEN <= 0 {
-			break
-		}
-	}
 }

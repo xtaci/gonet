@@ -11,6 +11,6 @@ func TestPike(t *testing.T) {
 	fmt.Println(ctx.addikey[1].buffer)
 	fmt.Println(ctx.addikey[2].buffer)
 	data := []byte{1, 2, 3, 4, 5, 6, 7, 8}
-	Encode(ctx, data)
+	ctx.Encode(data)
 	fmt.Println(data)
 }
