@@ -42,6 +42,7 @@ type PlayerInfo struct {
 	Host           int32 // host
 	Name           string
 	LCK            sync.Mutex // Record lock
+	WaitEventId    uint32     // current waiting event id
 }
 
 /**********************************************************
@@ -93,7 +94,7 @@ func _expire() {
 			_protectslock.Unlock()
 
 			player.LCK.Lock()
-			if player.ProtectTimeout <= time.Now().Unix() { // double validation
+			if player.WaitEventId == event_id { // double validation
 				player.State = player.State & (^PROTECTED)
 			}
 			player.LCK.Unlock()
@@ -105,7 +106,7 @@ func _expire() {
 			_raidslock.Unlock()
 
 			player.LCK.Lock()
-			if player.RaidTimeout <= time.Now().Unix() {
+			if player.WaitEventId == event_id {
 				player.State = player.State & (^RAID)
 			}
 			player.LCK.Unlock()
@@ -181,12 +182,13 @@ func Raid(id int32) bool {
 
 		if state&OFFLINE != 0 && state&(RAID|PROTECTED) == 0 { // when offline and free
 			timeout := time.Now().Unix() + RAID_TIME
+			event_id := timer.Add(timeout, _raids_ch) // generate timer
+
 			player.State = int32(OFFLINE | RAID)
 			player.RaidTimeout = timeout
+			player.WaitEventId = event_id
 			player.LCK.Unlock()
 
-			// add to raids timeout event queue
-			event_id := timer.Add(timeout, _raids_ch)
 			_raidslock.Lock()
 			_raids[event_id] = player
 			_raidslock.Unlock()
@@ -229,12 +231,13 @@ func Protect(id int32, until time.Time) bool {
 	if player != nil {
 		player.LCK.Lock()
 		if player.State&RAID == 0 { // when not being raid
+			event_id := timer.Add(until.Unix(), _raids_ch)
+
 			player.State |= PROTECTED
 			player.ProtectTimeout = until.Unix()
+			player.WaitEventId = event_id
 			player.LCK.Unlock()
 
-			// add to protects timeout event queue
-			event_id := timer.Add(until.Unix(), _raids_ch)
 			_protectslock.Lock()
 			_protects[event_id] = player
 			_protectslock.Unlock()
