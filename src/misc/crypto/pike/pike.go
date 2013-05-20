@@ -62,7 +62,7 @@ func NewCtx(sd uint32) (ctx *FF_CTX) {
 	return
 }
 
-func addikey_next(addikey *ff_addikey) {
+func _addikey_next(addikey *ff_addikey) {
 	tmp := addikey.index + 1
 	addikey.index = tmp & 0x03F
 
@@ -83,9 +83,9 @@ func _generate(ctx *FF_CTX) {
 		carry := ctx.addikey[0].carry + ctx.addikey[1].carry + ctx.addikey[2].carry
 
 		if carry == 0 || carry == 3 { /*!< 如果三个位相同(全0或全1),那么钟控所有的发生器*/
-			addikey_next(&ctx.addikey[0])
-			addikey_next(&ctx.addikey[1])
-			addikey_next(&ctx.addikey[2])
+			_addikey_next(&ctx.addikey[0])
+			_addikey_next(&ctx.addikey[1])
+			_addikey_next(&ctx.addikey[2])
 		} else { /*!< 如果三个位不全相同,则钟控两个相同的发生器*/
 			flag := int8(0)
 
@@ -95,7 +95,7 @@ func _generate(ctx *FF_CTX) {
 
 			for j := 0; j < 3; j++ {
 				if ctx.addikey[j].carry == flag {
-					addikey_next(&ctx.addikey[j])
+					_addikey_next(&ctx.addikey[j])
 				}
 			}
 		}
