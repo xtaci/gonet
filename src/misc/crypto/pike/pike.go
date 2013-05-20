@@ -22,8 +22,8 @@ const (
 
 //----------------------------------------------- Encode a given buffer
 func (ctx *Pike) Encode(data []byte) {
-	LEN := len(data)
-	if LEN == 0 {
+	length := len(data)
+	if length == 0 {
 		return
 	}
 
@@ -36,11 +36,11 @@ func (ctx *Pike) Encode(data []byte) {
 			continue
 		}
 
-		if remnant > LEN {
-			remnant = LEN
+		if remnant > length {
+			remnant = length
 		}
 
-		LEN -= remnant
+		length -= remnant
 		base := ctx.index
 
 		for i := 0; i < remnant; i++ {
@@ -50,7 +50,7 @@ func (ctx *Pike) Encode(data []byte) {
 
 		ctx.index += remnant
 
-		if LEN <= 0 {
+		if length <= 0 {
 			break
 		}
 	}
