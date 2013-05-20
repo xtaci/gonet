@@ -44,10 +44,10 @@ func _timer() {
 	for {
 		time.Sleep(100 * time.Millisecond)
 		now := time.Now().Unix()
-		diff := now-last
+		secs := now-last
 		last = now
 
-		for c:=int64(0); c<diff;c++ {
+		for c:=int64(0); c<secs;c++ {
 			timer_count++
 
 			// add pending events
