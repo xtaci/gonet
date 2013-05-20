@@ -15,7 +15,7 @@ import (
 const (
 	HISHIFT = 16
 
-	// 
+	//
 	OFFLINE = 1 << HISHIFT
 	ONLINE  = 1 << 1 << HISHIFT
 
@@ -32,9 +32,7 @@ const (
 	EVENT_MAX = 4096
 )
 
-var _raidtime_max int64
-
-//--------------------------------------------------------- player info 
+//--------------------------------------------------------- player info
 type PlayerInfo struct {
 	Id             int32
 	State          int32
@@ -47,15 +45,15 @@ type PlayerInfo struct {
 }
 
 /**********************************************************
- * consider following deadlock situations. 
+ * consider following deadlock situations.
  *
  * A(B) means lock A,lock B, unlock B, unlock A
  * A->B means lockA unlockA,then lockB, unlockB
  *
  * p:A(B), q:B(A), possible circular wait, deadlock!!!
- * p:A(B), q:A(B), ok 
+ * p:A(B), q:A(B), ok
  * p.A(B), q:B or A, ok
- * p:A->B, q: B->A, ok 
+ * p:A->B, q: B->A, ok
  *
  * make sure acquiring the lock IN SEQUENCE. i.e.
  * A: players
@@ -269,7 +267,7 @@ func UnProtect(id int32) bool {
 }
 
 // State Readers
-// A->B 
+// A->B
 func State(id int32) (ret int32) {
 	_lock_players.RLock()
 	player := _players[id]

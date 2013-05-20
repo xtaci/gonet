@@ -52,7 +52,7 @@ func ChangeScore(id, oldscore, newscore int32) bool {
 			_id_score[id] = newscore
 			return true
 		} else {
-			// temporary delete 
+			// temporary delete
 			_ranklist.DeleteNode(n)
 			tmplist = append(tmplist, n.Data())
 		}
@@ -86,7 +86,7 @@ func GetList(A, B int) (id []int32, score []int32) {
 	return
 }
 
-//------------------------------------------------ get score 
+//------------------------------------------------ get score
 func Score(id int32) (ret int32) {
 	_lock_ranklist.RLock()
 	defer _lock_ranklist.RUnlock()
