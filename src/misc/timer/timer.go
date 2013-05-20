@@ -12,7 +12,7 @@ type Event struct {
 }
 
 const (
-	TIMER_LEVEL = uint(10) // num of time intervals, 10 means max 2^10 seconds
+	TIMER_LEVEL = uint(16) // num of time intervals, 10 means max 2^10 seconds
 )
 
 var (
