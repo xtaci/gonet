@@ -41,8 +41,8 @@ type PlayerInfo struct {
 	Clan           int32 // clan info
 	Host           int32 // host
 	Name           string
+	WaitEventId    uint32     // current waiting event id, a user will only wait on ONE timeout event,  PROTECTTIMEOUT of RAID TIMEOUT
 	LCK            sync.Mutex // Record lock
-	WaitEventId    uint32     // current waiting event id
 }
 
 /**********************************************************
@@ -94,7 +94,7 @@ func _expire() {
 			_protectslock.Unlock()
 
 			player.LCK.Lock()
-			if player.WaitEventId == event_id { // double validation
+			if player.WaitEventId == event_id { // check if it is the waiting event, or just ignore
 				player.State = player.State & (^PROTECTED)
 			}
 			player.LCK.Unlock()
