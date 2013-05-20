@@ -39,50 +39,57 @@ func init() {
 //------------------------------------------------ Timer Routine
 func _timer() {
 	timer_count := uint32(0)
+	last := time.Now().Unix()
 
 	for {
-		time.Sleep(time.Second)
-		timer_count++
-
-		// add pending events
+		time.Sleep(100 * time.Millisecond)
 		now := time.Now().Unix()
-		_eventqueue_lock.Lock()
-		for k, v := range _eventqueue {
-			diff := v.Timeout - now
-			if diff <= 0 { // in case of very near event
-				diff = 1
-			}
+		diff := now-last
+		last = now
 
-			for i := TIMER_LEVEL - 1; i >= 0; i-- {
-				if diff >= 1<<i {
-					_eventlist[i][k] = v
-					break
+		for i:=int64(0); i<diff;i++ {
+			timer_count++
+
+			// add pending events
+			now := time.Now().Unix()
+			_eventqueue_lock.Lock()
+			for k, v := range _eventqueue {
+				diff := v.Timeout - now
+				if diff <= 0 { // in case of very near event
+					diff = 1
+				}
+
+				for i := TIMER_LEVEL - 1; i >= 0; i-- {
+					if diff >= 1<<i {
+						_eventlist[i][k] = v
+						break
+					}
 				}
 			}
-		}
-		_eventqueue = make(map[uint32]*Event)
-		_eventqueue_lock.Unlock()
+			_eventqueue = make(map[uint32]*Event)
+			_eventqueue_lock.Unlock()
 
-		// cancelqueue
-		_cancelqueue_lock.Lock()
-		for _, v := range _cancelqueue {
-			for i := TIMER_LEVEL - 1; i >= 0; i-- {
-				list := _eventlist[i]
-				delete(list, v)
+			// cancelqueue
+			_cancelqueue_lock.Lock()
+			for _, v := range _cancelqueue {
+				for i := TIMER_LEVEL - 1; i >= 0; i-- {
+					list := _eventlist[i]
+					delete(list, v)
+				}
 			}
-		}
-		_cancelqueue = nil
-		_cancelqueue_lock.Unlock()
+			_cancelqueue = nil
+			_cancelqueue_lock.Unlock()
 
-		// triggers
-		for i := TIMER_LEVEL - 1; i > 0; i-- {
-			mask := (uint32(1) << i) - 1
-			if timer_count&mask == 0 {
-				_trigger(i)
+			// triggers
+			for i := TIMER_LEVEL - 1; i > 0; i-- {
+				mask := (uint32(1) << i) - 1
+				if timer_count&mask == 0 {
+					_trigger(i)
+				}
 			}
-		}
 
-		_trigger(0)
+			_trigger(0)
+		}
 	}
 }
 
