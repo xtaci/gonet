@@ -51,7 +51,6 @@ func _timer() {
 			timer_count++
 
 			// add pending events
-			now := time.Now().Unix()
 			_eventqueue_lock.Lock()
 			for k, v := range _eventqueue {
 				diff := v.Timeout - now
