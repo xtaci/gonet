@@ -14,12 +14,13 @@ func TestTimer(t *testing.T) {
 	Add(now+4, ch)
 	Add(now+5, ch)
 	Add(now+10, ch)
+	Add(now+60, ch)
 
 	count := 0
 	for {
 		fmt.Println("timer event :", <-ch)
 		count++
-		if count == 6 {
+		if count == 7 {
 			break
 		}
 	}
