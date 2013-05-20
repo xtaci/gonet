@@ -47,7 +47,7 @@ func _timer() {
 		diff := now-last
 		last = now
 
-		for i:=int64(0); i<diff;i++ {
+		for c:=int64(0); c<diff;c++ {
 			timer_count++
 
 			// add pending events
