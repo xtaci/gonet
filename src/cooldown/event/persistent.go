@@ -2,8 +2,10 @@ package event
 
 import (
 	. "types"
+	playerdata "db/playerdata_tbl"
 )
 
-func init() {
-
+func Execute(event *Event) {
+	data := &PlayerData{}
+	playerdata.Get(event.user_id, data)
 }

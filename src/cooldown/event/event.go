@@ -35,7 +35,8 @@ func _expire() {
 		delete(_events, event_id)
 		_events_lock.Unlock()
 
-		// TODO : process event
+		// process event
+		Execute(event)
 	}
 }
 
