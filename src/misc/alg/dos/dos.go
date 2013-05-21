@@ -179,8 +179,6 @@ func rotate_right_callback(n, parent *Node) {
 }
 
 func fixup_size(n *Node) {
-	n = n.parent
-
 	for n != nil {
 		n.size--
 		n = n.parent
