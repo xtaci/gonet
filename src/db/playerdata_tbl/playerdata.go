@@ -17,7 +17,7 @@ const (
 
 //----------------------------------------------- Loading Player Data from DB
 func Load(user_id int32) (data *PlayerData,  err error) {
-	stmt := "SELECT data FROM buildings where user_id ='%v' LIMIT 1"
+	stmt := "SELECT data FROM player_data where user_id ='%v' LIMIT 1"
 
 	db := <-DBCH
 	defer func() { DBCH <- db }()
@@ -36,7 +36,7 @@ func Load(user_id int32) (data *PlayerData,  err error) {
 
 //----------------------------------------------- Storing Player Data into db
 func Store(user_id int32, data *PlayerData) {
-	stmt := "UPDATE buildings SET data='%v' WHERE user_id = %v"
+	stmt := "UPDATE player_data SET data='%v' WHERE user_id = %v"
 	json_estate, err := json.Marshal(*data)
 	CheckErr(err)
 
