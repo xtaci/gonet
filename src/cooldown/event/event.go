@@ -6,10 +6,8 @@ import (
 )
 
 type Event struct {
+	OID	uint32
 	user_id int32
-	obj_id int32
-	obj_type int32
-	obj_nextlevel int32
 	timeout int64
 }
 
@@ -41,9 +39,10 @@ func _expire() {
 	}
 }
 
-func Add(user_id int32, obj_id int32, obj_type int32, obj_nextlevel int32, timeout int64) uint32 {
+//------------------------------------------------ Add a timeout for a object-id
+func Add(oid uint32, user_id int32, timeout int64) uint32 {
 	_event_id := timer.Add(timeout, _event_ch)
-	event := &Event{user_id:user_id, obj_id:obj_id, obj_type:obj_type, obj_nextlevel:obj_nextlevel, timeout:timeout}
+	event := &Event{OID:oid, user_id:user_id, timeout:timeout}
 
 	_events_lock.Lock()
 	_events[_event_id] = event
@@ -52,6 +51,7 @@ func Add(user_id int32, obj_id int32, obj_type int32, obj_nextlevel int32, timeo
 	return _event_id
 }
 
+//------------------------------------------------ cancel an timeout
 func Cancel(event_id uint32) {
 	timer.Cancel(event_id)
 

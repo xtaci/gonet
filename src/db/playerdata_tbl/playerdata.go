@@ -1,48 +1,51 @@
-package playerdata
+package playerdata_tbl
 
 import (
-	. "db"
+	"github.com/hoisie/redis"
+	"cfg"
 	. "types"
-)
-
-import (
 	"encoding/json"
-	"errors"
+	"log"
 	"fmt"
 )
 
-const (
-	FMT = "%v:%v:%v:%v"
-)
+var _redis redis.Client
 
-//----------------------------------------------- Loading Player Data from DB
-func Load(user_id int32) (data *PlayerData,  err error) {
-	stmt := "SELECT data FROM player_data where user_id ='%v' LIMIT 1"
-
-	db := <-DBCH
-	defer func() { DBCH <- db }()
-
-	rows, _, err := db.Query(stmt, user_id)
-	CheckErr(err)
-
-	if len(rows) > 0 {
-		err = json.Unmarshal([]byte(rows[0].Str(0)), data)
-		CheckErr(err)
-	}
-
-	err = errors.New(fmt.Sprint("cannot find building belongs to id:%v", user_id))
-	return
+func init() {
+	config := cfg.Get()
+	_redis.Addr = config["redis_host"]
 }
 
-//----------------------------------------------- Storing Player Data into db
-func Store(user_id int32, data *PlayerData) {
-	stmt := "UPDATE player_data SET data='%v' WHERE user_id = %v"
-	json_estate, err := json.Marshal(*data)
-	CheckErr(err)
+func Set(user_id int32, data *PlayerData) bool {
+	json_var, err := json.Marshal(data)
 
-	db := <-DBCH
-	defer func() { DBCH <- db }()
-	_, _, err = db.Query(stmt, json_estate, user_id)
+	if err!= nil {
+		log.Println(err)
+		return false
+	}
 
-	CheckErr(err)
+	err = _redis.Set(fmt.Sprintf("DATA#%v",user_id), json_var)
+	if err!=nil {
+		log.Println(err)
+		return false
+	}
+
+	return true
+}
+
+func Get(user_id int32, data *PlayerData) bool {
+	json_val, err := _redis.Get(fmt.Sprintf("DATA#%v",user_id))
+
+	if err !=nil {
+		log.Println(err)
+		return false
+	}
+
+	err = json.Unmarshal(json_val, data)
+	if err !=nil {
+		log.Println(err)
+		return false
+	}
+
+	return true
 }

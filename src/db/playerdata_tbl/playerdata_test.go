@@ -1,11 +1,10 @@
-package playerdata
+package playerdata_tbl
 
 import "testing"
-import . "db"
 import . "types"
 
-func TestStore(t *testing.T) {
-	StartDB()
+func TestPlayerData(t *testing.T) {
 	data := &PlayerData{}
-	Store(0, data)
+	Set(0, data)
+	Get(0, data)
 }

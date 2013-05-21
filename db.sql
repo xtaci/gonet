@@ -14,15 +14,6 @@ CREATE TABLE `users` (
   UNIQUE KEY `uniq_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `player_data`;
-CREATE TABLE `player_data` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  `data` BLOB,
-  PRIMARY KEY (`id`),	
-  UNIQUE KEY `uniq_user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
 DROP PROCEDURE IF EXISTS gen_users;
 DELIMITER //
 CREATE PROCEDURE gen_users(MAX INT)
