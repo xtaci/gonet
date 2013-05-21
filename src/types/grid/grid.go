@@ -1,5 +1,9 @@
 package grid
 
+import (
+	"encoding/base64"
+)
+
 const (
 	GRID_W = 40
 	GRID_H = 40
@@ -48,4 +52,20 @@ func (m *Grid) Unset(X,Y uint) {
 		off := uint(bit%8)
 		m.Bitset[n] &= ^(byte(128)>>off)
 	}
+}
+
+//----------------------------------------------- decode bitmap bits from base64
+func DecodeMap(mapstr string) []byte {
+	bitset, err := base64.StdEncoding.DecodeString(mapstr)
+
+	if err != nil {
+		return nil
+	}
+
+	return bitset
+}
+
+//----------------------------------------------- encode bitmap bits into base64
+func EncodeMap(bitmap []byte) string {
+	return base64.StdEncoding.EncodeToString(bitmap)
 }

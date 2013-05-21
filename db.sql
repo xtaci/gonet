@@ -1,3 +1,6 @@
+DROP DATABASE IF EXISTS `game`;
+CREATE DATABASE `game`;
+USE `game`;
 DROP TABLE IF EXISTS `users`;
 
 CREATE TABLE `users` (
@@ -11,12 +14,11 @@ CREATE TABLE `users` (
   UNIQUE KEY `uniq_name` (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-DROP TABLE IF EXISTS `buildings`;
-CREATE TABLE `buildings` (
+DROP TABLE IF EXISTS `player_data`;
+CREATE TABLE `player_data` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
-  `list` varchar(40000),
-  `map` varchar(1024) DEFAULT NULL,
+  `data` BLOB,
   PRIMARY KEY (`id`),	
   UNIQUE KEY `uniq_user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
