@@ -1,0 +1,20 @@
+# 增加一个冷却REQ
+ADD_REQ=
+user_id integer
+obj_id integer
+obj_type integer
+obj_nextlevel integer
+timeout long
+===
+
+CANCEL_REQ=
+event_id integer
+===
+
+LONG=
+v long
+===
+
+INT=
+v integer
+===

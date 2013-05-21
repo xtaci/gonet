@@ -1,0 +1,21 @@
+# COOLDOWN 通信
+
+packet_type:0
+name:add_req
+payload:ADD_REQ
+desc:添加一个cooldown请求
+
+packet_type:1000
+name:add_ack
+payload:INT
+desc:返回这个cooldown编号
+
+packet_type:1
+name:cancel_req
+payload:CANCEL_REQ
+desc:取消一个cooldown请求
+
+packet_type:1001
+name:cancel_ack
+payload:INT
+desc:返回0
