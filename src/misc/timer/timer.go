@@ -42,45 +42,47 @@ func _timer() {
 	last := time.Now().Unix()
 
 	for {
-		time.Sleep(100 * time.Millisecond)
+		// add pending events
+		_eventqueue_lock.Lock()
+		for k, v := range _eventqueue {
+			diff := v.Timeout - time.Now().Unix()
+			if diff <= 0 { // in case of very near event
+				diff = 1
+			}
+
+			for i := TIMER_LEVEL - 1; i >= 0; i-- {
+				if diff >= 1<<i {
+					_eventlist[i][k] = v
+					break
+				}
+			}
+		}
+		_eventqueue = make(map[uint32]*Event)
+		_eventqueue_lock.Unlock()
+
+		// cancelqueue
+		_cancelqueue_lock.Lock()
+		for _, v := range _cancelqueue {
+			for i := TIMER_LEVEL - 1; i >= 0; i-- {
+				list := _eventlist[i]
+				delete(list, v)
+			}
+		}
+		_cancelqueue = nil
+		_cancelqueue_lock.Unlock()
+
+		// triggers
 		now := time.Now().Unix()
-		diff := now-last
+		nsecs := now - last // num of seconds passed since last trigger
 		last = now
 
-		for c:=int64(0); c<diff;c++ {
+		if nsecs < 0 { // maybe someone changed system clock
+			continue
+		}
+
+		for c := int64(0); c < nsecs; c++ {
 			timer_count++
 
-			// add pending events
-			now := time.Now().Unix()
-			_eventqueue_lock.Lock()
-			for k, v := range _eventqueue {
-				diff := v.Timeout - now
-				if diff <= 0 { // in case of very near event
-					diff = 1
-				}
-
-				for i := TIMER_LEVEL - 1; i >= 0; i-- {
-					if diff >= 1<<i {
-						_eventlist[i][k] = v
-						break
-					}
-				}
-			}
-			_eventqueue = make(map[uint32]*Event)
-			_eventqueue_lock.Unlock()
-
-			// cancelqueue
-			_cancelqueue_lock.Lock()
-			for _, v := range _cancelqueue {
-				for i := TIMER_LEVEL - 1; i >= 0; i-- {
-					list := _eventlist[i]
-					delete(list, v)
-				}
-			}
-			_cancelqueue = nil
-			_cancelqueue_lock.Unlock()
-
-			// triggers
 			for i := TIMER_LEVEL - 1; i > 0; i-- {
 				mask := (uint32(1) << i) - 1
 				if timer_count&mask == 0 {
@@ -90,6 +92,8 @@ func _timer() {
 
 			_trigger(0)
 		}
+
+		time.Sleep(100 * time.Millisecond)
 	}
 }
 
