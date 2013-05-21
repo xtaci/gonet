@@ -19,8 +19,8 @@ printf "var ProtoHandler map[uint16]func(*Session, *packet.Packet) ([]byte, erro
 awk -f api_bind_req.awk api.txt >> api.go 
 printf "}" >> api.go
 
-mv -f proto.go ../agent/protos
-mv -f api.go ../agent/protos
+mv -f proto.go ../agent/client_protos
+mv -f api.go ../agent/client_protos
 
 ##################################################
 ### hub proto & api

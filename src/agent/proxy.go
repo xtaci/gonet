@@ -1,7 +1,7 @@
 package agent
 
 import (
-	"agent/protos"
+	"agent/client_protos"
 	"agent/ipc"
 	"misc/packet"
 	. "types"
