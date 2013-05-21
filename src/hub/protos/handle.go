@@ -1,16 +1,17 @@
 package protos
 
 import (
-	"github.com/hoisie/redis"
-	"hub/accounts"
-	"misc/packet"
-)
-
-import (
 	"fmt"
 	"log"
 	"runtime"
 	"sync"
+)
+
+import (
+	"github.com/hoisie/redis"
+	"hub/accounts"
+	"misc/packet"
+	"cfg"
 )
 
 var _redis redis.Client
@@ -22,7 +23,8 @@ var (
 
 func init() {
 	Servers = make(map[int32]chan []byte)
-	_redis.Addr = "127.0.0.1:6379"
+	config := cfg.Get()
+	_redis.Addr = config["redis_host"]
 }
 
 //--------------------------------------------------------- send
