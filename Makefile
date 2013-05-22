@@ -8,3 +8,7 @@ all: $(PROGS)
 
 $(PROGS):
 	$(GO) install $@
+
+
+clean:
+	rm -rf bin pkg
