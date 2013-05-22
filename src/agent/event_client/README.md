@@ -1,1 +1,1 @@
-connection to cooldown server
+connection to event server

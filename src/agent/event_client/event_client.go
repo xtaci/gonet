@@ -1,7 +1,6 @@
-package cd_client
+package event_client
 
 import (
-	"errors"
 	"io"
 	"log"
 	"net"
@@ -13,7 +12,6 @@ import (
 
 import (
 	"cfg"
-	event "event/protos"
 	"misc/packet"
 )
 
@@ -21,10 +19,10 @@ var _conn net.Conn
 
 //----------------------------------------------- connect to cooldown server
 func DialCD() {
-	log.Println("Connecting to Cooldown server")
+	log.Println("Connecting to Event server")
 	config := cfg.Get()
 
-	conn, err := net.Dial("tcp", config["cd_service"])
+	conn, err := net.Dial("tcp", config["event_service"])
 	if err != nil {
 		log.Println("Cannot connect to Cooldown server")
 		os.Exit(1)
@@ -32,7 +30,7 @@ func DialCD() {
 
 	_conn = conn
 
-	log.Println("Cooldown connected")
+	log.Println("Event Service Connected")
 	go CDReceiver(conn)
 }
 
@@ -84,10 +82,9 @@ func CDReceiver(conn net.Conn) {
 			ack <- data
 			delete(_wait_ack, seqval)
 		} else {
-			log.Println("Illegal packet sequence number from HUB")
+			log.Println("Illegal packet sequence number from Event Server")
 		}
 		_wait_ack_lock.Unlock()
-L:
 	}
 }
 
@@ -109,7 +106,7 @@ func _call(data []byte) (ret []byte) {
 
 	_, err := _conn.Write(writer.Data())
 	if err != nil {
-		log.Println("Error send packet to HUB:", err)
+		log.Println("Error send packet to Event Server:", err)
 		return nil
 	}
 

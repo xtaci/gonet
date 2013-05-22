@@ -13,17 +13,17 @@ import (
 
 //----------------------------------------------- Cooldown Server start
 func CDStart() {
-	log.Println("Starting CoolDown Server")
+	log.Println("Starting Event Server")
 
 	// Listen
 	service := ":8890"
 	config := cfg.Get()
 
-	if config["cd_service"] != "" {
-		service = config["cd_service"]
+	if config["event_service"] != "" {
+		service = config["event_service"]
 	}
 
-	log.Println("CD Service:", service)
+	log.Println("Event Service:", service)
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", service)
 	checkError(err)
 
