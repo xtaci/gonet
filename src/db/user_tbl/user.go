@@ -19,7 +19,8 @@ const (
 	NEXTVAL = "NEXTVAL"
 	PAT_UID = "uid:%v:%v"
 	PAT_NAME = "name:%v:uid"
-	PAT_BASIC = "BASIC:%v"
+	PAT_BASIC = "basic:%v"
+	PAT_BASIC_KEYS = "basic:*"
 )
 
 var _redis *redis.Client
@@ -83,6 +84,14 @@ func Login(name string, pass string) (*Basic) {
 
 //----------------------------------------------- Create a new user
 func New(user, pass string) *Basic {
+	// check existence of a user
+	exists := _redis.Exists(fmt.Sprintf(PAT_NAME,user))
+	if exists.Val() == true {
+		log.Println("user exists")
+		return nil
+	}
+
+	// generate new user id
 	next_id := _redis.Incr(NEXTVAL)
 	if next_id.Err() !=nil {
 		return nil
@@ -91,25 +100,25 @@ func New(user, pass string) *Basic {
 	id := int32(next_id.Val())
 
 	// uid:1001:name -> xtaci
-	ret := _redis.Set(fmt.Sprintf(PAT_UID,id,"name"), user)
-	if ret.Err() != nil {
-		log.Println(ret.Err())
+	set := _redis.Set(fmt.Sprintf(PAT_UID,id,"name"), user)
+	if set.Err() != nil {
+		log.Println(set.Err())
 		return nil
 	}
 
 	// uid:1001:pass -> MD5("password")
 	h := md5.New()
 	io.WriteString(h, pass)
-	ret = _redis.Set(fmt.Sprintf(PAT_UID,id, "pass"), string(h.Sum(nil)))
-	if ret.Err() != nil {
-		log.Println(ret.Err())
+	set = _redis.Set(fmt.Sprintf(PAT_UID,id, "pass"), string(h.Sum(nil)))
+	if set.Err() != nil {
+		log.Println(set.Err())
 		return nil
 	}
 
 	// name:xtaci:uid -> 1001
-	ret = _redis.Set(fmt.Sprintf(PAT_NAME,user), fmt.Sprint(id))
-	if ret.Err() != nil {
-		log.Println(ret.Err())
+	set = _redis.Set(fmt.Sprintf(PAT_NAME,user), fmt.Sprint(id))
+	if set.Err() != nil {
+		log.Println(set.Err())
 		return nil
 	}
 
@@ -119,7 +128,7 @@ func New(user, pass string) *Basic {
 	basic.LoginCount = 1
 	basic.LastLogin = time.Now().Unix()
 
-	set := _redis.Set(fmt.Sprintf(PAT_BASIC,id), basic.JSON())
+	set = _redis.Set(fmt.Sprintf(PAT_BASIC,id), basic.JSON())
 	if set.Err() !=nil {
 		log.Println(set.Err())
 		return nil
@@ -147,7 +156,7 @@ func Get(id int32) *Basic {
 
 //----------------------------------------------- Load all users's basic info
 func GetAll() []*Basic {
-	get := _redis.Keys("BASIC:*")
+	get := _redis.Keys(PAT_BASIC_KEYS)
 	if get.Err() !=nil {
 		return nil
 	}
