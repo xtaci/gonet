@@ -16,26 +16,30 @@ BEGIN { RS = ""; FS ="\n" }
 			typeok = "true"
 		} else if (a[2] == "string") {
 			print "\ttbl.F_"a[1]",err = reader.ReadString()"
-			print "\tcheckErr(err)"
+			print "\tcheckErr(err)\n"
 		} else if (a[2] == "[]byte") {
 			print "\ttbl.F_"a[1]",err = reader.ReadBytes()"
-			print "\tcheckErr(err)"
+			print "\tcheckErr(err)\n"
 		} else if (a[2] == "integer") {
 			print "\ttbl.F_"a[1]",err = reader.ReadS32()"
-			print "\tcheckErr(err)"
+			print "\tcheckErr(err)\n"
+		} else if (a[2] == "long") {
+			print "\ttbl.F_"a[1]",err = reader.ReadS64()"
+			print "\tcheckErr(err)\n"
 		} else if (a[2] == "boolean") {
 			print "\ttbl.F_"a[1]",err = reader.ReadByte()"
-			print "\tcheckErr(err)"
+			print "\tcheckErr(err)\n"
 		} else if (a[2] == "float") {
 			print "\ttbl.F_"a[1]",err = reader.ReadFloat()"
-			print "\tcheckErr(err)"
+			print "\tcheckErr(err)\n"
 		} else if (a[2] == "array") {
-			print "\tnarr,err2 := reader.ReadU16()"
-			print "\tcheckErr(err2)"
+			print "\tnarr := uint16(0)\n"
+			print "\tnarr,err = reader.ReadU16()"
+			print "\tcheckErr(err)\n"
 			print "\ttbl.F_"a[1]"=make([]"a[3]",narr)"
 			print "\tfor i:=0;i<int(narr);i++ {"
 			print "\t\ttbl.F_"a[1]"[i], err = PKT_"a[3]"(reader)"
-			print "\t}"
+			print "\t}\n"
 		}
 	}
 
