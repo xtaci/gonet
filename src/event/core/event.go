@@ -6,19 +6,19 @@ import (
 )
 
 const (
-	EVENT_CD	=1		// 冷却事件
-	EVENT_MOVES	=2		// 建筑移动事件
+	EVENT_CD    = 1 // 冷却事件
+	EVENT_MOVES = 2 // 建筑移动事件
 )
 
 type Event struct {
-	OID	int32
+	oid     int32
 	user_id int32
 	timeout int64
 }
 
 var (
-	_event_ch chan uint32
-	_events map[uint32]*Event
+	_event_ch    chan uint32
+	_events      map[uint32]*Event
 	_events_lock sync.Mutex
 )
 
@@ -48,7 +48,7 @@ func _expire() {
 //------------------------------------------------ Add a timeout for a object-id
 func Add(oid int32, user_id int32, timeout int64) uint32 {
 	_event_id := timer.Add(timeout, _event_ch)
-	event := &Event{OID:oid, user_id:user_id, timeout:timeout}
+	event := &Event{oid: oid, user_id: user_id, timeout: timeout}
 
 	_events_lock.Lock()
 	_events[_event_id] = event

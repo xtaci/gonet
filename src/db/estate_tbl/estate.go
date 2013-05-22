@@ -23,17 +23,9 @@ func Set(user_id int32, manager *estate.Manager) bool {
 		return false
 	}
 
-	// CAS operation
-	multi, _ := Redis.MultiClient()
-	defer multi.Close()
-
-	key :=  fmt.Sprintf(PAT_ESTATE, user_id)
-	watch := multi.Watch(key)
-	_ = watch.Err()
-
-	reqs, err := CAS(multi, key, string(json_var))
-	if err!=nil {
-		log.Println(reqs, err)
+	set := Redis.Set(fmt.Sprintf(PAT_ESTATE,user_id), string(json_var))
+	if set.Err() !=nil {
+		log.Println(set.Err())
 		return false
 	}
 

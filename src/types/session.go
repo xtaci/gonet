@@ -9,10 +9,10 @@ import (
 
 type Session struct {
 	MQ chan interface{} // Player's Internal Message Queue
-	Basic		Basic //Basic Info
+	Basic		*Basic //Basic Info
 	Bitmap      *grid.Grid
 	Estate		*estate.Manager
-	Moves		*estate.Move
+	Moves		[]estate.Move
 	HeartBeat   time.Time
 	IsLoggedOut bool // represents user logout or connection failure
 }
