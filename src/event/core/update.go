@@ -2,6 +2,7 @@ package event
 
 import (
 	"fmt"
+	"log"
 )
 
 import (
@@ -19,7 +20,10 @@ func Execute(event *Event) {
 	watch := multi.Watch(key)
 	_ = watch.Err()
 
-	_do(multi, key)
+	reqs, err := _do(multi, key)
+	if err!= nil {
+		log.Println(err,reqs)
+	}
 }
 
 func _do(multi *redis.MultiClient, key string) ([]redis.Req, error) {
