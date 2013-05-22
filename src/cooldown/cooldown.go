@@ -9,7 +9,6 @@ import (
 
 import (
 	"cfg"
-	. "db"
 )
 
 //----------------------------------------------- Cooldown Server start
