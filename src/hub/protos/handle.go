@@ -8,13 +8,10 @@ import (
 )
 
 import (
-	"github.com/vmihailenco/redis"
 	"hub/accounts"
 	"misc/packet"
-	"cfg"
+	. "db"
 )
-
-var _redis *redis.Client
 
 var (
 	Servers    map[int32]chan []byte
@@ -23,8 +20,6 @@ var (
 
 func init() {
 	Servers = make(map[int32]chan []byte)
-	config := cfg.Get()
-	_redis = redis.NewTCPClient(config["redis_host"], "", -1)
 }
 
 //--------------------------------------------------------- send
@@ -86,7 +81,7 @@ func P_forward_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 		ch <- tbl.F_data
 	} else {
 		// send to redis
-		_redis.RPush(fmt.Sprintf("MSG#%v", tbl.F_id), string(tbl.F_data))
+		Redis.RPush(fmt.Sprintf("MSG#%v", tbl.F_id), string(tbl.F_data))
 	}
 
 	return nil, nil
@@ -200,7 +195,7 @@ func P_getofflinemsg_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	tbl, _ := PKT_ID(pkt)
 	ret := OFFLINEMSG{}
 	// get all message from redis
-	msgs := _redis.LRange(fmt.Sprintf("MSG#%v", tbl.F_id), 0, -1)
+	msgs := Redis.LRange(fmt.Sprintf("MSG#%v", tbl.F_id), 0, -1)
 
 	if msgs.Err() != nil {
 		return nil, msgs.Err()
@@ -213,7 +208,7 @@ func P_getofflinemsg_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	}
 
 	// remove messages
-	_redis.Del(fmt.Sprintf("MSG#%v", tbl.F_id))
+	Redis.Del(fmt.Sprintf("MSG#%v", tbl.F_id))
 
 	return packet.Pack(Code["getofflinemsg_ack"], ret, nil), nil
 }
