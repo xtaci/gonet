@@ -2,7 +2,7 @@ GO=go
 
 PROGS = hub \
 	 gate \
-	 cooldown
+	 event
 
 all: $(PROGS)
 

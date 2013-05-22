@@ -44,23 +44,23 @@ mv -f proto.go ../hub/protos
 mv -f api.go ../hub/protos
 
 ##################################################
-### cooldown proto & api
+### event proto & api
 ##################################################
-awk -f proto.awk cd_proto.txt > proto.go 
-awk -f proto_func.awk cd_proto.txt >> proto.go 
+awk -f proto.awk event_proto.txt > proto.go 
+awk -f proto_func.awk event_proto.txt >> proto.go 
 
 printf "package protos\n" > api.go
 printf "\n" >> api.go
 printf "import \"misc/packet\"\n" >> api.go
 printf "\n" >> api.go
 
-awk -f api.awk cd_api.txt >> api.go 
-awk -f api_rcode.awk cd_api.txt >> api.go 
+awk -f api.awk event_api.txt >> api.go 
+awk -f api_rcode.awk event_api.txt >> api.go 
 
 printf "var ProtoHandler map[uint16]func(*packet.Packet) ([]byte, error) = map[uint16]func(*packet.Packet)([]byte, error){\n" >> api.go
-awk -f api_bind_req.awk cd_api.txt >> api.go 
+awk -f api_bind_req.awk event_api.txt >> api.go 
 printf "}" >> api.go
 
 #### move #################
-mv -f proto.go ../cooldown/protos
-mv -f api.go ../cooldown/protos
+mv -f proto.go ../event/protos
+mv -f api.go ../event/protos
