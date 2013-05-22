@@ -19,13 +19,3 @@ packet_type:1001
 name:cancel_ack
 payload:INT
 desc:返回0
-
-packet_type:2
-name:add_moves_req
-payload:ADD_MOVES_REQ
-desc:添加建筑摆放调整
-
-packet_type:1002
-name:add_moves_ack
-payload:INT
-desc:返回0

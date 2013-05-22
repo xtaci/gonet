@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	PAT_DATA = "estate:%v"
+	PAT_ESTATE = "estate:%v"
 )
 
 func Set(user_id int32, manager *estate.Manager) bool {
@@ -23,9 +23,17 @@ func Set(user_id int32, manager *estate.Manager) bool {
 		return false
 	}
 
-	set := Redis.Set(fmt.Sprintf(PAT_DATA,user_id), string(json_var))
-	if set.Err() !=nil {
-		log.Println(set.Err())
+	// CAS operation
+	multi, _ := Redis.MultiClient()
+	defer multi.Close()
+
+	key :=  fmt.Sprintf(PAT_ESTATE, user_id)
+	watch := multi.Watch(key)
+	_ = watch.Err()
+
+	reqs, err := CAS(multi, key, string(json_var))
+	if err!=nil {
+		log.Println(reqs, err)
 		return false
 	}
 
@@ -33,7 +41,7 @@ func Set(user_id int32, manager *estate.Manager) bool {
 }
 
 func Get(user_id int32) (*estate.Manager) {
-	get := Redis.Get(fmt.Sprintf(PAT_DATA,user_id))
+	get := Redis.Get(fmt.Sprintf(PAT_ESTATE,user_id))
 
 	if get.Err() !=nil {
 		log.Println(get.Err())

@@ -7,8 +7,6 @@ var Code map[string]int16 = map[string]int16 {
 	"add_ack":1000,	// 返回这个cooldown编号
 	"cancel_req":1,	// 取消一个cooldown请求
 	"cancel_ack":1001,	// 返回0
-	"add_moves_req":2,	// 添加建筑摆放调整
-	"add_moves_ack":1002,	// 返回0
 }
 
 var RCode map[int16]string = map[int16]string {
@@ -16,12 +14,9 @@ var RCode map[int16]string = map[int16]string {
 	1000:"add_ack",
 	1:"cancel_req",
 	1001:"cancel_ack",
-	2:"add_moves_req",
-	1002:"add_moves_ack",
 }
 
 var ProtoHandler map[uint16]func(*packet.Packet) ([]byte, error) = map[uint16]func(*packet.Packet)([]byte, error){
 	0:P_add_req,
 	1:P_cancel_req,
-	2:P_add_moves_req,
 }

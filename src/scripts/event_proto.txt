@@ -5,11 +5,6 @@ user_id integer
 timeout long
 ===
 
-ADD_MOVES_REQ=
-user_id integer
-moves array MOVE
-===
-
 CANCEL_REQ=
 event_id integer
 ===
@@ -20,10 +15,4 @@ v long
 
 INT=
 v integer
-===
-
-MOVE=
-OID integer
-X integer
-Y integer
 ===

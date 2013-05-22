@@ -63,7 +63,6 @@ func P_cancel_req(reader *packet.Packet) ([]byte, error) {
 }
 
 func P_add_moves_req(reader *packet.Packet) ([]byte, error) {
-	tbl, _ := PKT_ADD_MOVES_REQ(reader)
 	return nil,nil
 }
 
