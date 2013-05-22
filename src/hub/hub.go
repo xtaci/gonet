@@ -9,15 +9,11 @@ import (
 
 import (
 	"cfg"
-	. "db"
 )
 
 //----------------------------------------------- HUB start
 func HubStart() {
 	log.Println("Starting HUB")
-
-	// start db
-	StartDB()
 
 	// data init
 	startup_work()

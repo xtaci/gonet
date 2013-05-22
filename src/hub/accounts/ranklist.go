@@ -20,11 +20,11 @@ func init() {
 }
 
 //------------------------------------------------ add a user to rank list
-func _add_rank(ud *User) {
+func _add_rank(basic *Basic) {
 	_lock_ranklist.Lock()
 	defer _lock_ranklist.Unlock()
-	_ranklist.Insert(int(ud.Score), ud.Id)
-	_id_score[ud.Id] = ud.Score
+	_ranklist.Insert(int(basic.Score), basic.Id)
+	_id_score[basic.Id] = basic.Score
 }
 
 //------------------------------------------------ update score of a player

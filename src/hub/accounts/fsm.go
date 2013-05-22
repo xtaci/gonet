@@ -115,11 +115,11 @@ func _expire() {
 }
 
 //------------------------------------------------ add a user to finite state machine manager
-func _add_fsm(ud *User) {
-	info := &PlayerInfo{Id: ud.Id, Name: ud.Name, State: OFFLINE}
+func _add_fsm(basic *Basic) {
+	info := &PlayerInfo{Id: basic.Id, Name: basic.Name, State: OFFLINE}
 
 	_lock_players.Lock()
-	_players[ud.Id] = info
+	_players[basic.Id] = info
 	_lock_players.Unlock()
 }
 

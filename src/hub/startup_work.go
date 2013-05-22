@@ -11,9 +11,9 @@ func startup_work() {
 
 //----------------------------------------------- load user table into memory
 func load_ranklist() {
-	uds := user_tbl.LoadAll()
+	uds := user_tbl.GetAll()
 
 	for i := range uds {
-		accounts.AddUser(&uds[i])
+		accounts.AddUser(uds[i])
 	}
 }

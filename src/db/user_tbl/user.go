@@ -1,143 +1,175 @@
 package user_tbl
 
 import (
-	. "db"
-	. "types"
+	"fmt"
+	"encoding/json"
+	"log"
+	"crypto/md5"
+	"io"
+	"time"
 )
 
 import (
-	"errors"
-	"fmt"
-	"strings"
+	"github.com/vmihailenco/redis"
+	. "types"
+	"cfg"
 )
 
-//----------------------------------------------- Store user struct into db
-func Store(ud *User) {
-	fields, values := SQL_dump(ud)
-	changes := SQL_set_clause(fields, values)
+const (
+	NEXTVAL = "NEXTVAL"
+	PAT_UID = "uid:%v:%v"
+	PAT_NAME = "name:%v:uid"
+	PAT_BASIC = "BASIC:%v"
+)
 
-	stmt := []string{"UPDATE users SET ", strings.Join(changes, ","), " WHERE id=", fmt.Sprint(ud.Id)}
+var _redis *redis.Client
 
-	db := <-DBCH
-	defer func() { DBCH <- db }()
-	_, _, err := db.Query(strings.Join(stmt, " "))
+func init() {
+	config := cfg.Get()
+	_redis = redis.NewTCPClient(config["redis_host"], "", -1)
+}
 
-	CheckErr(err)
+//----------------------------------------------- Change Name in both PAT_UID & PAT_NAME
+func ChangeName(basic *Basic, newname string) bool {
+	// update uid:1001:name -> xtaci
+	set := _redis.Set(fmt.Sprintf(PAT_UID, basic.Id,"name"), newname)
+	if set.Err() != nil {
+		log.Println(set.Err())
+		return false
+	}
+
+	// delete name:oldname:uid -> 1001
+	del := _redis.Del(fmt.Sprintf(PAT_NAME, basic.Name))
+	if del.Err() != nil {
+		log.Println(del.Err())
+		return false
+	}
+
+	// set name:newname:uid -> 1001
+	set = _redis.Set(fmt.Sprintf(PAT_NAME,newname), fmt.Sprint(basic.Id))
+	if set.Err() != nil {
+		log.Println(set.Err())
+		return false
+	}
+
+	// make changes to basic
+	set = _redis.Set(fmt.Sprintf(PAT_BASIC,basic.Id), basic.JSON())
+	if set.Err() !=nil {
+		log.Println(set.Err())
+		return false
+	}
+
+	return true
 }
 
 //----------------------------------------------- login with (name, password) pair
-func Login(name string, password string, ud *User) bool {
-	stmt := "select * from users where name = '%v' AND password = MD5('%v')"
+func Login(name string, pass string) (*Basic) {
+	name_uid_key := fmt.Sprintf(PAT_NAME, name)
+	_id := _redis.Get(name_uid_key)
+	_pass := _redis.Get(fmt.Sprintf(PAT_UID, _id.Val(), "pass"))
 
-	db := <-DBCH
-	defer func() { DBCH <- db }()
-	rows, res, err := db.Query(stmt, SQL_escape(name), SQL_escape(password))
-
-	CheckErr(err)
-
-	if len(rows) > 0 {
-		SQL_load(ud, &rows[0], res)
-		return true
+	// compare pass
+	h := md5.New()
+	io.WriteString(h, pass)
+	if string(h.Sum(nil)) == _pass.Val() {
+		return nil
 	}
 
-	return false
-}
-
-//----------------------------------------------- login with MAC addr
-func LoginMAC(mac string, ud *User) bool {
-	stmt := "SELECT * FROM users where mac='%v'"
-
-	db := <-DBCH
-	defer func() { DBCH <- db }()
-	rows, res, err := db.Query(stmt, mac)
-
-	CheckErr(err)
-
-	if len(rows) > 0 {
-		SQL_load(ud, &rows[0], res)
-		return true
-	}
-
-	return false
+	basic_json := _redis.Get(fmt.Sprintf(PAT_BASIC,_id.Val()))
+	var basic *Basic
+	json.Unmarshal([]byte(basic_json.Val()), basic)
+	return basic
 }
 
 //----------------------------------------------- Create a new user
-func New(ud *User) (ret bool) {
-	defer func() {
-		if x := recover(); x != nil {
-			ret = false
+func New(user, pass string) *Basic {
+	next_id := _redis.Incr(NEXTVAL)
+	if next_id.Err() !=nil {
+		return nil
+	}
+
+	id := int32(next_id.Val())
+
+	// uid:1001:name -> xtaci
+	ret := _redis.Set(fmt.Sprintf(PAT_UID,id,"name"), user)
+	if ret.Err() != nil {
+		log.Println(ret.Err())
+		return nil
+	}
+
+	// uid:1001:pass -> MD5("password")
+	h := md5.New()
+	io.WriteString(h, pass)
+	ret = _redis.Set(fmt.Sprintf(PAT_UID,id, "pass"), string(h.Sum(nil)))
+	if ret.Err() != nil {
+		log.Println(ret.Err())
+		return nil
+	}
+
+	// name:xtaci:uid -> 1001
+	ret = _redis.Set(fmt.Sprintf(PAT_NAME,user), fmt.Sprint(id))
+	if ret.Err() != nil {
+		log.Println(ret.Err())
+		return nil
+	}
+
+	basic := &Basic{}
+	basic.Id = id
+	basic.Name = user
+	basic.LoginCount = 1
+	basic.LastLogin = time.Now().Unix()
+
+	set := _redis.Set(fmt.Sprintf(PAT_BASIC,id), basic.JSON())
+	if set.Err() !=nil {
+		log.Println(set.Err())
+		return nil
+	}
+
+	return basic
+}
+
+//----------------------------------------------- Load a user's basic info 
+func Get(id int32) *Basic {
+	get := _redis.Get(fmt.Sprintf(PAT_BASIC,id))
+	if get.Err() !=nil {
+		return nil
+	}
+
+	basic := &Basic{}
+	err := json.Unmarshal([]byte(get.Val()), basic)
+	if err != nil {
+		log.Println(err)
+		return nil
+	}
+
+	return basic
+}
+
+//----------------------------------------------- Load all users's basic info
+func GetAll() []*Basic {
+	get := _redis.Keys("BASIC:*")
+	if get.Err() !=nil {
+		return nil
+	}
+
+	keys := get.Val()
+	basis := make([]*Basic, len(keys))
+
+	for i:=0;i<len(keys);i++ {
+		json_val := _redis.Get(keys[i])
+		if json_val.Err() !=nil {
+			return nil
 		}
-	}()
 
-	fields, values := SQL_dump(ud, "id")
-	stmt := []string{"INSERT INTO users(", strings.Join(fields, ","),
-		") VALUES (", strings.Join(values, ","), ")"}
+		basic := &Basic{}
+		err := json.Unmarshal([]byte(json_val.Val()), basic)
+		if err != nil {
+			log.Println(err)
+			return nil
+		}
 
-	db := <-DBCH
-	defer func() { DBCH <- db }()
-
-	// begin transaction
-	tr, err := db.Begin()
-	CheckErr(err)
-
-	// insert new user
-	_, res, err := tr.Query(strings.Join(stmt, " "))
-	if err != nil {
-		tr.Rollback()
-		return
+		basis[i] = basic
 	}
 
-	// set score to num of user	
-	ud.Id = int32(res.InsertId())
-	score_stmt := "UPDATE users SET score = ID WHERE ID = '%v'"
-	_, _, err = tr.Query(score_stmt, ud.Id)
-	if err != nil {
-		tr.Rollback()
-		return
-	}
-
-	// commit
-	err = tr.Commit()
-	if err == nil {
-		return true
-	}
-	return false
-}
-
-//----------------------------------------------- Load a user from db
-func Load(id int32) (ud User, err error) {
-	stmt := "SELECT * FROM users where id ='%v'"
-
-	db := <-DBCH
-	defer func() { DBCH <- db }()
-
-	rows, res, err := db.Query(stmt, id)
-	CheckErr(err)
-
-	if len(rows) > 0 {
-		SQL_load(&ud, &rows[0], res)
-		return
-	}
-
-	err = errors.New(fmt.Sprint("cannot find user with id:%v", id))
-	return
-}
-
-//----------------------------------------------- Load all users from db
-func LoadAll() (uds []User) {
-	stmt := "SELECT * FROM users"
-
-	db := <-DBCH
-	defer func() { DBCH <- db }()
-
-	rows, res, err := db.Query(stmt)
-	CheckErr(err)
-
-	for i := range rows {
-		var ud User
-		SQL_load(&ud, &rows[i], res)
-		uds = append(uds, ud)
-	}
-
-	return
+	return basis
 }

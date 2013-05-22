@@ -11,5 +11,5 @@ func close_work(sess *Session) {
 	} else {
 	}
 
-	ipc.UnregisterOnline(sess.User.Id)
+	ipc.UnregisterOnline(sess.Basic.Id)
 }

@@ -6,18 +6,18 @@ import (
 )
 
 //----------------------------------------------- Add a single user
-func AddUser(ud *User) {
-	_add_fsm(ud)
-	_add_rank(ud)
+func AddUser(basic *Basic) {
+	_add_fsm(basic)
+	_add_rank(basic)
 }
 
 //----------------------------------------------- Load a single usser directly from db
 func LoadUser(id int32) bool {
-	ud, err := user_tbl.Load(id)
+	basic := user_tbl.Get(id)
 
-	if err == nil {
-		_add_fsm(&ud)
-		_add_rank(&ud)
+	if basic != nil {
+		_add_fsm(basic)
+		_add_rank(basic)
 		return true
 	}
 

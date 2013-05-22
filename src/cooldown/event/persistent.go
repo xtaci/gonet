@@ -1,12 +1,10 @@
 package event
 
 import (
-	. "types"
-	playerdata "db/playerdata_tbl"
+	"db/estate_tbl"
 )
 
 func Execute(event *Event) {
-	data := &PlayerData{}
-	playerdata.Get(event.user_id, data)
+	manager := estate_tbl.Get(event.user_id)
 	// TODO :perform changes & save back
 }

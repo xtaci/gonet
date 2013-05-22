@@ -1,15 +1,15 @@
 package protos
 
 import (
-	"strconv"
+//	"strconv"
 	"time"
-	"log"
+//	"log"
 )
 
 import (
-	"agent/ipc"
-	"cfg"
-	"db/user_tbl"
+//	"agent/ipc"
+//	"cfg"
+//	"db/user_tbl"
 	"misc/packet"
 	. "types"
 )
@@ -17,6 +17,7 @@ import (
 var EPOCH = time.Unix(0, 0)
 
 func P_user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err error) {
+	/*
 	tbl, _ := PKT_user_login_info(reader)
 	writer := packet.Writer()
 	failed := command_result_pack{F_rst: 0}
@@ -64,15 +65,17 @@ func P_user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err err
 		}
 	}
 
+	*/
 	return
 }
 
-func _fill_user_snapshot(user *User, snapshot *user_snapshot) {
-	snapshot.F_id = user.Id
-	snapshot.F_name = user.Name
-	snapshot.F_rank = user.Score
+	/*	
+func _fill_user_snapshot(basic *Basic, snapshot *user_snapshot) {
+	snapshot.F_id = basic.Id
+	snapshot.F_name = basic.Name
+	snapshot.F_rank = basic.Score
 
-	info, _:= ipc.GetInfo(user.Id)
+	info, _:= ipc.GetInfo(basic.Id)
 	pt := info.ProtectTime - time.Now().Unix()
 	if pt > 0 {
 		snapshot.F_protect_time = int32(pt)
@@ -83,3 +86,4 @@ func _fill_user_snapshot(user *User, snapshot *user_snapshot) {
 	snapshot.F_last_save_time = int32(user.LastSaveTime.Unix())
 	snapshot.F_server_time = int32(time.Now().Unix())
 }
+	*/

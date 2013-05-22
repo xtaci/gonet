@@ -4,14 +4,14 @@ import "time"
 
 import (
 	"types/grid"
+	"types/estate"
 )
 
 type Session struct {
 	MQ chan interface{} // Player's Internal Message Queue
-
-	User        User
+	Basic		Basic //Basic Info
 	Bitmap      *grid.Grid
-	Data		*PlayerData
+	Estate		*estate.EstateManager
 	HeartBeat   time.Time
 	IsLoggedOut bool // represents user logout or connection failure
 }

@@ -1,50 +1,33 @@
 package main
 
 import (
-	. "agent"
-	"agent/ipc"
-	"cfg"
-)
-
-import (
 	"io"
 	"log"
 	"net"
 	"os"
 )
 
-//----------------------------------------------- Game Server Start
-func main() {
-	log.Println("Starting the server")
+import (
+	"cfg"
+	. "db"
+)
 
-	// start logger
-	config := cfg.Get()
-	if config["logfile"] != "" {
-		f, err := os.OpenFile(config["logfile"], os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+//----------------------------------------------- Cooldown Server start
+func CDStart() {
+	log.Println("Starting CoolDown Server")
 
-		if err != nil {
-			log.Println("cannot open logfile %v\n", err)
-			os.Exit(1)
-		}
-		var r Repeater
-		r.Out1 = os.Stdout
-		r.Out2 = f
-		log.SetOutput(&r)
-	}
-
-	// dial HUB
-	ipc.DialHub()
-
-	// signal
-	go SignalProc()
+	// start db
+	StartDB()
 
 	// Listen
-	service := ":8080"
-	if config["service"] != "" {
-		service = config["service"]
+	service := ":8890"
+	config := cfg.Get()
+
+	if config["cd_service"] != "" {
+		service = config["cd_service"]
 	}
 
-	log.Println("Service:", service)
+	log.Println("CD Service:", service)
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", service)
 	checkError(err)
 
@@ -61,14 +44,14 @@ func main() {
 	}
 }
 
-//----------------------------------------------- start a goroutine when a new connection is accepted
+//----------------------------------------------- handle cooldown request 
 func handleClient(conn net.Conn) {
 	defer conn.Close()
 
 	header := make([]byte, 2)
-	ch := make(chan []byte, 100)
+	ch := make(chan []byte, 8192)
 
-	go StartAgent(ch, conn)
+	go CDAgent(ch, conn)
 
 	for {
 		// header
@@ -100,4 +83,8 @@ func checkError(err error) {
 		log.Println("Fatal error: %v", err)
 		os.Exit(1)
 	}
+}
+
+func main() {
+	CDStart()
 }
