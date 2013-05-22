@@ -15,7 +15,7 @@ const (
 	PAT_DATA = "estate:%v"
 )
 
-func Set(user_id int32, manager *estate.EstateManager) bool {
+func Set(user_id int32, manager *estate.Manager) bool {
 	json_var, err := json.Marshal(manager)
 
 	if err!= nil {
@@ -32,7 +32,7 @@ func Set(user_id int32, manager *estate.EstateManager) bool {
 	return true
 }
 
-func Get(user_id int32) (*estate.EstateManager) {
+func Get(user_id int32) (*estate.Manager) {
 	get := Redis.Get(fmt.Sprintf(PAT_DATA,user_id))
 
 	if get.Err() !=nil {
@@ -40,7 +40,7 @@ func Get(user_id int32) (*estate.EstateManager) {
 		return nil
 	}
 
-	manager := &estate.EstateManager{}
+	manager := &estate.Manager{}
 	err := json.Unmarshal([]byte(get.Val()), manager)
 	if err !=nil {
 		log.Println(err)

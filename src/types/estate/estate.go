@@ -10,17 +10,23 @@ type Estate struct {
 	TYPE     uint16      // Object Type
 	X        uint16      // coordinate X
 	Y        uint16      // coordinate Y
-	SX       uint8       // size in X coord
-	SY       uint8       // size in Y coord
 	Property interface{} // related property
 }
 
-type EstateCD struct {
+//----------------------------------------------- Estate Move event records
+type Move struct {
+	OID uint32
+	X	uint16
+	Y	uint16
+}
+
+//----------------------------------------------- Estate Cooldown event records
+type CD struct {
 	OID     uint32
 	EventId uint32
 }
 
-type EstateManager struct {
+type Manager struct {
 	Estates []Estate
-	CDs     []EstateCD
+	CDs     []CD
 }
