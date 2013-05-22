@@ -8,13 +8,13 @@ import (
 )
 
 import (
-	"github.com/hoisie/redis"
+	"github.com/vmihailenco/redis"
 	"hub/accounts"
 	"misc/packet"
 	"cfg"
 )
 
-var _redis redis.Client
+var _redis *redis.Client
 
 var (
 	Servers    map[int32]chan []byte
@@ -24,7 +24,7 @@ var (
 func init() {
 	Servers = make(map[int32]chan []byte)
 	config := cfg.Get()
-	_redis.Addr = config["redis_host"]
+	_redis = redis.NewTCPClient(config["redis_host"], "", -1)
 }
 
 //--------------------------------------------------------- send
@@ -86,7 +86,7 @@ func P_forward_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 		ch <- tbl.F_data
 	} else {
 		// send to redis
-		_redis.Rpush(fmt.Sprintf("MSG#%v", tbl.F_id), tbl.F_data)
+		_redis.RPush(fmt.Sprintf("MSG#%v", tbl.F_id), string(tbl.F_data))
 	}
 
 	return nil, nil
@@ -200,16 +200,16 @@ func P_getofflinemsg_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	tbl, _ := PKT_ID(pkt)
 	ret := OFFLINEMSG{}
 	// get all message from redis
-	msgs, err := _redis.Lrange(fmt.Sprintf("MSG#%v", tbl.F_id), 0, -1)
+	msgs := _redis.LRange(fmt.Sprintf("MSG#%v", tbl.F_id), 0, -1)
 
-	if err != nil {
-		return nil, err
+	if msgs.Err() != nil {
+		return nil, msgs.Err()
 	}
 
-	ret.F_msgs = make([]PLAINMSG, len(msgs))
+	ret.F_msgs = make([]PLAINMSG, len(msgs.Val()))
 
-	for k := range msgs {
-		ret.F_msgs[k].F_msg = msgs[k]
+	for k := range msgs.Val() {
+		ret.F_msgs[k].F_msg = []byte(msgs.Val()[k])
 	}
 
 	// remove messages

@@ -1,9 +1,7 @@
 # 增加一个冷却REQ
 ADD_REQ=
+oid	integer
 user_id integer
-obj_id integer
-obj_type integer
-obj_nextlevel integer
 timeout long
 ===
 

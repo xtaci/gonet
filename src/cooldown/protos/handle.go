@@ -8,7 +8,7 @@ import (
 
 import (
 	"misc/packet"
-	"misc/timer"
+	"cooldown/event"
 )
 //--------------------------------------------------------- send
 func _send(seqid uint64, data []byte, output chan []byte) {
@@ -46,10 +46,20 @@ func HandleRequest(reader *packet.Packet, output chan []byte) {
 	}
 }
 
-func P_add_req(pkt *packet.Packet) ([]byte, error) {
+func P_add_req(reader *packet.Packet) ([]byte, error) {
+	tbl, _ := PKT_ADD_REQ(reader)
+	event_id := event.Add(tbl.F_oid, tbl.F_user_id, tbl.F_timeout)
+	ret := INT{int32(event_id)}
+
+	return packet.Pack(Code["add_ack"], ret, nil), nil
 }
 
-func P_cancel_req(pkt *packet.Packet) ([]byte, error) {
+func P_cancel_req(reader *packet.Packet) ([]byte, error) {
+	tbl, _ := PKT_CANCEL_REQ(reader)
+	event.Cancel(uint32(tbl.F_event_id))
+	ret := INT{1}
+
+	return packet.Pack(Code["cancel_ack"], ret, nil), nil
 }
 
 func checkErr(err error) {

@@ -4,7 +4,7 @@ mysql -uroot -p game < db.sql
 
 sh$go get github.com/ziutek/mymysql/mysql
 
-sh$go get github.com/hoisie/redis
+sh$go get github.com/vmihailenco/redis
 
 sh$cd src/scripts;./proto_gen.sh
 

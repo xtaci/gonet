@@ -3,10 +3,8 @@ package protos
 import "misc/packet"
 
 type ADD_REQ struct {
+	F_oid int32
 	F_user_id int32
-	F_obj_id int32
-	F_obj_type int32
-	F_obj_nextlevel int32
 	F_timeout int64
 }
 
@@ -23,13 +21,9 @@ type INT struct {
 }
 
 func PKT_ADD_REQ(reader *packet.Packet)(tbl ADD_REQ, err error){
+	tbl.F_oid,err = reader.ReadS32()
+	checkErr(err)
 	tbl.F_user_id,err = reader.ReadS32()
-	checkErr(err)
-	tbl.F_obj_id,err = reader.ReadS32()
-	checkErr(err)
-	tbl.F_obj_type,err = reader.ReadS32()
-	checkErr(err)
-	tbl.F_obj_nextlevel,err = reader.ReadS32()
 	checkErr(err)
 	return
 }
@@ -49,4 +43,3 @@ func PKT_INT(reader *packet.Packet)(tbl INT, err error){
 	checkErr(err)
 	return
 }
-

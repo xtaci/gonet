@@ -1,7 +1,7 @@
 package playerdata_tbl
 
 import (
-	"github.com/hoisie/redis"
+	"github.com/vmihailenco/redis"
 	"cfg"
 	. "types"
 	"encoding/json"
@@ -9,11 +9,11 @@ import (
 	"fmt"
 )
 
-var _redis redis.Client
+var _redis *redis.Client
 
 func init() {
 	config := cfg.Get()
-	_redis.Addr = config["redis_host"]
+	_redis = redis.NewTCPClient(config["redis_host"], "", -1)
 }
 
 func Set(user_id int32, data *PlayerData) bool {
@@ -24,9 +24,9 @@ func Set(user_id int32, data *PlayerData) bool {
 		return false
 	}
 
-	err = _redis.Set(fmt.Sprintf("DATA#%v",user_id), json_var)
-	if err!=nil {
-		log.Println(err)
+	set := _redis.Set(fmt.Sprintf("DATA#%v",user_id), string(json_var))
+	if set.Err() !=nil {
+		log.Println(set.Err())
 		return false
 	}
 
@@ -34,14 +34,14 @@ func Set(user_id int32, data *PlayerData) bool {
 }
 
 func Get(user_id int32, data *PlayerData) bool {
-	json_val, err := _redis.Get(fmt.Sprintf("DATA#%v",user_id))
+	get := _redis.Get(fmt.Sprintf("DATA#%v",user_id))
 
-	if err !=nil {
-		log.Println(err)
+	if get.Err() !=nil {
+		log.Println(get.Err())
 		return false
 	}
 
-	err = json.Unmarshal(json_val, data)
+	err := json.Unmarshal([]byte(get.Val()), data)
 	if err !=nil {
 		log.Println(err)
 		return false

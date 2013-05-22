@@ -47,7 +47,7 @@ func HubStart() {
 	}
 }
 
-//----------------------------------------------- handle logical server
+//----------------------------------------------- handle hub request
 func handleClient(conn net.Conn) {
 	defer conn.Close()
 
