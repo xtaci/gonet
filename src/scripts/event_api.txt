@@ -1,4 +1,4 @@
-# COOLDOWN 通信
+# 事件服务器通信
 
 packet_type:0
 name:add_req

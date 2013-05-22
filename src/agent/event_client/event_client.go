@@ -13,7 +13,7 @@ import (
 
 import (
 	"cfg"
-	cd "cooldown/protos"
+	event "event/protos"
 	"misc/packet"
 )
 
