@@ -1,20 +1,10 @@
-server implemented with Go language.
+#server implemented with Go language.
 
-mysql -uroot -p game < db.sql
+##条件
+1. 确保安装好redis
+2. 确保config.ini中的redis_xxxx配置正确
 
-sh$go get github.com/ziutek/mymysql/mysql
-
-sh$go get github.com/vmihailenco/redis
-
-sh$cd src/scripts;./proto_gen.sh
-
-sh$go install gate
-
-sh$hub
-
-sh$gate
-
-
-gonet只保证表级的数据操作原子性,
-
-跨表操作的原子性不保证
+##安装
+    sh$go get github.com/vmihailenco/redis  
+    sh$cd src/scripts;./proto_gen.sh  
+    sh$cd ../..;  make
