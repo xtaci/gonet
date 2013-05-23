@@ -33,11 +33,14 @@ func _expire() {
 
 		_events_lock.Lock()
 		event := _events[event_id]
-		delete(_events, event_id)
 		_events_lock.Unlock()
 
 		// process event, sequentially
-		Execute(event)
+		if Execute(event) {
+			_events_lock.Lock()
+			delete(_events, event_id)
+			_events_lock.Unlock()
+		}
 	}
 }
 

@@ -12,7 +12,7 @@ import (
 )
 
 //------------------------------------------------ perform changes & save back, atomic
-func Execute(event *Event) {
+func Execute(event *Event) bool {
 	multi, _ := db.Redis.MultiClient()
 	defer multi.Close()
 
@@ -23,9 +23,13 @@ func Execute(event *Event) {
 	reqs, err := _do(multi, key)
 	if err!= nil {
 		log.Println(err,reqs)
+		return false
 	}
+
+	return true
 }
 
+//------------------------------------------------ do the real work
 func _do(multi *redis.MultiClient, key string) ([]redis.Req, error) {
 	get := multi.Get(key)
 	if err := get.Err(); err != nil && err != redis.Nil {
