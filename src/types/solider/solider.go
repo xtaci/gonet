@@ -1,8 +1,9 @@
 package solider
 
 type Solider struct {
-	OID      uint32 // object id
-	Property interface{}
+	TYPE string // type in string
+	OID  uint32 // object id
+	HP   uint16
 }
 
 type SoliderCD struct {
