@@ -12,3 +12,7 @@ event_id uint32
 INT=
 v uint32
 ===
+
+PING=
+ping int32
+===
