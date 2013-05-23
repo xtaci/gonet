@@ -16,10 +16,6 @@ type INT struct {
 	F_v uint32
 }
 
-type PING struct {
-	F_ping int32
-}
-
 func PKT_ADD_REQ(reader *packet.Packet)(tbl ADD_REQ, err error){
 	tbl.F_oid,err = reader.ReadU32()
 	checkErr(err)
@@ -42,13 +38,6 @@ func PKT_CANCEL_REQ(reader *packet.Packet)(tbl CANCEL_REQ, err error){
 
 func PKT_INT(reader *packet.Packet)(tbl INT, err error){
 	tbl.F_v,err = reader.ReadU32()
-	checkErr(err)
-
-	return
-}
-
-func PKT_PING(reader *packet.Packet)(tbl PING, err error){
-	tbl.F_ping,err = reader.ReadS32()
 	checkErr(err)
 
 	return

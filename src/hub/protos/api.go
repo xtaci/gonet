@@ -3,8 +3,8 @@ package protos
 import "misc/packet"
 
 var Code map[string]int16 = map[string]int16 {
-	"forward_req":0,	// 消息转发
-	"forward_ack":1000,	// 
+	"ping_req":0,	// PING
+	"ping_ack":1000,	// 返回请求数值
 	"login_req":1,	// 登陆
 	"login_ack":1001,	// 
 	"logout_req":2,	// 登出
@@ -27,11 +27,13 @@ var Code map[string]int16 = map[string]int16 {
 	"getofflinemsg_ack":1010,	// 
 	"adduser_req":11,	// 注册一个新注册的玩家
 	"adduser_ack":1011,	// 
+	"forward_req":128,	// 消息转发
+	"forward_ack":1128,	// 
 }
 
 var RCode map[int16]string = map[int16]string {
-	0:"forward_req",
-	1000:"forward_ack",
+	0:"ping_req",
+	1000:"ping_ack",
 	1:"login_req",
 	1001:"login_ack",
 	2:"logout_req",
@@ -54,10 +56,12 @@ var RCode map[int16]string = map[int16]string {
 	1010:"getofflinemsg_ack",
 	11:"adduser_req",
 	1011:"adduser_ack",
+	128:"forward_req",
+	1128:"forward_ack",
 }
 
 var ProtoHandler map[uint16]func(int32, *packet.Packet) ([]byte, error) = map[uint16]func(int32, *packet.Packet)([]byte, error){
-	0:P_forward_req,
+	0:P_ping_req,
 	1:P_login_req,
 	2:P_logout_req,
 	3:P_changescore_req,
@@ -69,4 +73,5 @@ var ProtoHandler map[uint16]func(int32, *packet.Packet) ([]byte, error) = map[ui
 	9:P_getinfo_req,
 	10:P_getofflinemsg_req,
 	11:P_adduser_req,
+	128:P_forward_req,
 }

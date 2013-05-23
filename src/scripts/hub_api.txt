@@ -1,14 +1,16 @@
 # HUB 通信
 
 packet_type:0
-name:forward_req
-payload:forwardmsg
-desc:消息转发
+name:ping_req
+payload:INT
+desc:PING
 
 packet_type:1000
-name:forward_ack
-payload:command_result_pack
+name:ping_ack
+payload:INT
+desc:返回请求数值
 
+##############
 packet_type:1
 name:login_req
 payload:id
@@ -16,7 +18,7 @@ desc:登陆
 
 packet_type:1001
 name:login_ack
-payload:command_result_pack
+payload:INT
 desc:
 
 packet_type:2
@@ -26,7 +28,7 @@ desc:登出
 
 packet_type:1002
 name:logout_ack
-payload:command_result_pack
+payload:INT
 
 ####
 
@@ -37,7 +39,7 @@ desc:改变分数
 
 packet_type:1003
 name:changescore_ack
-payload:command_result_pack
+payload:INT
 
 ####
 
@@ -59,7 +61,7 @@ desc:攻击
 
 packet_type:1005
 name:raid_ack
-payload:command_result_pack
+payload:INT
 
 ####
 
@@ -70,7 +72,7 @@ desc:加保护
 
 packet_type:1006
 name:protect_ack
-payload:command_result_pack
+payload:INT
 
 ####
 
@@ -81,7 +83,7 @@ desc:撤销保护
 
 packet_type:1007
 name:unprotect_ack
-payload:command_result_pack
+payload:INT
 
 ###
 packet_type:8
@@ -91,7 +93,7 @@ desc:结束攻击
 
 packet_type:1008
 name:free_ack
-payload:command_result_pack
+payload:INT
 
 ####
 
@@ -122,4 +124,15 @@ desc:注册一个新注册的玩家
 
 packet_type:1011
 name:adduser_ack
-payload:command_result_pack
+payload:INT
+
+##########
+packet_type:128
+name:forward_req
+payload:forwardmsg
+desc:消息转发
+
+packet_type:1128
+name:forward_ack
+payload:INT
+

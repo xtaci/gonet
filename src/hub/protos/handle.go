@@ -59,6 +59,12 @@ func HandleRequest(hostid int32, reader *packet.Packet, output chan []byte) {
 
 }
 
+func P_ping_req(hostid int32, reader *packet.Packet) ([]byte, error) {
+	tbl, _ := PKT_INT(reader)
+	ret := INT{tbl.F_v}
+	return packet.Pack(Code["ping_ack"], ret, nil), nil
+}
+
 func P_forward_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	defer func() {
 		if x := recover(); x != nil {
