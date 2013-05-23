@@ -1,4 +1,4 @@
-#server implemented with Go language.
+###Server implemented with golang.
 
 ##条件
 1. 确保安装好redis
