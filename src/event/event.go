@@ -11,8 +11,8 @@ import (
 	"cfg"
 )
 
-//----------------------------------------------- Cooldown Server start
-func CDStart() {
+//----------------------------------------------- Event Server start
+func EventStart() {
 	log.Println("Starting Event Server")
 
 	// Listen
@@ -47,7 +47,7 @@ func handleClient(conn net.Conn) {
 	header := make([]byte, 2)
 	ch := make(chan []byte, 8192)
 
-	go CDAgent(ch, conn)
+	go EventAgent(ch, conn)
 
 	for {
 		// header
@@ -82,5 +82,5 @@ func checkError(err error) {
 }
 
 func main() {
-	CDStart()
+	EventStart()
 }

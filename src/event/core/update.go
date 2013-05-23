@@ -33,7 +33,7 @@ func _do(multi *redis.MultiClient, key string) ([]redis.Req, error) {
 	}
 
 	reqs, err := multi.Exec(func() {
-		// TODO : change value here
+		fmt.Println("TODO : change value here")
 		value := get.Val()
 		multi.Set(key, value)
 	})

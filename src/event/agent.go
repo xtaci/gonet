@@ -15,7 +15,7 @@ const (
 )
 
 func init() {
-	log.SetPrefix("[CD]")
+	log.SetPrefix("[EVENT]")
 }
 
 //--------------------------------------------------------- send
@@ -28,7 +28,7 @@ func _send(seqid uint64, data []byte, output chan []byte) {
 }
 
 //------------------------------------------------ CoolDown Agent
-func CDAgent(incoming chan []byte, conn net.Conn) {
+func EventAgent(incoming chan []byte, conn net.Conn) {
 	// output buffer
 	output := make(chan []byte, MAXCHAN)
 	go _write_routine(output, conn)
