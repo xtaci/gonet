@@ -17,8 +17,8 @@ import (
 
 var _conn net.Conn
 
-//----------------------------------------------- connect to cooldown server
-func DialCD() {
+//----------------------------------------------- connect to Event server
+func DialEvent() {
 	log.Println("Connecting to Event server")
 	config := cfg.Get()
 
@@ -31,11 +31,11 @@ func DialCD() {
 	_conn = conn
 
 	log.Println("Event Service Connected")
-	go CDReceiver(conn)
+	go EventReceiver(conn)
 }
 
-//----------------------------------------------- receive ack from cooldown server
-func CDReceiver(conn net.Conn) {
+//----------------------------------------------- receive ack from Event Server
+func EventReceiver(conn net.Conn) {
 	defer conn.Close()
 
 	header := make([]byte, 2)
