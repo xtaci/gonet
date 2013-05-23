@@ -39,7 +39,7 @@ func (buf *Buffer) Send(data []byte) (err error) {
 		return nil
 	}
 
-	return errors.New(fmt.Sprintf("Send Buffer Overflow, send rejected, possible DoS attack. Remote: %v", buf.conn.RemoteAddr()))
+	return errors.New(fmt.Sprintf("Send Buffer Overflow, possible DoS attack. Remote: %v", buf.conn.RemoteAddr()))
 }
 
 //------------------------------------------------ packet sender goroutine
