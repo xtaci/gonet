@@ -30,6 +30,7 @@ type Move struct {
 type CD struct {
 	OID     uint32
 	EventId uint32
+	Timeout int64
 }
 
 type Manager struct {
