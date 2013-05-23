@@ -5,11 +5,6 @@ import (
 	"sync"
 )
 
-const (
-	EVENT_CD    = 1 // 冷却事件
-	EVENT_MOVES = 2 // 建筑移动事件
-)
-
 type Event struct {
 	oid     int32
 	user_id int32
@@ -23,11 +18,12 @@ var (
 )
 
 const (
-	EVENT_MAX = 200000
+	EVENT_CHAN_MAX = 200000
 )
 
 func init() {
-	_event_ch = make(chan uint32, EVENT_MAX)
+	_event_ch = make(chan uint32, EVENT_CHAN_MAX)
+	_events = make(map[uint32]*Event)
 	go _expire()
 }
 
