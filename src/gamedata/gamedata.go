@@ -52,23 +52,30 @@ func Get(tblname string, level int, fieldname string) interface{} {
 	return rec.Fields[fieldname]
 }
 
-//------------------------------------------------ Get Num of Fields
-func NumField(tblname string) int {
+func FieldNames(tblname string) []string {
 	tbl := _tables[tblname]
 
 	if tbl == nil {
-		return 0
-	}
-	rec := tbl.Records[0]
-	if rec == nil {
-		return 0
+		return nil
 	}
 
-	return len(tbl.Records[0].Fields)
+	rec := tbl.Records[1]
+	if rec == nil {
+		return nil
+	}
+
+	ret := make([]string, len(rec.Fields))
+	count :=0
+	for k := range rec.Fields {
+		ret[count] = k
+		count++
+	}
+
+	return ret
 }
 
 //------------------------------------------------ Get Num of Levels
-func NumLevel(tblname string) int {
+func NumLevels(tblname string) int {
 	tbl := _tables[tblname]
 
 	if tbl == nil {

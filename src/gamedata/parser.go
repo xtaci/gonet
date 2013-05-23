@@ -2,7 +2,7 @@ package gamedata
 
 import (
 	"bufio"
-	//	"fmt"
+		"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -19,8 +19,11 @@ func parse(file *os.File) {
 		line, e := r.ReadString('\n')
 		line = strings.TrimSpace(line)
 
-		if e != nil {
-			break
+		// empty-line & #comment
+		if line == "" {
+			if e == nil {
+				continue
+			}
 		}
 
 		// split fields
@@ -41,7 +44,11 @@ func parse(file *os.File) {
 
 		for i := 1; i < len(fields); i++ {
 			Set(names[0], lv, names[i], fields[i])
-			//	fmt.Printf("%v %v %v %v\n", names[0],lv, names[i], fields[i])
+				fmt.Printf("%v %v %v %v\n", names[0],lv, names[i], fields[i])
+		}
+
+		if e != nil {
+			break
 		}
 	}
 }
