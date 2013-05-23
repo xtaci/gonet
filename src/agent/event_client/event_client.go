@@ -24,7 +24,7 @@ func DialEvent() {
 
 	conn, err := net.Dial("tcp", config["event_service"])
 	if err != nil {
-		log.Println("Cannot connect to Cooldown server")
+		log.Println("Cannot connect to Event server")
 		os.Exit(1)
 	}
 

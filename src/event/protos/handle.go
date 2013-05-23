@@ -73,13 +73,13 @@ func checkErr(err error) {
 			log.Printf("ERR:%v,[func:%v,file:%v,line:%v]\n", err, runtime.FuncForPC(funcName).Name(), file, line)
 		}
 
-		panic("error occured in CoolDown ipc module")
+		panic("error occured in Event Protocol Module")
 	}
 }
 
 func _HandleError() {
 	if x := recover(); x != nil {
-		log.Printf("run time panic when processing CoolDown request: %v", x)
+		log.Printf("run time panic when processing Event request: %v", x)
 		for i := 0; i < 10; i++ {
 			funcName, file, line, ok := runtime.Caller(i)
 			if ok {

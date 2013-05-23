@@ -27,7 +27,7 @@ func _send(seqid uint64, data []byte, output chan []byte) {
 	output <- writer.Data()
 }
 
-//------------------------------------------------ CoolDown Agent
+//------------------------------------------------ Event Server Agent
 func EventAgent(incoming chan []byte, conn net.Conn) {
 	// output buffer
 	output := make(chan []byte, MAXCHAN)
