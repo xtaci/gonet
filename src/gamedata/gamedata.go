@@ -1,8 +1,13 @@
 package gamedata
 
+import (
+	"strconv"
+	"log"
+)
+
 //----------------------------------------------- info for a level
 type Record struct {
-	Fields map[string]interface{}
+	Fields map[string]string
 }
 
 //----------------------------------------------- Numerical Table for a object
@@ -17,7 +22,7 @@ func init() {
 }
 
 //----------------------------------------------- Set Field value
-func Set(tblname string, level int, fieldname string, value interface{}) {
+func Set(tblname string, level int, fieldname string, value string) {
 	tbl := _tables[tblname]
 
 	if tbl == nil {
@@ -29,7 +34,7 @@ func Set(tblname string, level int, fieldname string, value interface{}) {
 	rec := tbl.Records[level]
 	if rec == nil {
 		rec = &Record{}
-		rec.Fields = make(map[string]interface{})
+		rec.Fields = make(map[string]string)
 		tbl.Records[level] = rec
 	}
 
@@ -37,19 +42,45 @@ func Set(tblname string, level int, fieldname string, value interface{}) {
 }
 
 //----------------------------------------------- Get Field value
-func Get(tblname string, level int, fieldname string) interface{} {
+func _get(tblname string, level int, fieldname string) string {
 	tbl := _tables[tblname]
 
 	if tbl == nil {
-		return nil
+		return ""
 	}
 
 	rec := tbl.Records[level]
 	if rec == nil {
-		return nil
+		return ""
 	}
 
 	return rec.Fields[fieldname]
+}
+
+
+func GetInt(tblname string, level int, fieldname string) int {
+	val := _get(tblname, level, fieldname)
+	if val == "" {
+		return ^int(0)		// return MAX INT
+	}
+
+	v, _ := strconv.Atoi(val)
+
+	return v
+}
+
+func GetFloat(tblname string, level int, fieldname string) float32 {
+	val := _get(tblname, level, fieldname)
+	if val == "" {
+		return 0.0
+	}
+
+	f, err :=  strconv.ParseFloat(val, 32)
+	if err!= nil {
+		log.Println(GetFloat, err)
+	}
+
+	return float32(f)
 }
 
 func FieldNames(tblname string) []string {
@@ -84,5 +115,3 @@ func NumLevels(tblname string) int {
 
 	return len(tbl.Records)
 }
-
-//TODO : GetAsXXX 
