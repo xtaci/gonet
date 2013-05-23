@@ -1,10 +1,10 @@
 package estate_tbl
 
 import (
-	"types/estate"
 	"encoding/json"
-	"log"
 	"fmt"
+	"log"
+	"types/estate"
 )
 
 import (
@@ -18,13 +18,13 @@ const (
 func Set(user_id int32, manager *estate.Manager) bool {
 	json_var, err := json.Marshal(manager)
 
-	if err!= nil {
+	if err != nil {
 		log.Println(err)
 		return false
 	}
 
-	set := Redis.Set(fmt.Sprintf(PAT_ESTATE,user_id), string(json_var))
-	if set.Err() !=nil {
+	set := Redis.Set(fmt.Sprintf(PAT_ESTATE, user_id), string(json_var))
+	if set.Err() != nil {
 		log.Println(set.Err())
 		return false
 	}
@@ -32,17 +32,17 @@ func Set(user_id int32, manager *estate.Manager) bool {
 	return true
 }
 
-func Get(user_id int32) (*estate.Manager) {
-	get := Redis.Get(fmt.Sprintf(PAT_ESTATE,user_id))
+func Get(user_id int32) *estate.Manager {
+	get := Redis.Get(fmt.Sprintf(PAT_ESTATE, user_id))
 
-	if get.Err() !=nil {
+	if get.Err() != nil {
 		log.Println(get.Err())
 		return nil
 	}
 
 	manager := &estate.Manager{}
 	err := json.Unmarshal([]byte(get.Val()), manager)
-	if err !=nil {
+	if err != nil {
 		log.Println(err)
 		return nil
 	}

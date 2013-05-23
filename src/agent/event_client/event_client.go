@@ -5,9 +5,9 @@ import (
 	"log"
 	"net"
 	"os"
-	"time"
 	"sync"
 	"sync/atomic"
+	"time"
 )
 
 import (
@@ -62,7 +62,7 @@ func EventReceiver(conn net.Conn) {
 
 		seqval := uint64(0)
 
-		for k,v := range seq_id {
+		for k, v := range seq_id {
 			seqval |= uint64(v) << uint((7-k)*8)
 		}
 
@@ -76,7 +76,7 @@ func EventReceiver(conn net.Conn) {
 			break
 		}
 
-		// acks 
+		// acks
 		_wait_ack_lock.Lock()
 		if ack, ok := _wait_ack[seqval]; ok {
 			ack <- data

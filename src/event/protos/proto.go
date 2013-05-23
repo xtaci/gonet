@@ -3,7 +3,7 @@ package protos
 import "misc/packet"
 
 type ADD_REQ struct {
-	F_oid uint32
+	F_oid     uint32
 	F_user_id int32
 	F_timeout int64
 }
@@ -16,30 +16,29 @@ type INT struct {
 	F_v uint32
 }
 
-func PKT_ADD_REQ(reader *packet.Packet)(tbl ADD_REQ, err error){
-	tbl.F_oid,err = reader.ReadU32()
+func PKT_ADD_REQ(reader *packet.Packet) (tbl ADD_REQ, err error) {
+	tbl.F_oid, err = reader.ReadU32()
 	checkErr(err)
 
-	tbl.F_user_id,err = reader.ReadS32()
+	tbl.F_user_id, err = reader.ReadS32()
 	checkErr(err)
 
-	tbl.F_timeout,err = reader.ReadS64()
-	checkErr(err)
-
-	return
-}
-
-func PKT_CANCEL_REQ(reader *packet.Packet)(tbl CANCEL_REQ, err error){
-	tbl.F_event_id,err = reader.ReadU32()
+	tbl.F_timeout, err = reader.ReadS64()
 	checkErr(err)
 
 	return
 }
 
-func PKT_INT(reader *packet.Packet)(tbl INT, err error){
-	tbl.F_v,err = reader.ReadU32()
+func PKT_CANCEL_REQ(reader *packet.Packet) (tbl CANCEL_REQ, err error) {
+	tbl.F_event_id, err = reader.ReadU32()
 	checkErr(err)
 
 	return
 }
 
+func PKT_INT(reader *packet.Packet) (tbl INT, err error) {
+	tbl.F_v, err = reader.ReadU32()
+	checkErr(err)
+
+	return
+}

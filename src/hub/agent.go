@@ -74,7 +74,7 @@ func HubAgent(incoming chan []byte, conn net.Conn) {
 
 }
 
-//----------------------------------------------- to gs write buffer 
+//----------------------------------------------- to gs write buffer
 func _write_routine(output chan []byte, conn net.Conn) {
 	for {
 		msg, ok := <-output

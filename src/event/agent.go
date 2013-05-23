@@ -6,8 +6,8 @@ import (
 )
 
 import (
-	"misc/packet"
 	"event/protos"
+	"misc/packet"
 )
 
 const (
@@ -50,7 +50,7 @@ func EventAgent(incoming chan []byte, conn net.Conn) {
 	}
 }
 
-//----------------------------------------------- write buffer 
+//----------------------------------------------- write buffer
 func _write_routine(output chan []byte, conn net.Conn) {
 	for {
 		msg, ok := <-output

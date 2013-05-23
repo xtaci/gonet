@@ -2,14 +2,14 @@ package queue
 
 type Queue struct {
 	capacity int
-	size	int
-	front	int
-	rear	int
+	size     int
+	front    int
+	rear     int
 	elements []interface{}
 }
 
 func New(max int) *Queue {
-	queue := &Queue {capacity:max, size:0, front:0, rear:-1}
+	queue := &Queue{capacity: max, size: 0, front: 0, rear: -1}
 	queue.elements = make([]interface{}, max)
 	return queue
 }
@@ -20,7 +20,7 @@ func (q *Queue) Enqueue(elem interface{}) bool {
 		q.size++
 		q.rear++
 
-		if (q.rear == q.capacity) {
+		if q.rear == q.capacity {
 			q.rear = 0
 		}
 
@@ -33,7 +33,7 @@ func (q *Queue) Enqueue(elem interface{}) bool {
 }
 
 //----------------------------------------------- Dequeue
-func (q *Queue) Dequeue()(ret interface{}) {
+func (q *Queue) Dequeue() (ret interface{}) {
 	if q.size > 0 {
 		ret = q.elements[q.front]
 
@@ -50,14 +50,14 @@ func (q *Queue) Dequeue()(ret interface{}) {
 }
 
 //----------------------------------------------- return queue
-func (q *Queue) All()(all []interface{}) {
+func (q *Queue) All() (all []interface{}) {
 	all = make([]interface{}, q.size)
 
 	count := q.size
 	idx := q.front
 
-	for count > 0  {
-		all[q.size-count]= q.elements[idx]
+	for count > 0 {
+		all[q.size-count] = q.elements[idx]
 
 		idx++
 		if idx >= q.capacity {

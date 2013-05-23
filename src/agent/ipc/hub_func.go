@@ -1,8 +1,8 @@
 package ipc
 
 import (
-	"time"
 	"log"
+	"time"
 )
 
 import (
@@ -11,12 +11,12 @@ import (
 )
 
 type Info struct {
-	Id int32
-	State int32
-	Score int32
-	Clan int32
+	Id          int32
+	State       int32
+	Score       int32
+	Clan        int32
 	ProtectTime int64
-	Name string
+	Name        string
 }
 
 func Login(id int32) bool {
@@ -27,7 +27,7 @@ func Login(id int32) bool {
 	reader := packet.Reader(ret)
 	tbl, err := hub.PKT_INT(reader)
 
-	if err != nil || tbl.F_v==0 {
+	if err != nil || tbl.F_v == 0 {
 		return false
 	}
 
@@ -42,7 +42,7 @@ func Logout(id int32) bool {
 	reader := packet.Reader(ret)
 	tbl, err := hub.PKT_INT(reader)
 
-	if err != nil || tbl.F_v==0 {
+	if err != nil || tbl.F_v == 0 {
 		return false
 	}
 
@@ -58,7 +58,7 @@ func Raid(id int32) bool {
 	reader := packet.Reader(ret)
 	tbl, err := hub.PKT_INT(reader)
 
-	if err != nil || tbl.F_v==0 {
+	if err != nil || tbl.F_v == 0 {
 		return false
 	}
 
@@ -74,7 +74,7 @@ func Protect(id int32, until time.Time) bool {
 	reader := packet.Reader(ret)
 	tbl, err := hub.PKT_INT(reader)
 
-	if err != nil || tbl.F_v==0 {
+	if err != nil || tbl.F_v == 0 {
 		return false
 	}
 
@@ -90,7 +90,7 @@ func Free(id int32) bool {
 	reader := packet.Reader(ret)
 	tbl, err := hub.PKT_INT(reader)
 
-	if err != nil || tbl.F_v==0 {
+	if err != nil || tbl.F_v == 0 {
 		return false
 	}
 
@@ -106,14 +106,14 @@ func Unprotect(id int32) bool {
 	reader := packet.Reader(ret)
 	tbl, err := hub.PKT_INT(reader)
 
-	if err != nil || tbl.F_v==0 {
+	if err != nil || tbl.F_v == 0 {
 		return false
 	}
 
 	return true
 }
 
-func GetInfo(id int32) (info Info,err error) {
+func GetInfo(id int32) (info Info, err error) {
 	defer _hub_err()
 
 	req := hub.ID{}
@@ -131,7 +131,7 @@ func GetInfo(id int32) (info Info,err error) {
 	return info, _err
 }
 
-func GetList(A,B int32) (ids, scores []int32, err error) {
+func GetList(A, B int32) (ids, scores []int32, err error) {
 	defer _hub_err()
 
 	req := hub.GETLIST{}
@@ -159,7 +159,7 @@ func AddUser(id int32) bool {
 	reader := packet.Reader(ret)
 	tbl, err := hub.PKT_INT(reader)
 
-	if err != nil || tbl.F_v==0 {
+	if err != nil || tbl.F_v == 0 {
 		return false
 	}
 

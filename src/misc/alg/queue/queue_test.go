@@ -6,8 +6,8 @@ import "fmt"
 func TestQueue(t *testing.T) {
 	q := New(10)
 
-	for i:=0;i<10;i++ {
-		q.Enqueue(i+10)
+	for i := 0; i < 10; i++ {
+		q.Enqueue(i + 10)
 	}
 
 	q.Dequeue()
@@ -24,7 +24,7 @@ func TestQueue(t *testing.T) {
 	v := q.Dequeue()
 	fmt.Println(v)
 
-	for v = q.Dequeue() ; v!= nil; v = q.Dequeue() {
+	for v = q.Dequeue(); v != nil; v = q.Dequeue() {
 		fmt.Println(v)
 	}
 }

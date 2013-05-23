@@ -1,7 +1,5 @@
 package types
 
-import "time"
-
 import (
 	"types/estate"
 	"types/grid"
@@ -14,6 +12,6 @@ type Session struct {
 	Bitmap        *grid.Grid
 	EstateManager *estate.Manager
 	Moves         []estate.Move
-	HeartBeat     time.Time
+	HeartBeat     int64
 	IsLoggedOut   bool // represents user logout or connection failure
 }

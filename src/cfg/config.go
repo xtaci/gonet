@@ -1,10 +1,10 @@
 package cfg
 
 import (
-	"os"
 	"bufio"
-	"regexp"
 	"fmt"
+	"os"
+	"regexp"
 	"strings"
 )
 

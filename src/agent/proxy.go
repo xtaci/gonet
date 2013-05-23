@@ -3,21 +3,21 @@ package agent
 import (
 	"agent/client_protos"
 	"agent/ipc"
+	"cfg"
 	"misc/packet"
 	. "types"
-	"cfg"
 )
 
 import (
 	"fmt"
 	"log"
-	"runtime"
 	"os"
+	"runtime"
 )
 
 var (
 	proto_logger *log.Logger
-	ipc_logger *log.Logger
+	ipc_logger   *log.Logger
 )
 
 //----------------------------------------------- client protocol handle proxy

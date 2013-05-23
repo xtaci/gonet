@@ -1,15 +1,16 @@
 package protos
 
 import (
-	"log"
 	"fmt"
+	"log"
 	"runtime"
 )
 
 import (
-	"misc/packet"
 	"event/core"
+	"misc/packet"
 )
+
 //--------------------------------------------------------- send
 func _send(seqid uint64, data []byte, output chan []byte) {
 	writer := packet.Writer()
@@ -22,7 +23,7 @@ func _send(seqid uint64, data []byte, output chan []byte) {
 func HandleRequest(reader *packet.Packet, output chan []byte) {
 	defer _HandleError()
 
-	seqid, err := reader.ReadU64() // read seqid 
+	seqid, err := reader.ReadU64() // read seqid
 	if err != nil {
 		log.Println("Read Sequence Id failed.", err)
 		return
@@ -63,7 +64,7 @@ func P_cancel_req(reader *packet.Packet) ([]byte, error) {
 }
 
 func P_add_moves_req(reader *packet.Packet) ([]byte, error) {
-	return nil,nil
+	return nil, nil
 }
 
 func checkErr(err error) {

@@ -8,9 +8,9 @@ import (
 )
 
 import (
+	. "db"
 	"hub/accounts"
 	"misc/packet"
-	. "db"
 )
 
 var (
@@ -34,7 +34,7 @@ func _send(seqid uint64, data []byte, output chan []byte) {
 func HandleRequest(hostid int32, reader *packet.Packet, output chan []byte) {
 	defer _HandleError()
 
-	seqid, err := reader.ReadU64() // read seqid 
+	seqid, err := reader.ReadU64() // read seqid
 	if err != nil {
 		log.Println("Read Sequence Id failed.", err)
 		return
@@ -68,7 +68,7 @@ func P_forward_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 
 	tbl, _ := PKT_FORWARDMSG(pkt)
 
-	// if user is online, send to the server, or else send to redis 
+	// if user is online, send to the server, or else send to redis
 	state := accounts.State(tbl.F_id)
 	host := accounts.Host(tbl.F_id)
 

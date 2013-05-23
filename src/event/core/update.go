@@ -21,8 +21,8 @@ func Execute(event *Event) bool {
 	_ = watch.Err()
 
 	reqs, err := _do(multi, key)
-	if err!= nil {
-		log.Println(err,reqs)
+	if err != nil {
+		log.Println(err, reqs)
 		return false
 	}
 

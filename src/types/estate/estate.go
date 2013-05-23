@@ -44,7 +44,7 @@ func (m *Manager) AppendEstate(estate *Estate) {
 }
 
 func (m *Manager) AppendCD(cd *CD) {
-	m.CDs= append(m.CDs, *cd)
+	m.CDs = append(m.CDs, *cd)
 }
 
 func (m *Manager) JSON() string {

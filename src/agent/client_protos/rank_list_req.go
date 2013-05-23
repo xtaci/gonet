@@ -14,7 +14,7 @@ func P_rank_list_req(sess *Session, reader *packet.Packet) (ret []byte, err erro
 	ids, scores, err := ipc.GetList(1, -1)
 
 	if err != nil {
-			return nil, err
+		return nil, err
 	}
 
 	out := rank_list{}

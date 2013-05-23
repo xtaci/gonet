@@ -14,7 +14,7 @@ func Pack(tos int16, tbl interface{}, writer *Packet) []byte {
 	count := v.NumField()
 
 	// write code
-	if tos != -1{
+	if tos != -1 {
 		writer.WriteU16(uint16(tos))
 	}
 

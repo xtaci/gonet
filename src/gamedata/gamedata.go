@@ -1,8 +1,8 @@
 package gamedata
 
 import (
-	"strconv"
 	"log"
+	"strconv"
 )
 
 //----------------------------------------------- info for a level
@@ -57,11 +57,10 @@ func _get(tblname string, level int, fieldname string) string {
 	return rec.Fields[fieldname]
 }
 
-
 func GetInt(tblname string, level int, fieldname string) int32 {
 	val := _get(tblname, level, fieldname)
 	if val == "" {
-		return ^int32(0)		// return MAX INT
+		return ^int32(0) // return MAX INT
 	}
 
 	v, _ := strconv.Atoi(val)
@@ -75,8 +74,8 @@ func GetFloat(tblname string, level int, fieldname string) float32 {
 		return 0.0
 	}
 
-	f, err :=  strconv.ParseFloat(val, 32)
-	if err!= nil {
+	f, err := strconv.ParseFloat(val, 32)
+	if err != nil {
 		log.Println(GetFloat, err)
 	}
 
@@ -96,7 +95,7 @@ func FieldNames(tblname string) []string {
 	}
 
 	ret := make([]string, len(rec.Fields))
-	count :=0
+	count := 0
 	for k := range rec.Fields {
 		ret[count] = k
 		count++

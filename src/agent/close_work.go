@@ -7,7 +7,7 @@ import (
 
 //----------------------------------------------- connection close cleanup work
 func close_work(sess *Session) {
-	if sess.IsLoggedOut {		// normal exit
+	if sess.IsLoggedOut { // normal exit
 	} else {
 	}
 

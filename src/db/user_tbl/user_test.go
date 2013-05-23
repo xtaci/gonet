@@ -8,7 +8,7 @@ func TestUser(t *testing.T) {
 	fmt.Println("New:", basic)
 	fmt.Println("Existing:")
 	all := GetAll()
-	for _, v:= range all {
+	for _, v := range all {
 		fmt.Println(v)
 	}
 }

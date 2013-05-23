@@ -1,9 +1,9 @@
 package ipc
 
 import (
-	"time"
 	"errors"
 	"fmt"
+	"time"
 )
 
 import (

@@ -6,9 +6,9 @@ import (
 	"log"
 	"net"
 	"os"
-	"time"
 	"sync"
 	"sync/atomic"
+	"time"
 )
 
 import (
@@ -64,7 +64,7 @@ func HubReceiver(conn net.Conn) {
 
 		seqval := uint64(0)
 
-		for k,v := range seq_id {
+		for k, v := range seq_id {
 			seqval |= uint64(v) << uint((7-k)*8)
 		}
 
@@ -78,7 +78,7 @@ func HubReceiver(conn net.Conn) {
 			break
 		}
 
-		if seqval == 0 {		// packet forwarding, deliver to MQ
+		if seqval == 0 { // packet forwarding, deliver to MQ
 			reader := packet.Reader(data)
 			forward_id, err := reader.ReadS32()
 			if err != nil {
@@ -96,7 +96,7 @@ func HubReceiver(conn net.Conn) {
 							log.Println("forward to MQ failed, the user is so lucky")
 						}
 					}()
-					sess.MQ <- data[reader.Pos():]	// the payload is the message
+					sess.MQ <- data[reader.Pos():] // the payload is the message
 				}()
 			}
 		} else {
@@ -109,7 +109,7 @@ func HubReceiver(conn net.Conn) {
 			}
 			_wait_ack_lock.Unlock()
 		}
-L:
+	L:
 	}
 }
 
