@@ -49,7 +49,7 @@ func HandleRequest(reader *packet.Packet, output chan []byte) {
 func P_add_req(reader *packet.Packet) ([]byte, error) {
 	tbl, _ := PKT_ADD_REQ(reader)
 	event_id := event.Add(tbl.F_oid, tbl.F_user_id, tbl.F_timeout)
-	ret := INT{int32(event_id)}
+	ret := INT{event_id}
 
 	return packet.Pack(Code["add_ack"], ret, nil), nil
 }

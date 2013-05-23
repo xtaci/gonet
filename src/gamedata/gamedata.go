@@ -58,15 +58,15 @@ func _get(tblname string, level int, fieldname string) string {
 }
 
 
-func GetInt(tblname string, level int, fieldname string) int {
+func GetInt(tblname string, level int, fieldname string) int32 {
 	val := _get(tblname, level, fieldname)
 	if val == "" {
-		return ^int(0)		// return MAX INT
+		return ^int32(0)		// return MAX INT
 	}
 
 	v, _ := strconv.Atoi(val)
 
-	return v
+	return int32(v)
 }
 
 func GetFloat(tblname string, level int, fieldname string) float32 {

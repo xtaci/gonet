@@ -1,18 +1,14 @@
 # 增加一个冷却REQ
 ADD_REQ=
-oid	integer
-user_id integer
-timeout long
+oid	uint32
+user_id int32
+timeout int64
 ===
 
 CANCEL_REQ=
-event_id integer
-===
-
-LONG=
-v long
+event_id uint32
 ===
 
 INT=
-v integer
+v uint32
 ===

@@ -6,7 +6,7 @@ import (
 )
 
 type Event struct {
-	oid     int32
+	oid     uint32
 	user_id int32
 	timeout int64
 }
@@ -45,7 +45,7 @@ func _expire() {
 }
 
 //------------------------------------------------ Add a timeout for a object-id
-func Add(oid int32, user_id int32, timeout int64) uint32 {
+func Add(oid uint32, user_id int32, timeout int64) uint32 {
 	_event_id := timer.Add(timeout, _event_ch)
 	event := &Event{oid: oid, user_id: user_id, timeout: timeout}
 

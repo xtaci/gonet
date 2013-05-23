@@ -9,7 +9,7 @@ type Res struct {
 	Resources map[string]int32
 }
 
-func (r *Res) Get(name string) {
+func (r *Res) Get(name string) int32 {
 	return r.Resources[name]
 }
 

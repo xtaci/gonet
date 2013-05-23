@@ -9,7 +9,7 @@ import (
 	"misc/packet"
 )
 
-func Add(oid int32, user_id int32, timeout int64) bool {
+func Add(oid uint32, user_id int32, timeout int64) uint32 {
 	defer _event_err()
 	req := event.ADD_REQ{}
 	req.F_oid = oid

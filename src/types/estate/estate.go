@@ -6,18 +6,17 @@ import (
 )
 
 const (
-	STATUS_NORMAL     = 0
-	STATUS_UPGRADING  = 1
-	STATUS_RECRUITING = 2
+	STATUS_NORMAL = 0
+	STATUS_CD     = 1
 )
 
 type Estate struct {
-	TYPE    string // Object Type
-	OID     uint32 // Object ID
-	X       uint16 // coordinate X
-	Y       uint16 // coordinate Y
-	Level   uint8
-	Status  uint8
+	TYPE   string // Object Type
+	OID    uint32 // Object ID
+	X      uint16 // coordinate X
+	Y      uint16 // coordinate Y
+	Level  uint8
+	Status uint8
 }
 
 //----------------------------------------------- Estate Move event records
@@ -36,7 +35,15 @@ type CD struct {
 type Manager struct {
 	Estates []Estate
 	CDs     []CD
-	NextVal int32
+	NextVal uint32
+}
+
+func (m *Manager) AppendEstate(estate *Estate) {
+	m.Estates = append(m.Estates, *estate)
+}
+
+func (m *Manager) AppendCD(cd *CD) {
+	m.CDs= append(m.CDs, *cd)
 }
 
 func (m *Manager) JSON() string {
@@ -44,6 +51,6 @@ func (m *Manager) JSON() string {
 	return string(val)
 }
 
-func (m *Manager) GENID() int32 {
-	return atomic.AddInt32(&m.NextVal, 1)
+func (m *Manager) GENID() uint32 {
+	return atomic.AddUint32(&m.NextVal, 1)
 }

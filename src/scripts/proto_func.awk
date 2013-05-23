@@ -20,11 +20,17 @@ BEGIN { RS = ""; FS ="\n" }
 		} else if (a[2] == "[]byte") {
 			print "\ttbl.F_"a[1]",err = reader.ReadBytes()"
 			print "\tcheckErr(err)\n"
-		} else if (a[2] == "integer") {
+		} else if (a[2] == "integer" || a[2] == "int32") {
 			print "\ttbl.F_"a[1]",err = reader.ReadS32()"
 			print "\tcheckErr(err)\n"
-		} else if (a[2] == "long") {
+		} else if (a[2] == "uint32") {
+			print "\ttbl.F_"a[1]",err = reader.ReadU32()"
+			print "\tcheckErr(err)\n"
+		} else if (a[2] == "long" || a[2] == "int64") {
 			print "\ttbl.F_"a[1]",err = reader.ReadS64()"
+			print "\tcheckErr(err)\n"
+		} else if (a[2] == "uint64") {
+			print "\ttbl.F_"a[1]",err = reader.ReadU64()"
 			print "\tcheckErr(err)\n"
 		} else if (a[2] == "boolean") {
 			print "\ttbl.F_"a[1]",err = reader.ReadByte()"
