@@ -17,23 +17,18 @@ import (
 var _BUFSIZE int32
 var _MAXCHAN int32
 
-type _RawPacket struct {
-	data []byte // payload
-}
-
 type Buffer struct {
-	ctrl    chan bool // receive exit signal
-	pending chan *_RawPacket // pending Packet
-	size    int32            // packet payload bytes count
+	ctrl    chan bool   // receive exit signal
+	pending chan []byte // pending Packet
+	size    int32       // packet payload bytes count
 
 	conn net.Conn // connection
 }
 
 //------------------------------------------------ Send packet
 func (buf *Buffer) Send(data []byte) (err error) {
-	if buf.size <= _BUFSIZE {
-		rp := _RawPacket{data}
-		buf.pending <- &rp
+	if atomic.LoadInt32(&buf.size) < _BUFSIZE {
+		buf.pending <- data
 
 		atomic.AddInt32(&buf.size, int32(len(data)))
 		return nil
@@ -48,9 +43,9 @@ func (buf *Buffer) Start() {
 
 	for {
 		select {
-		case pkt := <-buf.pending:
-			buf.raw_send(pkt)
-			atomic.AddInt32(&buf.size, -int32(len(pkt.data)))
+		case data := <-buf.pending:
+			buf.raw_send(data)
+			atomic.AddInt32(&buf.size, -int32(len(data)))
 		case _ = <-buf.ctrl:
 			return
 		}
@@ -58,10 +53,10 @@ func (buf *Buffer) Start() {
 }
 
 //------------------------------------------------ send packet online
-func (buf *Buffer) raw_send(pkt *_RawPacket) {
+func (buf *Buffer) raw_send(data []byte) {
 	writer := packet.Writer()
-	writer.WriteU16(uint16(len(pkt.data)))
-	writer.WriteRawBytes(pkt.data)
+	writer.WriteU16(uint16(len(data)))
+	writer.WriteRawBytes(data)
 
 	_, err := buf.conn.Write(writer.Data())
 	if err != nil {
@@ -73,7 +68,7 @@ func (buf *Buffer) raw_send(pkt *_RawPacket) {
 //------------------------------------------------ create a new write buffer
 func NewBuffer(conn net.Conn, ctrl chan bool) *Buffer {
 	buf := Buffer{conn: conn, size: 0}
-	buf.pending = make(chan *_RawPacket, _MAXCHAN)
+	buf.pending = make(chan []byte, _MAXCHAN)
 	buf.ctrl = ctrl
 	return &buf
 }
