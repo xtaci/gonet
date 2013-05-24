@@ -10,14 +10,15 @@ import (
 
 var _map map[string]string
 
-const CONFIG_PATH = "./config.ini"
+const CONFIG_FILE = "config.ini"
+
+func init() {
+	path := os.Getenv("GOPATH") + "/" + CONFIG_FILE
+	_map = _load_config(path)
+}
 
 //----------------------------------------------- Singleton method for accessing config.ini
 func Get() map[string]string {
-	if _map == nil {
-		_map = _load_config(CONFIG_PATH)
-	}
-
 	return _map
 }
 

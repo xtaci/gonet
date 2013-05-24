@@ -1,11 +1,10 @@
 package cfg
 
-import "testing"
+import (
+	"testing"
+	"fmt"
+)
 
 func TestReadConfig(t *testing.T) {
-	m := read_config("config.ini")
-
-	if m["service"] == "" {
-		t.Error("load config file failed")
-	}
+	fmt.Println(Get())
 }
