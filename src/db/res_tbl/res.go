@@ -1,26 +1,28 @@
 package res_tbl
 
 import (
-	"encoding/json"
-	"fmt"
+	"labix.org/v2/mgo/bson"
 	"log"
-	. "types"
 )
 
 import (
 	. "db"
+	. "types"
+	"cfg"
 )
 
 const (
-	PAT_RES = "res:%v"
+	COLLECTION = "RES"
 )
 
-func Set(user_id int32, res *Res) bool {
-	json_val := res.JSON()
+func Set(res *Res) bool {
+	config := cfg.Get()
+	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
 
-	set := Redis.Set(fmt.Sprintf(PAT_RES, user_id), string(json_val))
-	if set.Err() != nil {
-		log.Println(set.Err())
+	res.Version++
+	info, err := c.Upsert(bson.M{"id": res.Id}, res)
+	if err != nil {
+		log.Println(info, err)
 		return false
 	}
 
@@ -28,15 +30,11 @@ func Set(user_id int32, res *Res) bool {
 }
 
 func Get(user_id int32) *Res {
-	get := Redis.Get(fmt.Sprintf(PAT_RES, user_id))
-
-	if get.Err() != nil {
-		log.Println(get.Err())
-		return nil
-	}
+	config := cfg.Get()
+	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
 
 	res := &Res{}
-	err := json.Unmarshal([]byte(get.Val()), res)
+	err := c.Find(bson.M{"id": user_id}).One(res)
 	if err != nil {
 		log.Println(err)
 		return nil

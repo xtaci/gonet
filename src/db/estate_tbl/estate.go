@@ -12,7 +12,6 @@ import (
 )
 
 const (
-	PAT_ESTATE = "estate:%v"
 	COLLECTION = "ESTATE"
 )
 
