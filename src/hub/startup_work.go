@@ -14,8 +14,6 @@ func load_ranklist() {
 	uds := user_tbl.GetAll()
 
 	for i := range uds {
-		if uds[i] != nil { // in case of db corruption
-			accounts.AddUser(uds[i])
-		}
+		accounts.AddUser(&uds[i])
 	}
 }

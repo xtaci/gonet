@@ -5,10 +5,12 @@ import (
 	"log"
 	"runtime"
 	"sync"
+	"labix.org/v2/mgo/bson"
 )
 
 import (
 	. "db"
+	"cfg"
 	"hub/accounts"
 	"misc/packet"
 )
@@ -16,6 +18,10 @@ import (
 var (
 	Servers    map[int32]chan []byte
 	ServerLock sync.RWMutex
+)
+
+const (
+	COLLECTION = "MESSAGES"
 )
 
 func init() {
@@ -65,33 +71,7 @@ func P_ping_req(hostid int32, reader *packet.Packet) ([]byte, error) {
 	return packet.Pack(Code["ping_ack"], ret, nil), nil
 }
 
-func P_forward_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
-	defer func() {
-		if x := recover(); x != nil {
-			log.Println("forward packet error")
-		}
-	}()
 
-	tbl, _ := PKT_FORWARDMSG(pkt)
-
-	// if user is online, send to the server, or else send to redis
-	state := accounts.State(tbl.F_id)
-	host := accounts.Host(tbl.F_id)
-
-	fmt.Println(tbl.F_id, tbl.F_data)
-	if state&accounts.ONLINE != 0 {
-		ServerLock.RLock()
-		ch := Servers[host] // forwarding request
-		ServerLock.RUnlock()
-
-		ch <- tbl.F_data
-	} else {
-		// send to redis
-		Redis.RPush(fmt.Sprintf("MSG#%v", tbl.F_id), string(tbl.F_data))
-	}
-
-	return nil, nil
-}
 
 func P_login_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	tbl, _ := PKT_ID(pkt)
@@ -197,24 +177,63 @@ func P_getinfo_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	return packet.Pack(Code["getinfo_ack"], ret, nil), nil
 }
 
-func P_getofflinemsg_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
-	tbl, _ := PKT_ID(pkt)
-	ret := OFFLINEMSG{}
-	// get all message from redis
-	msgs := Redis.LRange(fmt.Sprintf("MSG#%v", tbl.F_id), 0, -1)
+func P_forward_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
+	defer func() {
+		if x := recover(); x != nil {
+			log.Println("forward packet error")
+		}
+	}()
 
-	if msgs.Err() != nil {
-		return nil, msgs.Err()
+	tbl, _ := PKT_FORWARDMSG(pkt)
+
+	// if user is online, send to the server, or else send to redis
+	state := accounts.State(tbl.F_id)
+	host := accounts.Host(tbl.F_id)
+
+	fmt.Println(tbl.F_id, tbl.F_data)
+	if state&accounts.ONLINE != 0 {
+		ServerLock.RLock()
+		ch := Servers[host] // forwarding request
+		ServerLock.RUnlock()
+
+		ch <- tbl.F_data
+	} else {
+		// send to db
+		config := cfg.Get()
+		c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
+		err := c.Insert(tbl)
+		if err != nil {
+			log.Println(err)
+		}
 	}
 
-	ret.F_msgs = make([]PLAINMSG, len(msgs.Val()))
+	return nil, nil
+}
 
-	for k := range msgs.Val() {
-		ret.F_msgs[k].F_msg = []byte(msgs.Val()[k])
+func P_getofflinemsg_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
+	// get all forward message from db
+	tbl, _ := PKT_ID(pkt)
+	var msgs []FORWARDMSG
+	config := cfg.Get()
+	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
+	err := c.Find(bson.M{"f_id":tbl.F_id}).All(&msgs)
+	if err != nil {
+		log.Println(err)
+		return nil, nil
+	}
+
+	ret := OFFLINEMSG{}
+	ret.F_msgs = make([]PLAINMSG, len(msgs))
+
+	for k := range msgs {
+		ret.F_msgs[k].F_msg = msgs[k].F_data
 	}
 
 	// remove messages
-	Redis.Del(fmt.Sprintf("MSG#%v", tbl.F_id))
+	info, err := c.RemoveAll(bson.M{"f_id":tbl.F_id})
+	if err != nil {
+		log.Println(info,err)
+	}
 
 	return packet.Pack(Code["getofflinemsg_ack"], ret, nil), nil
 }
