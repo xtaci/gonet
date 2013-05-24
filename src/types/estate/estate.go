@@ -38,6 +38,7 @@ type Manager struct {
 	Estates []Estate
 	CDs     []CD
 	NextVal uint32
+	Version	uint32
 }
 
 func (m *Manager) AppendEstate(estate *Estate) {

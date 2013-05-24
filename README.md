@@ -1,10 +1,11 @@
 ###Server implemented with golang.
 
 ##条件
-1. 确保安装好redis
-2. 确保config.ini中的redis_xxxx配置正确
+0. 确保安装好bzr
+1. 确保安装好mongodb
+2. 确保config.ini中的mongo_xxxx配置正确
 
 ##安装
-    sh$go get github.com/vmihailenco/redis  
+	sh$go get labix.org/v2/mgo
     sh$make
 

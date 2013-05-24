@@ -1,4 +1,4 @@
-package event
+package core
 
 import (
 	"misc/timer"

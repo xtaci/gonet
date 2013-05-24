@@ -1,50 +1,52 @@
-package event
+package core
 
 import (
 	"fmt"
 	"log"
+	"labix.org/v2/mgo"
+	"labix.org/v2/mgo/bson"
 )
 
 import (
-	"db"
+	. "db"
 	"db/estate_tbl"
-	"github.com/vmihailenco/redis"
+	"cfg"
+	"types/estate"
 )
 
 //------------------------------------------------ perform changes & save back, atomic
-func Execute(event *Event) bool {
-	multi, _ := db.Redis.MultiClient()
-	defer multi.Close()
+func Execute(event *Event)(ret bool) {
+	defer func() {
+		if x:=recover();x!=nil {
+			log.Println(x)
+			ret = false
+		}
 
-	key := fmt.Sprintf(estate_tbl.PAT_ESTATE, event.user_id)
-	watch := multi.Watch(key)
-	_ = watch.Err()
+		ret = true
+	}()
 
-	reqs, err := _do(multi, key)
-	if err != nil {
-		log.Println(err, reqs)
-		return false
-	}
-
+	_do(event)
 	return true
 }
 
 //------------------------------------------------ do the real work
-func _do(multi *redis.MultiClient, key string) ([]redis.Req, error) {
-	get := multi.Get(key)
-	if err := get.Err(); err != nil && err != redis.Nil {
-		return nil, err
+func _do(event *Event) {
+	config := cfg.Get()
+	c := Mongo.DB(config["mongo_db"]).C(estate_tbl.COLLECTION)
+
+	manager := &estate.Manager{}
+	err := c.Find(bson.M{"id": event.user_id}).One(manager)
+
+	change := mgo.Change{
+		Update:    bson.M{"$inc": bson.M{"version": 1}},
+		ReturnNew: true,
 	}
 
-	reqs, err := multi.Exec(func() {
-		fmt.Println("TODO : change value here")
-		value := get.Val()
-		multi.Set(key, value)
-	})
+	fmt.Println("TODO : change value here")
 
-	// Transaction failed. Repeat.
-	if err == redis.Nil {
-		return _do(multi, key)
+	// find & update 
+	_, err = c.Find(bson.M{"id":event.user_id, "version":manager.Version}).Apply(change, manager)
+	if err != nil {		// repeat 
+		_do(event)
 	}
-	return reqs, err
 }
