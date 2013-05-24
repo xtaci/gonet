@@ -184,7 +184,7 @@ func P_forward_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 
 	tbl, _ := PKT_FORWARDMSG(pkt)
 
-	// if user is online, send to the server, or else send to redis
+	// if user is online, send to the server, or else send to database
 	state := accounts.State(tbl.F_id)
 	host := accounts.Host(tbl.F_id)
 
