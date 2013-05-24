@@ -6,6 +6,5 @@
 
 ##安装
     sh$go get github.com/vmihailenco/redis  
-    sh$cd src/scripts;./proto_gen.sh  
-    sh$cd ../..;  make
+    sh$make
 
