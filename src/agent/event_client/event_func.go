@@ -37,6 +37,13 @@ func Add(oid uint32, user_id int32, timeout int64) uint32 {
 	return tbl.F_v
 }
 
+func Cancel(event_id uint32) {
+	defer _event_err()
+	req := event.CANCEL_REQ{}
+	req.F_event_id = event_id
+	_call(packet.Pack(event.Code["cancel_req"], req, nil))
+}
+
 func _event_err() {
 	if x := recover(); x != nil {
 		log.Println(x)
