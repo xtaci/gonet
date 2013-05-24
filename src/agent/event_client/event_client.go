@@ -61,13 +61,12 @@ func EventReceiver(conn net.Conn) {
 		}
 
 		seqval := uint64(0)
-
 		for k, v := range seq_id {
 			seqval |= uint64(v) << uint((7-k)*8)
 		}
 
 		// data
-		size := int(header[0])<<8 | int(header[1]) - 8
+		size := int(header[0])<<8 | int(header[1]) - len(seq_id)
 		data := make([]byte, size)
 		n, err = io.ReadFull(conn, data)
 
@@ -118,7 +117,7 @@ func _call(data []byte) (ret []byte) {
 
 	select {
 	case msg := <-ACK:
-		return msg
+		return msg[2:]	// the first 2-bytes are TYPE, just ignore it
 	case _ = <-time.After(10 * time.Second):
 	}
 
