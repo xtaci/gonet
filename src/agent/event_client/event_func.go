@@ -17,7 +17,6 @@ func Ping() bool {
 	ret := _call(packet.Pack(event.Code["ping_req"], req, nil))
 	reader := packet.Reader(ret)
 	tbl, _ := event.PKT_INT(reader)
-	fmt.Println(tbl)
 	if tbl.F_v != req.F_v {
 		return false
 	}

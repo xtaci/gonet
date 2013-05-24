@@ -19,6 +19,20 @@ type Info struct {
 	Name        string
 }
 
+func Ping() bool {
+	defer _hub_err()
+	req := hub.INT{}
+	req.F_v = 1
+	ret := _call(packet.Pack(hub.Code["ping_req"], req, nil))
+	reader := packet.Reader(ret)
+	tbl, _ := hub.PKT_INT(reader)
+	if tbl.F_v != req.F_v {
+		return false
+	}
+
+	return true
+}
+
 func Login(id int32) bool {
 	defer _hub_err()
 	req := hub.ID{}
