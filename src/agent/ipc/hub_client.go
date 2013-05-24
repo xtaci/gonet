@@ -163,7 +163,7 @@ func _call(data []byte) (ret []byte) {
 
 	select {
 	case msg := <-ACK:
-		return msg[2:]			// ignore protocol header
+		return msg[2:] // ignore protocol header
 	case _ = <-time.After(10 * time.Second):
 	}
 

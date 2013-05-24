@@ -1,8 +1,8 @@
 package ipc
 
 import (
-	"testing"
 	"fmt"
+	"testing"
 )
 
 func TestEventFunc(t *testing.T) {

@@ -1,8 +1,8 @@
 package event_client
 
 import (
-	"testing"
 	"fmt"
+	"testing"
 )
 
 func TestEventFunc(t *testing.T) {
