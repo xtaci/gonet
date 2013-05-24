@@ -17,7 +17,6 @@ func init() {
 	_map = _load_config(path)
 }
 
-//----------------------------------------------- Singleton method for accessing config.ini
 func Get() map[string]string {
 	return _map
 }
