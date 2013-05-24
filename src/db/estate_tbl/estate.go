@@ -20,6 +20,7 @@ func Set(manager *estate.Manager) bool {
 	config := cfg.Get()
 	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
 
+	manager.Version++
 	info, err := c.Upsert(bson.M{"id":manager.Id}, manager)
 	if err != nil {
 		log.Println(info, err)
