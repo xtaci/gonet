@@ -1,31 +1,28 @@
 package estate_tbl
 
 import (
-	"encoding/json"
-	"fmt"
 	"log"
-	"types/estate"
+	"labix.org/v2/mgo/bson"
 )
 
 import (
 	. "db"
+	"cfg"
+	"types/estate"
 )
 
 const (
 	PAT_ESTATE = "estate:%v"
+	COLLECTION = "ESTATE"
 )
 
-func Set(user_id int32, manager *estate.Manager) bool {
-	json_var, err := json.Marshal(manager)
+func Set(manager *estate.Manager) bool {
+	config := cfg.Get()
+	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
 
+	info, err := c.Upsert(bson.M{"id":manager.Id}, manager)
 	if err != nil {
-		log.Println(err)
-		return false
-	}
-
-	set := Redis.Set(fmt.Sprintf(PAT_ESTATE, user_id), string(json_var))
-	if set.Err() != nil {
-		log.Println(set.Err())
+		log.Println(info, err)
 		return false
 	}
 
@@ -33,15 +30,11 @@ func Set(user_id int32, manager *estate.Manager) bool {
 }
 
 func Get(user_id int32) *estate.Manager {
-	get := Redis.Get(fmt.Sprintf(PAT_ESTATE, user_id))
-
-	if get.Err() != nil {
-		log.Println(get.Err())
-		return nil
-	}
+	config := cfg.Get()
+	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
 
 	manager := &estate.Manager{}
-	err := json.Unmarshal([]byte(get.Val()), manager)
+	err := c.Find(bson.M{"id":user_id}).One(manager)
 	if err != nil {
 		log.Println(err)
 		return nil

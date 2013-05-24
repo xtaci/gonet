@@ -7,6 +7,8 @@ import (
 type Basic struct {
 	Id             int32
 	Name           string
+	Pass           []byte
+	Mac            string
 	Score          int32
 	ProtectTimeout int64
 	IsProtecting   bool

@@ -34,6 +34,7 @@ type CD struct {
 }
 
 type Manager struct {
+	Id		int32
 	Estates []Estate
 	CDs     []CD
 	NextVal uint32

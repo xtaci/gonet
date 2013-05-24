@@ -2,53 +2,36 @@ package user_tbl
 
 import (
 	"crypto/md5"
-	"encoding/json"
-	"fmt"
 	"io"
+	"labix.org/v2/mgo"
+	"labix.org/v2/mgo/bson"
 	"log"
 	"time"
 )
 
 import (
+	"cfg"
 	. "db"
 	. "types"
 )
 
 const (
-	NEXTVAL        = "NEXTVAL"
-	PAT_UID        = "uid:%v:%v"
-	PAT_NAME       = "name:%v:uid"
-	PAT_BASIC      = "basic:%v"
-	PAT_BASIC_KEYS = "basic:*"
+	COLLECTION = "BASIC"
+	NEXTVAL    = "NEXTVAL"
 )
 
-//----------------------------------------------- Change Name in both PAT_UID & PAT_NAME
-func ChangeName(basic *Basic, newname string) bool {
-	// update uid:1001:name -> xtaci
-	set := Redis.Set(fmt.Sprintf(PAT_UID, basic.Id, "name"), newname)
-	if set.Err() != nil {
-		log.Println(set.Err())
-		return false
-	}
+type NextVal struct {
+	ID int32
+}
 
-	// delete name:oldname:uid -> 1001
-	del := Redis.Del(fmt.Sprintf(PAT_NAME, basic.Name))
-	if del.Err() != nil {
-		log.Println(del.Err())
-		return false
-	}
+//----------------------------------------------- Change
+func Set(basic *Basic) bool {
+	config := cfg.Get()
+	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
 
-	// set name:newname:uid -> 1001
-	set = Redis.Set(fmt.Sprintf(PAT_NAME, newname), fmt.Sprint(basic.Id))
-	if set.Err() != nil {
-		log.Println(set.Err())
-		return false
-	}
-
-	// make changes to basic
-	set = Redis.Set(fmt.Sprintf(PAT_BASIC, basic.Id), basic.JSON())
-	if set.Err() != nil {
-		log.Println(set.Err())
+	info, err := c.Upsert(bson.M{"id": basic.Id}, basic)
+	if err != nil {
+		log.Println(info, err)
 		return false
 	}
 
@@ -57,87 +40,50 @@ func ChangeName(basic *Basic, newname string) bool {
 
 //----------------------------------------------- login with (name, password) pair
 func Login(name string, pass string) *Basic {
-	name_uid_key := fmt.Sprintf(PAT_NAME, name)
-	_id := Redis.Get(name_uid_key)
-	_pass := Redis.Get(fmt.Sprintf(PAT_UID, _id.Val(), "pass"))
+	config := cfg.Get()
+	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
 
-	// compare pass
-	h := md5.New()
-	io.WriteString(h, pass)
-	if string(h.Sum(nil)) == _pass.Val() {
+	basic := &Basic{}
+	err := c.Find(bson.M{"name": name, "pass": _md5(pass)}).One(basic)
+	if err != nil {
+		log.Println(err)
 		return nil
 	}
 
-	basic_json := Redis.Get(fmt.Sprintf(PAT_BASIC, _id.Val()))
-	var basic *Basic
-	json.Unmarshal([]byte(basic_json.Val()), basic)
 	return basic
 }
 
 //----------------------------------------------- Create a new user
-func New(user, pass string) *Basic {
-	// check existence of a user
-	exists := Redis.Exists(fmt.Sprintf(PAT_NAME, user))
-	if exists.Val() == true {
-		log.Println("user exists")
-		return nil
-	}
-
-	// generate new user id
-	next_id := Redis.Incr(NEXTVAL)
-	if next_id.Err() != nil {
-		return nil
-	}
-
-	id := int32(next_id.Val())
-
-	// uid:1001:name -> xtaci
-	set := Redis.Set(fmt.Sprintf(PAT_UID, id, "name"), user)
-	if set.Err() != nil {
-		log.Println(set.Err())
-		return nil
-	}
-
-	// uid:1001:pass -> MD5("password")
-	h := md5.New()
-	io.WriteString(h, pass)
-	set = Redis.Set(fmt.Sprintf(PAT_UID, id, "pass"), string(h.Sum(nil)))
-	if set.Err() != nil {
-		log.Println(set.Err())
-		return nil
-	}
-
-	// name:xtaci:uid -> 1001
-	set = Redis.Set(fmt.Sprintf(PAT_NAME, user), fmt.Sprint(id))
-	if set.Err() != nil {
-		log.Println(set.Err())
-		return nil
-	}
+func New(name, pass string) *Basic {
+	config := cfg.Get()
+	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
 
 	basic := &Basic{}
-	basic.Id = id
-	basic.Name = user
-	basic.LoginCount = 1
-	basic.LastLogin = time.Now().Unix()
-
-	set = Redis.Set(fmt.Sprintf(PAT_BASIC, id), basic.JSON())
-	if set.Err() != nil {
-		log.Println(set.Err())
-		return nil
+	err := c.Find(bson.M{"name": name}).One(basic)
+	if err != nil {
+		basic.Id = _nextval()
+		basic.Name = name
+		basic.Pass = _md5(pass)
+		basic.LoginCount = 1
+		basic.LastLogin = time.Now().Unix()
+		err := c.Insert(basic)
+		if err != nil {
+			log.Println(err)
+			return nil
+		}
+		return basic
 	}
 
-	return basic
+	return nil
 }
 
 //----------------------------------------------- Load a user's basic info
 func Get(id int32) *Basic {
-	get := Redis.Get(fmt.Sprintf(PAT_BASIC, id))
-	if get.Err() != nil {
-		return nil
-	}
+	config := cfg.Get()
+	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
 
 	basic := &Basic{}
-	err := json.Unmarshal([]byte(get.Val()), basic)
+	err := c.Find(bson.M{"id": id}).One(basic)
 	if err != nil {
 		log.Println(err)
 		return nil
@@ -147,30 +93,41 @@ func Get(id int32) *Basic {
 }
 
 //----------------------------------------------- Load all users's basic info
-func GetAll() []*Basic {
-	get := Redis.Keys(PAT_BASIC_KEYS)
-	if get.Err() != nil {
+func GetAll() []Basic {
+	config := cfg.Get()
+	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
+
+	var basis []Basic
+	err := c.Find(nil).All(&basis)
+	if err != nil {
+		log.Println(err)
 		return nil
 	}
 
-	keys := get.Val()
-	basis := make([]*Basic, len(keys))
+	return basis
+}
 
-	for i := 0; i < len(keys); i++ {
-		json_val := Redis.Get(keys[i])
-		if json_val.Err() != nil {
-			return nil
-		}
+func _md5(str string) []byte {
+	h := md5.New()
+	io.WriteString(h, str)
+	return h.Sum(nil)
+}
 
-		basic := &Basic{}
-		err := json.Unmarshal([]byte(json_val.Val()), basic)
-		if err != nil {
-			log.Println(err)
-			return nil
-		}
+func _nextval() int32 {
+	config := cfg.Get()
+	c := Mongo.DB(config["mongo_db"]).C(NEXTVAL)
 
-		basis[i] = basic
+	change := mgo.Change{
+		Update:    bson.M{"$inc": bson.M{"n": 1}},
+		ReturnNew: true,
 	}
 
-	return basis
+	next := &NextVal{}
+	info, err := c.Find(nil).Apply(change, &next)
+	if err != nil {
+		log.Println(info, err)
+		return -1
+	}
+
+	return next.ID
 }
