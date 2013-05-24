@@ -1,13 +1,13 @@
 package estate_tbl
 
 import (
-	"log"
 	"labix.org/v2/mgo/bson"
+	"log"
 )
 
 import (
-	. "db"
 	"cfg"
+	. "db"
 	"types/estate"
 )
 
@@ -21,7 +21,7 @@ func Set(manager *estate.Manager) bool {
 	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
 
 	manager.Version++
-	info, err := c.Upsert(bson.M{"id":manager.Id}, manager)
+	info, err := c.Upsert(bson.M{"id": manager.Id}, manager)
 	if err != nil {
 		log.Println(info, err)
 		return false
@@ -35,7 +35,7 @@ func Get(user_id int32) *estate.Manager {
 	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
 
 	manager := &estate.Manager{}
-	err := c.Find(bson.M{"id":user_id}).One(manager)
+	err := c.Find(bson.M{"id": user_id}).One(manager)
 	if err != nil {
 		log.Println(err)
 		return nil

@@ -2,15 +2,15 @@ package protos
 
 import (
 	"fmt"
+	"labix.org/v2/mgo/bson"
 	"log"
 	"runtime"
 	"sync"
-	"labix.org/v2/mgo/bson"
 )
 
 import (
-	. "db"
 	"cfg"
+	. "db"
 	"hub/accounts"
 	"misc/packet"
 )
@@ -70,8 +70,6 @@ func P_ping_req(hostid int32, reader *packet.Packet) ([]byte, error) {
 	ret := INT{tbl.F_v}
 	return packet.Pack(Code["ping_ack"], ret, nil), nil
 }
-
-
 
 func P_login_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	tbl, _ := PKT_ID(pkt)
@@ -216,7 +214,7 @@ func P_getofflinemsg_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	var msgs []FORWARDMSG
 	config := cfg.Get()
 	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
-	err := c.Find(bson.M{"f_id":tbl.F_id}).All(&msgs)
+	err := c.Find(bson.M{"f_id": tbl.F_id}).All(&msgs)
 	if err != nil {
 		log.Println(err)
 		return nil, nil
@@ -230,9 +228,9 @@ func P_getofflinemsg_req(hostid int32, pkt *packet.Packet) ([]byte, error) {
 	}
 
 	// remove messages
-	info, err := c.RemoveAll(bson.M{"f_id":tbl.F_id})
+	info, err := c.RemoveAll(bson.M{"f_id": tbl.F_id})
 	if err != nil {
-		log.Println(info,err)
+		log.Println(info, err)
 	}
 
 	return packet.Pack(Code["getofflinemsg_ack"], ret, nil), nil

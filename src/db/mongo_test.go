@@ -1,8 +1,8 @@
 package db
 
 import (
-	"fmt"
 	"cfg"
+	"fmt"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"testing"

@@ -2,22 +2,22 @@ package core
 
 import (
 	"fmt"
-	"log"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
+	"log"
 )
 
 import (
+	"cfg"
 	. "db"
 	"db/estate_tbl"
-	"cfg"
 	"types/estate"
 )
 
 //------------------------------------------------ perform changes & save back, atomic
-func Execute(event *Event)(ret bool) {
+func Execute(event *Event) (ret bool) {
 	defer func() {
-		if x:=recover();x!=nil {
+		if x := recover(); x != nil {
 			log.Println(x)
 			ret = false
 		}
@@ -44,9 +44,9 @@ func _do(event *Event) {
 
 	fmt.Println("TODO : change value here")
 
-	// find & update 
-	_, err = c.Find(bson.M{"id":event.user_id, "version":manager.Version}).Apply(change, manager)
-	if err != nil {		// repeat 
+	// find & update
+	_, err = c.Find(bson.M{"id": event.user_id, "version": manager.Version}).Apply(change, manager)
+	if err != nil { // repeat
 		_do(event)
 	}
 }
