@@ -7,9 +7,11 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"sync"
 )
 
 var _map map[string]string
+var _lock sync.RWMutex
 
 const CONFIG_FILE = "config.ini"
 
@@ -18,13 +20,17 @@ func Get() map[string]string {
 		Reload()
 	}
 
+	_lock.RLock()
+	defer _lock.RUnlock()
 	return _map
 }
 
 func Reload() {
 	path := os.Getenv("GOPATH") + "/" + CONFIG_FILE
 	log.Println("Read", CONFIG_FILE)
+	_lock.Lock()
 	_map = _load_config(path)
+	_lock.Unlock()
 }
 
 func _load_config(path string) (ret map[string]string) {
