@@ -38,35 +38,33 @@ func HandleRequest(reader *packet.Packet, output chan []byte) {
 	fmt.Println("proto: ", b)
 	handle := ProtoHandler[b]
 	if handle != nil {
-		ret, err := handle(reader)
-		if err == nil {
+		ret := handle(reader)
+		if len(ret) != 0 {
 			_send(seqid, ret, output)
-		} else {
-			log.Println(ret)
 		}
 	}
 }
 
-func P_ping_req(reader *packet.Packet) ([]byte, error) {
+func P_ping_req(reader *packet.Packet) []byte {
 	tbl, _ := PKT_INT(reader)
 	ret := INT{tbl.F_v}
-	return packet.Pack(Code["ping_ack"], ret, nil), nil
+	return packet.Pack(Code["ping_ack"], ret, nil)
 }
 
-func P_add_req(reader *packet.Packet) ([]byte, error) {
+func P_add_req(reader *packet.Packet) []byte {
 	tbl, _ := PKT_ADD_REQ(reader)
 	event_id := core.Add(tbl.F_oid, tbl.F_user_id, tbl.F_timeout)
 	ret := INT{event_id}
 
-	return packet.Pack(Code["add_ack"], ret, nil), nil
+	return packet.Pack(Code["add_ack"], ret, nil)
 }
 
-func P_cancel_req(reader *packet.Packet) ([]byte, error) {
+func P_cancel_req(reader *packet.Packet) []byte {
 	tbl, _ := PKT_CANCEL_REQ(reader)
 	core.Cancel(uint32(tbl.F_event_id))
 	ret := INT{1}
 
-	return packet.Pack(Code["cancel_ack"], ret, nil), nil
+	return packet.Pack(Code["cancel_ack"], ret, nil)
 }
 
 func checkErr(err error) {

@@ -1,15 +1,11 @@
-# 转发消息
-FORWARDMSG=
-id integer
-data []byte
+# 转发IPC消息
+FORWARDIPC=
+dest_id integer
+IPC []byte
 ===
 
-PLAINMSG=
-msg []byte
-===
-
-OFFLINEMSG=
-msgs array PLAINMSG
+ALLIPC=
+IPCS array FORWARDIPC
 ===
 
 #用户登陆发包

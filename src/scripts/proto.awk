@@ -2,7 +2,6 @@
 ## generate proto payload struct 
 ##
 BEGIN { RS = ""; FS ="\n" 
-print "package protos"
 print ""
 print "import \"misc/packet\"\n"
 }

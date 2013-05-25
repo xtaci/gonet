@@ -39,17 +39,14 @@ func UserRequestProxy(sess *Session, p []byte) []byte {
 }
 
 //----------------------------------------------- IPC proxy
-func IPCRequestProxy(sess *Session, p interface{}) []byte {
+func IPCRequestProxy(sess *Session, p *IPCObject) {
 	defer _ProxyError()
-	msg := p.(ipc.RequestType)
-	handle := ipc.RequestHandler[msg.Code]
-	log.Printf("ipc:%v,user:%v\n", msg.Code, sess.Basic.Id)
+	handle := ipc.IPCHandler[p.Service]
+	log.Printf("ipc:%v,user:%v\n", p.Service, sess.Basic.Id)
 
 	if handle != nil {
-		return handle(sess, msg.Data)
+		handle(sess, p)
 	}
-
-	return nil
 }
 
 func _ProxyError() {

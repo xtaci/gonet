@@ -1,7 +1,7 @@
 package ipc
 
 import (
-	"errors"
+	"encoding/json"
 	"io"
 	"log"
 	"net"
@@ -13,8 +13,8 @@ import (
 
 import (
 	"cfg"
-	hub "hub/protos"
 	"misc/packet"
+	. "types"
 )
 
 var _conn net.Conn
@@ -80,23 +80,29 @@ func HubReceiver(conn net.Conn) {
 
 		if seqval == 0 { // packet forwarding, deliver to MQ
 			reader := packet.Reader(data)
-			forward_id, err := reader.ReadS32()
+			dest_id, err := reader.ReadS32()
 			if err != nil {
-				log.Println("packet forwarding error")
+				log.Println("forward: read dest_id failed.")
 				goto L
 			}
 
-			sess := QueryOnline(forward_id)
+			sess := QueryOnline(dest_id)
 			if sess == nil {
-				log.Println("forward failed, maybe user is offline?")
+				log.Println("forward: user is offline.")
 			} else {
 				func() {
 					defer func() {
 						if x := recover(); x != nil {
-							log.Println("forward to MQ failed, the user is so lucky")
+							log.Println("forward: deliver to MQ failed.")
 						}
 					}()
-					sess.MQ <- data[reader.Pos():] // the payload is the message
+					decoded := &IPCObject{}
+					err := json.Unmarshal(data[reader.Pos():], decoded)
+					if err != nil {
+						log.Println("unable to decode forwared-IPC request")
+					} else {
+						sess.MQ <- *decoded
+					}
 				}()
 			}
 		} else {
@@ -111,26 +117,6 @@ func HubReceiver(conn net.Conn) {
 		}
 	L:
 	}
-}
-
-//------------------------------------------------ Forward to Hub
-func ForwardHub(id int32, data []byte) (err error) {
-	defer func() {
-		if x := recover(); x != nil {
-			err = errors.New(x.(string))
-		}
-	}()
-
-	// HUB protocol forwarding
-	msg := hub.FORWARDMSG{}
-	msg.F_id = id
-	msg.F_data = data
-	ack := _call(packet.Pack(hub.Code["forward_req"], msg, nil))
-	if ack != nil {
-		panic("ForwardHub failed or timed-out")
-	}
-
-	return nil
 }
 
 // packet sequence number generator

@@ -2,17 +2,13 @@ package protos
 
 import "misc/packet"
 
-type FORWARDMSG struct {
-	F_id   int32
-	F_data []byte
+type FORWARDIPC struct {
+	F_dest_id int32
+	F_IPC     []byte
 }
 
-type PLAINMSG struct {
-	F_msg []byte
-}
-
-type OFFLINEMSG struct {
-	F_msgs []PLAINMSG
+type ALLIPC struct {
+	F_IPCS []FORWARDIPC
 }
 
 type ID struct {
@@ -60,32 +56,25 @@ type INT struct {
 	F_v int32
 }
 
-func PKT_FORWARDMSG(reader *packet.Packet) (tbl FORWARDMSG, err error) {
-	tbl.F_id, err = reader.ReadS32()
+func PKT_FORWARDIPC(reader *packet.Packet) (tbl FORWARDIPC, err error) {
+	tbl.F_dest_id, err = reader.ReadS32()
 	checkErr(err)
 
-	tbl.F_data, err = reader.ReadBytes()
-	checkErr(err)
-
-	return
-}
-
-func PKT_PLAINMSG(reader *packet.Packet) (tbl PLAINMSG, err error) {
-	tbl.F_msg, err = reader.ReadBytes()
+	tbl.F_IPC, err = reader.ReadBytes()
 	checkErr(err)
 
 	return
 }
 
-func PKT_OFFLINEMSG(reader *packet.Packet) (tbl OFFLINEMSG, err error) {
+func PKT_ALLIPC(reader *packet.Packet) (tbl ALLIPC, err error) {
 	narr := uint16(0)
 
 	narr, err = reader.ReadU16()
 	checkErr(err)
 
-	tbl.F_msgs = make([]PLAINMSG, narr)
+	tbl.F_IPCS = make([]FORWARDIPC, narr)
 	for i := 0; i < int(narr); i++ {
-		tbl.F_msgs[i], err = PKT_PLAINMSG(reader)
+		tbl.F_IPCS[i], err = PKT_FORWARDIPC(reader)
 	}
 
 	return

@@ -20,7 +20,7 @@ var RCode map[int16]string = map[int16]string{
 	1002: "cancel_ack",
 }
 
-var ProtoHandler map[uint16]func(*packet.Packet) ([]byte, error) = map[uint16]func(*packet.Packet) ([]byte, error){
+var ProtoHandler map[uint16]func(*packet.Packet) []byte = map[uint16]func(*packet.Packet) []byte{
 	0: P_ping_req,
 	1: P_add_req,
 	2: P_cancel_req,

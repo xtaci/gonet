@@ -58,6 +58,8 @@ func HubAgent(incoming chan []byte, conn net.Conn) {
 		log.Printf("server id:%v disconnected\n", hostid)
 	}()
 
+	// HUB只处理两类消息，来自GS的，和转发来自其他GS的IPC消息
+	// 转发IPC消息时,seqid为0,GS检查如果seqid为0，则为forward消息
 	for {
 		select {
 		case msg, ok := <-incoming:

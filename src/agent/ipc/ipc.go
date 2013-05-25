@@ -1,52 +1,53 @@
 package ipc
 
 import (
-	"errors"
-	"fmt"
+	"encoding/json"
+	"log"
 	"time"
 )
 
 import (
-	"misc/packet"
 	. "types"
 )
 
 const (
-	UNKNOWN = int16(iota)
-	ECHO
+	IPC_PING = int16(1)
 )
 
-type RequestType struct {
-	Sender int32 // player id
-	Code   int16
-	Data   []byte
+var IPCHandler map[int16]func(*Session, *IPCObject) = map[int16]func(*Session, *IPCObject){
+	IPC_PING: IPC_ping,
 }
 
-//--------------------------------------------------------- return to ipc && bytes to client
-var RequestHandler map[int16]func(*Session, []byte) []byte = map[int16]func(*Session, []byte) []byte{}
-
-//--------------------------------------------------------- Non-Blocking Send
-func Send(id int32, tos int16, data []byte) (err error) {
+//------------------------------------------------ p2p send from src_id to dest_id
+func Send(src_id, dest_id int32, service int16, object interface{}) (ret bool) {
 	defer func() {
 		if x := recover(); x != nil {
-			err = errors.New(fmt.Sprint(x))
+			ret = false
 		}
 	}()
 
-	peer := QueryOnline(id)
-	req := &RequestType{Code: tos}
-	req.Data = data
+	// convert the OBJECT to json, LEVEL-1 encapsulation
+	val, err := json.Marshal(object)
+	if err != nil {
+		log.Println("IPC Send error:", err)
+		return false
+	}
+	req := IPCObject{Sender: src_id, Service: service, Object: val}
 
-	if peer != nil { // local delivery
+	// first try local delivery, if dest_id is not in same server, forward to hub
+	peer := QueryOnline(dest_id)
+	if peer != nil {
 		select {
 		case peer.MQ <- req:
 		case <-time.After(time.Second):
 			panic("deadlock") // rare case, when both chan is full
 		}
 		return
-	} else { // delivery to hub
-		return ForwardHub(id, packet.Pack(-1, req, nil))
+	} else {
+		// convert req to json again, LEVEL-2 encapsulation
+		req_json, _ := json.Marshal(object)
+		return ForwardHub(dest_id, req_json)
 	}
 
-	return
+	return true
 }

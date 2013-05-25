@@ -10,6 +10,10 @@ import (
 	. "types"
 )
 
+const (
+	DEFAULT_MQ_SIZE = 128
+)
+
 //----------------------------------------------- a simple timer
 func _timer(interval int, ch chan bool) {
 	defer func() {
@@ -25,7 +29,7 @@ func _timer(interval int, ch chan bool) {
 //----------------------------------------------- Start Agent when a client is connected
 func StartAgent(in chan []byte, conn net.Conn) {
 	var sess Session
-	sess.MQ = make(chan interface{}, 128)
+	sess.MQ = make(chan IPCObject, DEFAULT_MQ_SIZE)
 
 	// session timeout
 	session_timeout := make(chan bool)
@@ -71,14 +75,7 @@ func StartAgent(in chan []byte, conn net.Conn) {
 				return
 			}
 
-			if result := IPCRequestProxy(&sess, msg); result != nil {
-				fmt.Println(result)
-				err := buf.Send(result)
-				if err != nil {
-					return
-				}
-			}
-
+			IPCRequestProxy(&sess, &msg)
 		case _ = <-session_timeout:
 			if session_work(&sess) {
 				return

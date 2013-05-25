@@ -3,32 +3,32 @@ package protos
 import "misc/packet"
 
 var Code map[string]int16 = map[string]int16{
-	"ping_req":          0,    // PING
-	"ping_ack":          1000, // 返回请求数值
-	"login_req":         1,    // 登陆
-	"login_ack":         1001, //
-	"logout_req":        2,    // 登出
-	"logout_ack":        1002, //
-	"changescore_req":   3,    // 改变分数
-	"changescore_ack":   1003, //
-	"getlist_req":       4,    // 获取列表
-	"getlist_ack":       1004, //
-	"raid_req":          5,    // 攻击
-	"raid_ack":          1005, //
-	"protect_req":       6,    // 加保护
-	"protect_ack":       1006, //
-	"unprotect_req":     7,    // 撤销保护
-	"unprotect_ack":     1007, //
-	"free_req":          8,    // 结束攻击
-	"free_ack":          1008, //
-	"getinfo_req":       9,    // 读取玩家信息
-	"getinfo_ack":       1009, //
-	"getofflinemsg_req": 10,   // 获取离线信息
-	"getofflinemsg_ack": 1010, //
-	"adduser_req":       11,   // 注册一个新注册的玩家
-	"adduser_ack":       1011, //
-	"forward_req":       128,  // 消息转发
-	"forward_ack":       1128, //
+	"ping_req":        0,    // PING
+	"ping_ack":        1000, // 返回请求数值
+	"login_req":       1,    // 登陆
+	"login_ack":       1001, // 
+	"logout_req":      2,    // 登出
+	"logout_ack":      1002, // 
+	"changescore_req": 3,    // 改变分数
+	"changescore_ack": 1003, // 
+	"getlist_req":     4,    // 获取列表
+	"getlist_ack":     1004, // 
+	"raid_req":        5,    // 攻击
+	"raid_ack":        1005, // 
+	"protect_req":     6,    // 加保护
+	"protect_ack":     1006, // 
+	"unprotect_req":   7,    // 撤销保护
+	"unprotect_ack":   1007, // 
+	"free_req":        8,    // 结束攻击
+	"free_ack":        1008, // 
+	"getinfo_req":     9,    // 读取玩家信息
+	"getinfo_ack":     1009, // 
+	"adduser_req":     11,   // 注册一个新注册的玩家
+	"adduser_ack":     1011, // 
+	"getipc_req":      100,  // 获取尚未收取的IPC信息
+	"getipc_ack":      1100, // 
+	"forward_req":     101,  // 转发IPC消息
+	"forward_ack":     1101, // 
 }
 
 var RCode map[int16]string = map[int16]string{
@@ -52,15 +52,15 @@ var RCode map[int16]string = map[int16]string{
 	1008: "free_ack",
 	9:    "getinfo_req",
 	1009: "getinfo_ack",
-	10:   "getofflinemsg_req",
-	1010: "getofflinemsg_ack",
 	11:   "adduser_req",
 	1011: "adduser_ack",
-	128:  "forward_req",
-	1128: "forward_ack",
+	100:  "getipc_req",
+	1100: "getipc_ack",
+	101:  "forward_req",
+	1101: "forward_ack",
 }
 
-var ProtoHandler map[uint16]func(int32, *packet.Packet) ([]byte, error) = map[uint16]func(int32, *packet.Packet) ([]byte, error){
+var ProtoHandler map[uint16]func(int32, *packet.Packet) []byte = map[uint16]func(int32, *packet.Packet) []byte{
 	0:   P_ping_req,
 	1:   P_login_req,
 	2:   P_logout_req,
@@ -71,7 +71,7 @@ var ProtoHandler map[uint16]func(int32, *packet.Packet) ([]byte, error) = map[ui
 	7:   P_unprotect_req,
 	8:   P_free_req,
 	9:   P_getinfo_req,
-	10:  P_getofflinemsg_req,
 	11:  P_adduser_req,
-	128: P_forward_req,
+	100: P_getipc_req,
+	101: P_forward_req,
 }

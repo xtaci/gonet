@@ -21,8 +21,6 @@ func Execute(event *Event) (ret bool) {
 			log.Println(x)
 			ret = false
 		}
-
-		ret = true
 	}()
 
 	_do(event)

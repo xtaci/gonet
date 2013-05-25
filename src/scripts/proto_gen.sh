@@ -3,7 +3,8 @@
 ##################################################
 ###   client proto & api
 ##################################################
-awk -f proto.awk proto.txt > proto.go 
+printf "package protos\n" > proto.go
+awk -f proto.awk proto.txt >> proto.go 
 awk -f proto_func.awk proto.txt >> proto.go 
 
 printf "package protos\n" > api.go
@@ -25,7 +26,8 @@ mv -f api.go ../agent/client_protos
 ##################################################
 ### hub proto & api
 ##################################################
-awk -f proto.awk hub_proto.txt > proto.go 
+printf "package protos\n" > proto.go
+awk -f proto.awk hub_proto.txt >> proto.go 
 awk -f proto_func.awk hub_proto.txt >> proto.go 
 
 printf "package protos\n" > api.go
@@ -36,7 +38,7 @@ printf "\n" >> api.go
 awk -f api.awk hub_api.txt >> api.go 
 awk -f api_rcode.awk hub_api.txt >> api.go 
 
-printf "var ProtoHandler map[uint16]func(int32, *packet.Packet) ([]byte, error) = map[uint16]func(int32, *packet.Packet)([]byte, error){\n" >> api.go
+printf "var ProtoHandler map[uint16]func(int32, *packet.Packet) []byte = map[uint16]func(int32, *packet.Packet) []byte {\n" >> api.go
 awk -f api_bind_req.awk hub_api.txt >> api.go 
 printf "}" >> api.go
 
@@ -46,7 +48,8 @@ mv -f api.go ../hub/protos
 ##################################################
 ### event proto & api
 ##################################################
-awk -f proto.awk event_proto.txt > proto.go 
+printf "package protos\n" > proto.go 
+awk -f proto.awk event_proto.txt >> proto.go 
 awk -f proto_func.awk event_proto.txt >> proto.go 
 
 printf "package protos\n" > api.go
@@ -57,10 +60,9 @@ printf "\n" >> api.go
 awk -f api.awk event_api.txt >> api.go 
 awk -f api_rcode.awk event_api.txt >> api.go 
 
-printf "var ProtoHandler map[uint16]func(*packet.Packet) ([]byte, error) = map[uint16]func(*packet.Packet)([]byte, error){\n" >> api.go
+printf "var ProtoHandler map[uint16]func(*packet.Packet) []byte = map[uint16]func(*packet.Packet) []byte {\n" >> api.go
 awk -f api_bind_req.awk event_api.txt >> api.go 
 printf "}" >> api.go
 
-#### move #################
 mv -f proto.go ../event/protos
 mv -f api.go ../event/protos
