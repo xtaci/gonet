@@ -6,7 +6,6 @@ import (
 	"log"
 	"net"
 	"strconv"
-	"sync/atomic"
 )
 
 import (
@@ -14,23 +13,23 @@ import (
 	"misc/packet"
 )
 
-var _BUFSIZE int32
-var _MAXCHAN int32
-
 type Buffer struct {
 	ctrl    chan bool   // receive exit signal
 	pending chan []byte // pending Packet
-	size    int32       // packet payload bytes count
+	max     int         // max queue size 
 
 	conn net.Conn // connection
 }
 
+const (
+	DEFAULT_QUEUE_SIZE = 5
+)
+
 //------------------------------------------------ Send packet
 func (buf *Buffer) Send(data []byte) (err error) {
-	if atomic.LoadInt32(&buf.size) < _BUFSIZE {
+	// len of Channel: the number of elements queued (unread) in the channel buffer;
+	if len(buf.pending) < buf.max {
 		buf.pending <- data
-
-		atomic.AddInt32(&buf.size, int32(len(data)))
 		return nil
 	}
 
@@ -45,7 +44,6 @@ func (buf *Buffer) Start() {
 		select {
 		case data := <-buf.pending:
 			buf.raw_send(data)
-			atomic.AddInt32(&buf.size, -int32(len(data)))
 		case _ = <-buf.ctrl:
 			return
 		}
@@ -67,20 +65,15 @@ func (buf *Buffer) raw_send(data []byte) {
 
 //------------------------------------------------ create a new write buffer
 func NewBuffer(conn net.Conn, ctrl chan bool) *Buffer {
-	buf := Buffer{conn: conn, size: 0}
-	buf.pending = make(chan []byte, _MAXCHAN)
-	buf.ctrl = ctrl
-	return &buf
-}
-
-func init() {
-	_BUFSIZE = 65535
-
+	max := DEFAULT_QUEUE_SIZE
 	config := cfg.Get()
-	if config["write_buffer"] != "" {
-		v, _ := strconv.Atoi(config["write_buffer"])
-		_BUFSIZE = int32(v)
+	if config["packet_queue"] != "" {
+		max, _ = strconv.Atoi(config["packet_queue"])
 	}
 
-	_MAXCHAN = _BUFSIZE / 16
+	buf := Buffer{conn: conn}
+	buf.pending = make(chan []byte, max)
+	buf.ctrl = ctrl
+	buf.max = max
+	return &buf
 }
