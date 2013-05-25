@@ -15,22 +15,13 @@ import (
 
 //----------------------------------------------- Game Server Start
 func main() {
-	log.Println("Starting the server")
-
 	// start logger
 	config := cfg.Get()
-	if config["logfile"] != "" {
-		f, err := os.OpenFile(config["logfile"], os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
-
-		if err != nil {
-			log.Println("cannot open logfile %v\n", err)
-			os.Exit(1)
-		}
-		var r Repeater
-		r.Out1 = os.Stdout
-		r.Out2 = f
-		log.SetOutput(&r)
+	if config["gs_log"] != "" {
+		cfg.StartLogger(config["gs_log"])
 	}
+
+	log.Println("Starting the server")
 
 	// dial HUB
 	ipc.DialHub()

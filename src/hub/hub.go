@@ -11,17 +11,25 @@ import (
 	"cfg"
 )
 
+const (
+	DEFAULT_SERVICE = ":8889"
+)
+
 //----------------------------------------------- HUB start
 func HubStart() {
+	// start logger
+	config := cfg.Get()
+	if config["hub_log"] != "" {
+		cfg.StartLogger(config["hub_log"])
+	}
+
 	log.Println("Starting HUB")
 
 	// data init
 	startup_work()
 
 	// Listen
-	service := ":9090"
-	config := cfg.Get()
-
+	service := DEFAULT_SERVICE
 	if config["hub_service"] != "" {
 		service = config["hub_service"]
 	}

@@ -11,14 +11,22 @@ import (
 	"cfg"
 )
 
+const (
+	DEFAULT_SERVICE = ":8890"
+)
+
 //----------------------------------------------- Event Server start
 func EventStart() {
+	// start logger
+	config := cfg.Get()
+	if config["event_log"] != "" {
+		cfg.StartLogger(config["event_log"])
+	}
+
 	log.Println("Starting Event Server")
 
 	// Listen
-	service := ":8890"
-	config := cfg.Get()
-
+	service := DEFAULT_SERVICE
 	if config["event_service"] != "" {
 		service = config["event_service"]
 	}
