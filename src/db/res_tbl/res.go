@@ -6,9 +6,9 @@ import (
 )
 
 import (
+	"cfg"
 	. "db"
 	. "types"
-	"cfg"
 )
 
 const (

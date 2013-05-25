@@ -1,8 +1,8 @@
 package cfg
 
 import (
-	"testing"
 	"fmt"
+	"testing"
 )
 
 func TestReadConfig(t *testing.T) {

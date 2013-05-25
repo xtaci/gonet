@@ -7,7 +7,7 @@ import (
 type Res struct {
 	Id        int32
 	Resources map[string]int32
-	Version	uint32
+	Version   uint32
 }
 
 func (r *Res) Get(name string) int32 {

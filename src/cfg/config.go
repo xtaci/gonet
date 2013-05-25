@@ -3,6 +3,7 @@ package cfg
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"regexp"
 	"strings"
@@ -12,13 +13,18 @@ var _map map[string]string
 
 const CONFIG_FILE = "config.ini"
 
-func init() {
-	path := os.Getenv("GOPATH") + "/" + CONFIG_FILE
-	_map = _load_config(path)
+func Get() map[string]string {
+	if _map == nil {
+		Reload()
+	}
+
+	return _map
 }
 
-func Get() map[string]string {
-	return _map
+func Reload() {
+	path := os.Getenv("GOPATH") + "/" + CONFIG_FILE
+	log.Println("Read", CONFIG_FILE)
+	_map = _load_config(path)
 }
 
 func _load_config(path string) (ret map[string]string) {

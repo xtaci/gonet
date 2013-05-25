@@ -1,8 +1,8 @@
 package cfg
 
 import (
-	"os"
 	"log"
+	"os"
 )
 
 func StartLogger(logfile string) {
@@ -11,8 +11,8 @@ func StartLogger(logfile string) {
 	var err error
 	var f *os.File
 
-	if bl[0] == '/' {		// start with slash, just open
-		f,err = os.OpenFile(logfile, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
+	if bl[0] == '/' { // start with slash, just open
+		f, err = os.OpenFile(logfile, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)
 	} else {
 		path := os.Getenv("GOPATH") + "/" + logfile
 		f, err = os.OpenFile(path, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0644)

@@ -25,7 +25,7 @@ const (
 	DEFAULT_QUEUE_SIZE = 5
 )
 
-//------------------------------------------------ Send packet
+//------------------------------------------------ send packet
 func (buf *Buffer) Send(data []byte) (err error) {
 	// len of Channel: the number of elements queued (unread) in the channel buffer;
 	if len(buf.pending) < buf.max {
