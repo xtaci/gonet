@@ -15,11 +15,11 @@ var _lock sync.RWMutex
 
 const CONFIG_FILE = "config.ini"
 
-func Get() map[string]string {
-	if _map == nil {
-		Reload()
-	}
+func init() {
+	Reload()
+}
 
+func Get() map[string]string {
 	_lock.RLock()
 	defer _lock.RUnlock()
 	return _map
