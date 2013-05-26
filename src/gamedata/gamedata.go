@@ -2,8 +2,12 @@ package gamedata
 
 import (
 	"log"
+	"os"
+	"path/filepath"
 	"strconv"
 )
+
+var _tables map[string]*Table
 
 //----------------------------------------------- info for a level
 type Record struct {
@@ -15,10 +19,22 @@ type Table struct {
 	Records map[int]*Record
 }
 
-var _tables map[string]*Table
-
 func init() {
 	_tables = make(map[string]*Table)
+
+	pattern := os.Getenv("GOPATH") + "/src/gamedata/data/*.csv"
+	files, _ := filepath.Glob(pattern)
+
+	for _, f := range files {
+		file, err := os.Open(f)
+		if err != nil {
+			log.Println("error opening file %v\n", err)
+			continue
+		}
+
+		parse(file)
+		file.Close()
+	}
 }
 
 //----------------------------------------------- Set Field value
