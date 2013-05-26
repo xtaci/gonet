@@ -14,4 +14,7 @@ func TestEstate(t *testing.T) {
 	Set(data)
 	data = Get(1)
 	fmt.Println(data)
+	for k:= range data.CDs {
+		fmt.Println(data.CDs[k])
+	}
 }
