@@ -23,7 +23,12 @@ func init() {
 	_tables = make(map[string]*Table)
 
 	pattern := os.Getenv("GOPATH") + "/src/gamedata/data/*.csv"
-	files, _ := filepath.Glob(pattern)
+	files, err := filepath.Glob(pattern)
+
+	if err != nil {
+		log.Println(err)
+		panic(err)
+	}
 
 	for _, f := range files {
 		file, err := os.Open(f)
