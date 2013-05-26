@@ -32,32 +32,32 @@ var Code map[string]int16 = map[string]int16{
 }
 
 var RCode map[int16]string = map[int16]string{
-	0:    "ping_req",
-	1000: "ping_ack",
-	1:    "login_req",
-	1001: "login_ack",
-	2:    "logout_req",
-	1002: "logout_ack",
-	3:    "changescore_req",
-	1003: "changescore_ack",
-	4:    "getlist_req",
-	1004: "getlist_ack",
-	5:    "raid_req",
-	1005: "raid_ack",
-	6:    "protect_req",
-	1006: "protect_ack",
-	7:    "unprotect_req",
-	1007: "unprotect_ack",
-	8:    "free_req",
-	1008: "free_ack",
-	9:    "getinfo_req",
-	1009: "getinfo_ack",
-	11:   "adduser_req",
-	1011: "adduser_ack",
-	100:  "getipc_req",
-	1100: "getipc_ack",
-	101:  "forward_req",
-	1101: "forward_ack",
+	0:    "ping_req",        // PING
+	1000: "ping_ack",        // 返回请求数值
+	1:    "login_req",       // 登陆
+	1001: "login_ack",       // 
+	2:    "logout_req",      // 登出
+	1002: "logout_ack",      // 
+	3:    "changescore_req", // 改变分数
+	1003: "changescore_ack", // 
+	4:    "getlist_req",     // 获取列表
+	1004: "getlist_ack",     // 
+	5:    "raid_req",        // 攻击
+	1005: "raid_ack",        // 
+	6:    "protect_req",     // 加保护
+	1006: "protect_ack",     // 
+	7:    "unprotect_req",   // 撤销保护
+	1007: "unprotect_ack",   // 
+	8:    "free_req",        // 结束攻击
+	1008: "free_ack",        // 
+	9:    "getinfo_req",     // 读取玩家信息
+	1009: "getinfo_ack",     // 
+	11:   "adduser_req",     // 注册一个新注册的玩家
+	1011: "adduser_ack",     // 
+	100:  "getipc_req",      // 获取尚未收取的IPC信息
+	1100: "getipc_ack",      // 
+	101:  "forward_req",     // 转发IPC消息
+	1101: "forward_ack",     // 
 }
 
 var ProtoHandler map[uint16]func(int32, *packet.Packet) []byte = map[uint16]func(int32, *packet.Packet) []byte{

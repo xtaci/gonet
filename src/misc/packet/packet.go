@@ -25,6 +25,16 @@ func (p *Packet) Seek(n uint) {
 }
 
 //=============================================== Readers
+func (p *Packet) ReadBool() (ret bool, err error) {
+	b, _err := p.ReadByte()
+
+	if b != byte(1) {
+		return false, _err
+	}
+
+	return true, _err
+}
+
 func (p *Packet) ReadByte() (ret byte, err error) {
 	if p.pos >= uint(len(p.data)) {
 		err = errors.New("read byte failed")
@@ -149,10 +159,36 @@ func (p *Packet) ReadS64() (ret int64, err error) {
 	return
 }
 
+func (p *Packet) ReadFloat32() (ret float32, err error) {
+	bits, _err := p.ReadU32()
+	if _err != nil {
+		return float32(0), _err
+	}
+
+	return math.Float32frombits(bits), nil
+}
+
+func (p *Packet) ReadFloat64() (ret float64, err error) {
+	bits, _err := p.ReadU64()
+	if _err != nil {
+		return float64(0), _err
+	}
+
+	return math.Float64frombits(bits), nil
+}
+
 //================================================ Writers
 func (p *Packet) WriteZeros(n int) {
 	zeros := make([]byte, n)
 	p.data = append(p.data, zeros...)
+}
+
+func (p *Packet) WriteBool(v bool) {
+	if v {
+		p.data = append(p.data, byte(1))
+	} else {
+		p.data = append(p.data, byte(0))
+	}
 }
 
 func (p *Packet) WriteByte(v byte) {

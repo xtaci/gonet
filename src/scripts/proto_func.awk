@@ -1,7 +1,21 @@
 ###########################################################
 ## generate protocol packet reader
 ##
-BEGIN { RS = ""; FS ="\n" }
+BEGIN { RS = ""; FS ="\n" 
+TYPES["byte"]="ReadByte"
+TYPES["string"]="ReadString"
+TYPES["integer"]="ReadS32"
+TYPES["int32"]="ReadS32"
+TYPES["uint32"]="ReadU32"
+TYPES["long"]="ReadS64"
+TYPES["int64"]="ReadS64"
+TYPES["uint64"]="ReadU64"
+TYPES["bool"]="ReadBool"
+TYPES["boolean"]="ReadBool"
+TYPES["float"]="ReadFloat32"
+TYPES["float32"]="ReadFloat32"
+TYPES["float64"]="ReadFloat64"
+}
 {
 	for (i=1;i<=NF;i++)
 	{
@@ -14,38 +28,24 @@ BEGIN { RS = ""; FS ="\n" }
 			name = substr(a[1],1, match(a[1],/=/)-1)
 			print "func PKT_"name"(reader *packet.Packet)(tbl "name", err error){"
 			typeok = "true"
-		} else if (a[2] == "string") {
-			print "\ttbl.F_"a[1]",err = reader.ReadString()"
+		} else if (a[2] ==  "array") {
+			if (a[3] == "byte") { 		## bytes
+				print "\ttbl.F_"a[1]", err = reader.ReadBytes()"
+				print "\tcheckErr(err)\n"
+			} else {	## struct
+				print "\tnarr := uint16(0)\n"
+				print "\tnarr,err = reader.ReadU16()"
+				print "\tcheckErr(err)\n"
+				print "\ttbl.F_"a[1]"=make([]"a[3]",narr)"
+				print "\tfor i:=0;i<int(narr);i++ {"
+				print "\t\ttbl.F_"a[1]"[i], err = PKT_"a[3]"(reader)"
+				print "\t\tcheckErr(err)\n"
+				print "\t}\n"
+			}
+		}
+		else {
+			print "\ttbl.F_"a[1]",err = reader." TYPES[a[2]] "()"
 			print "\tcheckErr(err)\n"
-		} else if (a[2] == "[]byte") {
-			print "\ttbl.F_"a[1]",err = reader.ReadBytes()"
-			print "\tcheckErr(err)\n"
-		} else if (a[2] == "integer" || a[2] == "int32") {
-			print "\ttbl.F_"a[1]",err = reader.ReadS32()"
-			print "\tcheckErr(err)\n"
-		} else if (a[2] == "uint32") {
-			print "\ttbl.F_"a[1]",err = reader.ReadU32()"
-			print "\tcheckErr(err)\n"
-		} else if (a[2] == "long" || a[2] == "int64") {
-			print "\ttbl.F_"a[1]",err = reader.ReadS64()"
-			print "\tcheckErr(err)\n"
-		} else if (a[2] == "uint64") {
-			print "\ttbl.F_"a[1]",err = reader.ReadU64()"
-			print "\tcheckErr(err)\n"
-		} else if (a[2] == "boolean") {
-			print "\ttbl.F_"a[1]",err = reader.ReadByte()"
-			print "\tcheckErr(err)\n"
-		} else if (a[2] == "float") {
-			print "\ttbl.F_"a[1]",err = reader.ReadFloat()"
-			print "\tcheckErr(err)\n"
-		} else if (a[2] == "array") {
-			print "\tnarr := uint16(0)\n"
-			print "\tnarr,err = reader.ReadU16()"
-			print "\tcheckErr(err)\n"
-			print "\ttbl.F_"a[1]"=make([]"a[3]",narr)"
-			print "\tfor i:=0;i<int(narr);i++ {"
-			print "\t\ttbl.F_"a[1]"[i], err = PKT_"a[3]"(reader)"
-			print "\t}\n"
 		}
 	}
 
@@ -53,5 +53,7 @@ BEGIN { RS = ""; FS ="\n" }
 		print "\treturn"
 		print "}\n"
 	}
+
+	typeok=false
 }
 END { }

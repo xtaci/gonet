@@ -5,7 +5,7 @@ import "misc/packet"
 type user_login_info struct {
 	F_mac_addr       string
 	F_client_version int32
-	F_new_user       byte
+	F_new_user       bool
 	F_user_name      string
 }
 
@@ -72,7 +72,7 @@ func PKT_user_login_info(reader *packet.Packet) (tbl user_login_info, err error)
 	tbl.F_client_version, err = reader.ReadS32()
 	checkErr(err)
 
-	tbl.F_new_user, err = reader.ReadByte()
+	tbl.F_new_user, err = reader.ReadBool()
 	checkErr(err)
 
 	tbl.F_user_name, err = reader.ReadString()
@@ -151,6 +151,8 @@ func PKT_rank_list(reader *packet.Packet) (tbl rank_list, err error) {
 	tbl.F_items = make([]rank_list_item, narr)
 	for i := 0; i < int(narr); i++ {
 		tbl.F_items[i], err = PKT_rank_list_item(reader)
+		checkErr(err)
+
 	}
 
 	return
@@ -184,6 +186,8 @@ func PKT_pve_list(reader *packet.Packet) (tbl pve_list, err error) {
 	tbl.F_items = make([]pve_list_item, narr)
 	for i := 0; i < int(narr); i++ {
 		tbl.F_items[i], err = PKT_pve_list_item(reader)
+		checkErr(err)
+
 	}
 
 	return

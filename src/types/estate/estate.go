@@ -2,8 +2,8 @@ package estate
 
 import (
 	"encoding/json"
-	"sync/atomic"
 	"fmt"
+	"sync/atomic"
 )
 
 const (

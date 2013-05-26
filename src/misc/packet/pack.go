@@ -44,7 +44,8 @@ func Pack(tos int16, tbl interface{}, writer *Packet) []byte {
 //----------------------------------------------- test whether the field is primitive type
 func _is_primitive(f reflect.Value) bool {
 	switch f.Type().Kind() {
-	case reflect.Uint8,
+	case reflect.Bool,
+		reflect.Uint8,
 		reflect.Uint16,
 		reflect.Uint32,
 		reflect.Uint64,
@@ -54,6 +55,7 @@ func _is_primitive(f reflect.Value) bool {
 		reflect.Int32,
 		reflect.Int64,
 		reflect.Float32,
+		reflect.Float64,
 		reflect.String:
 		return true
 	}
@@ -63,6 +65,8 @@ func _is_primitive(f reflect.Value) bool {
 //----------------------------------------------- write a primitive field
 func _write_primitive(f reflect.Value, writer *Packet) {
 	switch f.Type().Kind() {
+	case reflect.Bool:
+		writer.WriteBool(f.Interface().(bool))
 	case reflect.Uint8:
 		writer.WriteByte(f.Interface().(byte))
 	case reflect.Uint16:
@@ -85,6 +89,9 @@ func _write_primitive(f reflect.Value, writer *Packet) {
 
 	case reflect.Float32:
 		writer.WriteFloat32(f.Interface().(float32))
+
+	case reflect.Float64:
+		writer.WriteFloat64(f.Interface().(float64))
 
 	case reflect.String:
 		writer.WriteString(f.Interface().(string))

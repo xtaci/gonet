@@ -1,14 +1,15 @@
 ###########################################################
 ## Scripts for generate protocol string->code(uint16)
 ##
+## packet_type:0
+## name:heart_beat_req
+## payload:null
+## desc:心跳包..
+##
 BEGIN { RS = ""; FS ="\n" 
 print "var Code map[string]int16 = map[string]int16 {"
 }
 {
-	name = ""
-	payload= ""
-	desc =""
-
 	for (i=1;i<=NF;i++)
 	{
 		if ($i ~ /^#.*/) {
@@ -17,18 +18,21 @@ print "var Code map[string]int16 = map[string]int16 {"
 
 		split($i, a, ":")
 		if (a[1] == "packet_type") {
-			type = a[2]
+			array["packet_type"] = a[2]
 		} else if (a[1] == "name") {
-			name = a[2]
+			array["name"] = a[2]
 		} else if (a[1] == "payload") {
-			payload = a[2]
+			array["payload"] = a[2]
 		} else if (a[1] == "desc") {
-			desc = a[2]
+			array["desc"] = a[2]
 		}
 	}
-	if (name!= "") {
-		print "\t\""name"\":"type",\t// " desc
+
+	if ("packet_type" in array && "name" in array) {
+		print "\t\""array["name"]"\":"array["packet_type"]",\t// "array["desc"]
 	}
+
+	delete array
 }
 END {
 print "}\n"	

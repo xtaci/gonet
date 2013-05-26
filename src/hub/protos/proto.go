@@ -75,6 +75,8 @@ func PKT_ALLIPC(reader *packet.Packet) (tbl ALLIPC, err error) {
 	tbl.F_IPCS = make([]FORWARDIPC, narr)
 	for i := 0; i < int(narr); i++ {
 		tbl.F_IPCS[i], err = PKT_FORWARDIPC(reader)
+		checkErr(err)
+
 	}
 
 	return
@@ -151,6 +153,8 @@ func PKT_LIST(reader *packet.Packet) (tbl LIST, err error) {
 	tbl.F_items = make([]ID_SCORE, narr)
 	for i := 0; i < int(narr); i++ {
 		tbl.F_items[i], err = PKT_ID_SCORE(reader)
+		checkErr(err)
+
 	}
 
 	return

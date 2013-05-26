@@ -12,12 +12,12 @@ var Code map[string]int16 = map[string]int16{
 }
 
 var RCode map[int16]string = map[int16]string{
-	0:    "ping_req",
-	1000: "ping_ack",
-	1:    "add_req",
-	1001: "add_ack",
-	2:    "cancel_req",
-	1002: "cancel_ack",
+	0:    "ping_req",   // PING
+	1000: "ping_ack",   // 返回请求数值
+	1:    "add_req",    // 添加一个cooldown请求
+	1001: "add_ack",    // 返回这个cooldown编号
+	2:    "cancel_req", // 取消一个cooldown请求
+	1002: "cancel_ack", // 返回0
 }
 
 var ProtoHandler map[uint16]func(*packet.Packet) []byte = map[uint16]func(*packet.Packet) []byte{

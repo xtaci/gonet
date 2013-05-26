@@ -1,6 +1,9 @@
 package packet
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestPacketWriter(t *testing.T) {
 	p := Writer()
@@ -9,16 +12,27 @@ func TestPacketWriter(t *testing.T) {
 	c := uint32(0xFF0000)
 	d := uint32(0xFF000000)
 	e := uint64(0xFF00000000000000)
+	f32 := float32(1.0)
+	f64 := float64(2.0)
 
+	p.WriteBool(true)
 	p.WriteByte(a)
 	p.WriteU16(b)
 	p.WriteU24(c)
 	p.WriteU32(d)
 	p.WriteU64(e)
+	p.WriteFloat32(f32)
+	p.WriteFloat64(f64)
 
 	p.WriteString("hello world")
+	p.WriteBytes([]byte("hello world"))
 
 	reader := Reader(p.Data())
+
+	BOOL, _ := reader.ReadBool()
+	if BOOL != true {
+		t.Error("packet readbool mismatch")
+	}
 
 	tmp, _ := reader.ReadByte()
 	if a != tmp {
@@ -45,10 +59,27 @@ func TestPacketWriter(t *testing.T) {
 		t.Error("packet readu64 mismatch")
 	}
 
-	tmp5, _ := reader.ReadString()
+	tmp5, _ := reader.ReadFloat32()
+	if f32 != tmp5 {
+		t.Error("packet readf32 mismatch")
+	}
 
-	if "hello world" != tmp5 {
+	tmp6, _ := reader.ReadFloat64()
+	if f64 != tmp6 {
+		t.Error("packet readf32 mismatch")
+	}
+
+	tmp100, _ := reader.ReadString()
+
+	if "hello world" != tmp100 {
 		t.Error("packet read string mistmatch")
+	}
+
+	tmp101, _ := reader.ReadBytes()
+
+	fmt.Println(tmp101)
+	if tmp101[0] != 'h' {
+		t.Error("packet read bytes mistmatch")
 	}
 
 	_, err := reader.ReadByte()

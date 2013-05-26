@@ -1,7 +1,7 @@
 # 转发IPC消息
 FORWARDIPC=
 dest_id integer
-IPC []byte
+IPC array byte
 ===
 
 ALLIPC=

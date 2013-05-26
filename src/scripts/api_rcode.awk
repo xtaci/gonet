@@ -5,26 +5,29 @@ BEGIN { RS = ""; FS ="\n"
 print "var RCode map[int16]string = map[int16]string {"
 }
 {
-	name = ""
 	for (i=1;i<=NF;i++)
 	{
 		if ($i ~ /^#.*/) {
 			continue
 		}
+
 		split($i, a, ":")
 		if (a[1] == "packet_type") {
-			type = a[2]
+			array["packet_type"] = a[2]
 		} else if (a[1] == "name") {
-			name = a[2]
+			array["name"] = a[2]
 		} else if (a[1] == "payload") {
-			payload = a[2]
+			array["payload"] = a[2]
 		} else if (a[1] == "desc") {
-			desc = a[2]
+			array["desc"] = a[2]
 		}
 	}
-	if (name!= "") {
-		print "\t"type":\""name"\","
+
+	if ("packet_type" in array && "name" in array) {
+		print "\t"array["packet_type"]":\""array["name"]"\",\t// "array["desc"]
 	}
+
+	delete array
 }
 END {
 print "}\n"	

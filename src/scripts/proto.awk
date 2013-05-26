@@ -1,45 +1,59 @@
 ###########################################################
 ## generate proto payload struct 
 ##
-BEGIN { RS = ""; FS ="\n" 
+BEGIN { RS = "===\n\n+"; FS ="\n" 
 print ""
 print "import \"misc/packet\"\n"
+TYPES["byte"]="byte"
+TYPES["string"]="string"
+TYPES["integer"]="int32"
+TYPES["int32"]="int32"
+TYPES["uint32"]="uint32"
+TYPES["long"]="int64"
+TYPES["int64"]="int64"
+TYPES["uint64"]="uint64"
+TYPES["bool"]="bool"
+TYPES["boolean"]="bool"
+TYPES["float"]="float32"
+TYPES["float32"]="float32"
+TYPES["float64"]="float64"
 }
 {
-
-	typeok = false
 	for (i=1;i<=NF;i++)
 	{
-		if ($i ~ /^#.*/ || $i ~ /^===/) {
+		if ($i ~ /^#.*/) {
 			continue
 		}
 
-		split($i, a, " ")
-		if (a[1] ~ /[A-Za-z_]+=/) {
-			name = substr(a[1],1, match(a[1],/=/)-1)
-			print "type",name, "struct {"
+		if ($i ~ /[A-Za-z_]+=/) {
+			name = substr($i,1, match($i,/=/)-1)
+			print "type " name " struct {"
 			typeok = "true"
-		} else if (a[2] == "string") {
-			print "\tF_"a[1] " string"
-		} else if (a[2] == "integer" || a[2]=="int32") {
-			print "\tF_"a[1] " int32"
-		} else if (a[2] == "uint32") {
-			print "\tF_"a[1] " uint32"
-		} else if (a[2] == "long" || a[2]=="int64") {
-			print "\tF_"a[1] " int64"
-		} else if (a[2] == "uint64") {
-			print "\tF_"a[1] " uint64"
-		} else if (a[2] == "boolean") {
-			print "\tF_"a[1] " byte"
-		} else if (a[2] == "float") {
-			print "\tF_"a[1] " float32"
-		} else if (a[2] == "array") {
-			print "\tF_"a[1]" []"a[3]
 		} else {
-			print "\tF_"a[1] " "a[2]
+			v = _field($i)
+			if (v) {
+				print v
+			}
 		}
+
 	}
 
 	if (typeok) print "}\n"
+	typeok=false
+
 }
 END { }
+
+function _field(line) {
+	split(line, a, " ")
+
+	if (a[2] in TYPES) {
+		return "\tF_"a[1] " " TYPES[a[2]]
+	} else if (a[2] == "array") {
+		if (a[3] in TYPES) {
+			return "\tF_"a[1]" []" TYPES[a[3]]
+		} else {
+			return "\tF_"a[1]" []" a[3]
+		}
+	}
+}

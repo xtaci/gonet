@@ -23,22 +23,22 @@ var Code map[string]int16 = map[string]int16{
 }
 
 var RCode map[int16]string = map[int16]string{
-	0:  "heart_beat_req",
-	1:  "user_login_req",
-	2:  "user_login_succeed_ack",
-	3:  "user_login_faild_ack",
-	4:  "save_user_info_req",
-	5:  "rank_list_req",
-	6:  "rank_list_ack",
-	7:  "pve_list_req",
-	8:  "pve_list_ack",
-	9:  "atk_player_req",
-	10: "atk_player_succeed_ack",
-	11: "atk_player_faild_ack",
-	12: "atk_player_rst_req",
-	13: "atk_monster_req",
-	14: "atk_monster_ack",
-	15: "atk_monster_rst_req",
+	0:  "heart_beat_req",         // 心跳包..
+	1:  "user_login_req",         // 客户端发送用户登陆请求包
+	2:  "user_login_succeed_ack", // 登陆成功
+	3:  "user_login_faild_ack",   // 登陆失败
+	4:  "save_user_info_req",     // 存档
+	5:  "rank_list_req",          // 客户端向服务器请求排行榜快照.
+	6:  "rank_list_ack",          // 排行榜信息.
+	7:  "pve_list_req",           // 客户端向服务器请求PVE快照.
+	8:  "pve_list_ack",           // pve信息
+	9:  "atk_player_req",         // 攻击另一玩家
+	10: "atk_player_succeed_ack", // 攻击玩家成功
+	11: "atk_player_faild_ack",   // 攻击玩家失败
+	12: "atk_player_rst_req",     // 攻击玩家结果存档
+	13: "atk_monster_req",        // 攻击怪物
+	14: "atk_monster_ack",        // 攻击怪物结果
+	15: "atk_monster_rst_req",    // 攻击怪物结果存档
 }
 
 var ProtoHandler map[uint16]func(*Session, *packet.Packet) ([]byte, error) = map[uint16]func(*Session, *packet.Packet) ([]byte, error){
