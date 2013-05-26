@@ -29,14 +29,13 @@ type Move struct {
 //----------------------------------------------- Estate Cooldown event records
 type CD struct {
 	OID     uint32
-	EventId uint32
 	Timeout int64
 }
 
 type Manager struct {
 	Id      int32
 	Estates []Estate
-	CDs     []CD
+	CDs     map[uint32]*CD
 	NextVal uint32
 	Version uint32
 }
@@ -45,8 +44,8 @@ func (m *Manager) AppendEstate(estate *Estate) {
 	m.Estates = append(m.Estates, *estate)
 }
 
-func (m *Manager) AppendCD(cd *CD) {
-	m.CDs = append(m.CDs, *cd)
+func (m *Manager) AppendCD(event_id uint32, cd *CD) {
+	m.CDs[event_id] = cd
 }
 
 func (m *Manager) JSON() string {
