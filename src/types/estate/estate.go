@@ -3,6 +3,7 @@ package estate
 import (
 	"encoding/json"
 	"sync/atomic"
+	"fmt"
 )
 
 const (
@@ -35,7 +36,7 @@ type CD struct {
 type Manager struct {
 	Id      int32
 	Estates []Estate
-	CDs     map[uint32]*CD
+	CDs     map[string]*CD
 	NextVal uint32
 	Version uint32
 }
@@ -45,7 +46,10 @@ func (m *Manager) AppendEstate(estate *Estate) {
 }
 
 func (m *Manager) AppendCD(event_id uint32, cd *CD) {
-	m.CDs[event_id] = cd
+	if m.CDs == nil {
+		m.CDs = make(map[string]*CD)
+	}
+	m.CDs[fmt.Sprint(event_id)] = cd
 }
 
 func (m *Manager) JSON() string {
