@@ -29,7 +29,6 @@ func init() {
 		line, e := r.ReadString('\n')
 		line = strings.TrimSpace(line)
 
-		// empty-line & #comment
 		if line == "" {
 			if e == nil {
 				continue
@@ -38,7 +37,6 @@ func init() {
 			}
 		}
 
-		// split fields
 		fields := strings.Split(line, ",")
 		from := net.ParseIP(strings.Trim(fields[0], `"`))
 		to := net.ParseIP(strings.Trim(fields[1], `"`))
