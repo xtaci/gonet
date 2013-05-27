@@ -32,6 +32,7 @@ func Send(src_id, dest_id int32, service int16, object interface{}) (ret bool) {
 		log.Println("IPC Send error:", err)
 		return false
 	}
+	println(string(val))
 	req := IPCObject{Sender: src_id, Service: service, Object: val}
 
 	// first try local delivery, if dest_id is not in same server, forward to hub
@@ -45,8 +46,8 @@ func Send(src_id, dest_id int32, service int16, object interface{}) (ret bool) {
 		return
 	} else {
 		// convert req to json again, LEVEL-2 encapsulation
-		req_json, _ := json.Marshal(object)
-		return ForwardHub(dest_id, req_json)
+		req_json, _ := json.Marshal(req)
+		return _forward(dest_id, req_json)
 	}
 
 	return true

@@ -181,19 +181,16 @@ func AddUser(id int32) bool {
 }
 
 //------------------------------------------------ Forward to Hub
-func ForwardHub(dest_id int32, IPC []byte) (ret bool) {
-	defer func() {
-		if x := recover(); x != nil {
-			log.Println(x)
-			ret = false
-		}
-	}()
-
+func _forward(dest_id int32, IPC []byte) bool {
+	defer _hub_err()
 	// HUB protocol forwarding
 	msg := hub.FORWARDIPC{F_dest_id: dest_id, F_IPC: IPC}
-	ack := _call(packet.Pack(hub.Code["forward_req"], msg, nil))
-	if ack != nil {
-		panic("ForwardHub failed or timed-out")
+	ret := _call(packet.Pack(hub.Code["forward_req"], msg, nil))
+	reader := packet.Reader(ret)
+	tbl, err := hub.PKT_INT(reader)
+
+	if err != nil || tbl.F_v == 0 {
+		return false
 	}
 
 	return true
