@@ -33,7 +33,7 @@ func Send(src_id, dest_id int32, service int16, object interface{}) (ret bool) {
 		return false
 	}
 	println(string(val))
-	req := IPCObject{Sender: src_id, Service: service, Object: val}
+	req := IPCObject{Sender: src_id, Service: service, Object: val, Time: time.Now().Unix()}
 
 	// first try local delivery, if dest_id is not in same server, forward to hub
 	peer := QueryOnline(dest_id)

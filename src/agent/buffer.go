@@ -16,7 +16,7 @@ import (
 type Buffer struct {
 	ctrl    chan bool   // receive exit signal
 	pending chan []byte // pending Packet
-	max     int         // max queue size 
+	max     int         // max queue size
 
 	conn net.Conn // connection
 }
