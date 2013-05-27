@@ -39,12 +39,13 @@ func EstateNew(sess *Session, name string, X, Y uint16) bool {
 	// 新的冷却事件
 	E := &estate.CD{}
 	E.OID = N.OID
-	E.EventId = event.Add(N.OID, sess.Basic.Id, time.Now().Unix()+cd_time)
+	E.Timeout = time.Now().Unix() + cd_time
+	event_id := event.Add(N.OID, sess.Basic.Id, E.Timeout)
 
 	// 变更当前session内容
 	sess.EstateManager.AppendEstate(N)
-	sess.EstateManager.AppendCD(E)
+	sess.EstateManager.AppendCD(event_id, E)
 
 	// 持久化
-	return estate_tbl.Set(sess.Basic.Id, sess.EstateManager)
+	return estate_tbl.Set(sess.EstateManager)
 }

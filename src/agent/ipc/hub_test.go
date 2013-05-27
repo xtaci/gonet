@@ -27,7 +27,7 @@ func TestEventFunc(t *testing.T) {
 		t.Error("login")
 	}
 
-	info, err := GetInfo(0)
+	info, success := GetInfo(0)
 	fmt.Println(info)
-	fmt.Println(err)
+	fmt.Println(success)
 }

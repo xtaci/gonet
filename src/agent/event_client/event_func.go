@@ -1,7 +1,6 @@
 package event_client
 
 import (
-	"fmt"
 	"log"
 )
 

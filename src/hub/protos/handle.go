@@ -2,15 +2,13 @@ package protos
 
 import (
 	"fmt"
-	"labix.org/v2/mgo/bson"
 	"log"
 	"runtime"
 	"sync"
 )
 
 import (
-	"cfg"
-	. "db"
+	"db/forward_tbl"
 	"hub/accounts"
 	"misc/packet"
 )
@@ -201,39 +199,11 @@ func P_forward_req(hostid int32, pkt *packet.Packet) []byte {
 		ch <- tbl.F_IPC
 	} else {
 		// send to db
-		config := cfg.Get()
-		c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
-		err := c.Insert(tbl)
-		if err != nil {
-			log.Println(err)
-		}
+		forward_tbl.Push(tbl.F_dest_id, tbl.F_IPC)
 	}
 
 	ret := INT{F_v: 1}
 	return packet.Pack(Code["forward_ack"], ret, nil)
-}
-
-func P_getipc_req(hostid int32, pkt *packet.Packet) []byte {
-	// get all forward message for a user from db
-	// and send to gs
-	tbl, _ := PKT_ID(pkt)
-	var msgs []FORWARDIPC
-	config := cfg.Get()
-	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
-	err := c.Find(bson.M{"f_id": tbl.F_id}).All(&msgs)
-	if err != nil {
-		log.Println(err)
-		return nil
-	}
-
-	// remove messages
-	info, err := c.RemoveAll(bson.M{"f_id": tbl.F_id})
-	if err != nil {
-		log.Println(info, err)
-	}
-
-	ret := ALLIPC{F_IPCS: msgs}
-	return packet.Pack(Code["getipc_ack"], ret, nil)
 }
 
 func P_adduser_req(hostid int32, pkt *packet.Packet) []byte {

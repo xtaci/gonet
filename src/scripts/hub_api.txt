@@ -116,22 +116,12 @@ packet_type:1011
 name:adduser_ack
 payload:INT
 
-##### 100开始 
+########## IPC forward
 packet_type:100
-name:getipc_req
-payload:id
-desc:获取尚未收取的IPC信息
-
-packet_type:1100
-name:getipc_ack
-payload:IPCMSGS
-
-##########
-packet_type:101
 name:forward_req
 payload:FORWARDIPC
 desc:转发IPC消息
 
-packet_type:1101
+packet_type:1100
 name:forward_ack
 payload:INT

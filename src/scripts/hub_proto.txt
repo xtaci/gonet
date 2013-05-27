@@ -4,10 +4,6 @@ dest_id integer
 IPC array byte
 ===
 
-ALLIPC=
-IPCS array FORWARDIPC
-===
-
 #用户登陆发包
 ID=
 id integer
