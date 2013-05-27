@@ -19,5 +19,15 @@ func TestEventFunc(t *testing.T) {
 	}
 
 	obj := &TMPObj{A: 10, B: 20, C: "test"}
-	Send(0, 1, 1, obj)
+	if !Send(0, 1, 1, obj) {
+		t.Error("send")
+	}
+
+	if Login(0) {
+		t.Error("login")
+	}
+
+	info, err := GetInfo(0)
+	fmt.Println(info)
+	fmt.Println(err)
 }

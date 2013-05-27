@@ -127,7 +127,7 @@ func Unprotect(id int32) bool {
 	return true
 }
 
-func GetInfo(id int32) (info Info, err error) {
+func GetInfo(id int32) (info Info, flag bool) {
 	defer _hub_err()
 
 	req := hub.ID{}
@@ -135,14 +135,19 @@ func GetInfo(id int32) (info Info, err error) {
 	ret := _call(packet.Pack(hub.Code["getinfo_req"], req, nil))
 	reader := packet.Reader(ret)
 	tbl, _err := hub.PKT_INFO(reader)
-	info.Id = tbl.F_id
-	info.State = tbl.F_state
-	info.Score = tbl.F_score
-	info.Clan = tbl.F_clan
-	info.ProtectTime = tbl.F_protecttime
-	info.Name = tbl.F_name
+	if _err == nil && tbl.F_flag {
+		info.Id = tbl.F_id
+		info.State = tbl.F_state
+		info.Score = tbl.F_score
+		info.Clan = tbl.F_clan
+		info.ProtectTime = tbl.F_protecttime
+		info.Name = tbl.F_name
+		flag = true
+		return
+	}
 
-	return info, _err
+	flag = false
+	return
 }
 
 func GetList(A, B int32) (ids, scores []int32, err error) {

@@ -15,6 +15,7 @@ id integer
 
 #玩家信息
 INFO=
+flag bool
 id integer
 state integer
 score integer
