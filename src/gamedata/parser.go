@@ -22,6 +22,8 @@ func parse(file *os.File) {
 		if line == "" {
 			if e == nil {
 				continue
+			} else {
+				break
 			}
 		}
 
@@ -43,10 +45,6 @@ func parse(file *os.File) {
 
 		for i := 1; i < len(fields); i++ {
 			Set(names[0], lv, names[i], fields[i])
-		}
-
-		if e != nil {
-			break
 		}
 	}
 }
