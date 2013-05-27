@@ -51,10 +51,16 @@ func _load_config(path string) (ret map[string]string) {
 		line = strings.TrimSpace(line)
 
 		// empty-line & #comment
-		if line == "" || []byte(line)[0] == '#' {
+		if line == "" {
 			if e == nil {
 				continue
+			} else {
+				break
 			}
+		}
+
+		if []byte(line)[0] == '#' {
+			continue
 		}
 
 		// maping
