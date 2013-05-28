@@ -78,7 +78,11 @@ func HubReceiver(conn net.Conn) {
 			break
 		}
 
-		if seqval == 0 { // packet forwarding, deliver to MQ
+		// two kinds of IPC:
+		// a). Hub Sends to GS, sequence number is not needed, just forwarding to session
+		// b). Call, sequence number is needed, send will wake up blocking-chan.
+		//
+		if seqval == 0 {
 			reader := packet.Reader(data)
 			dest_id, err := reader.ReadS32()
 			if err != nil {
@@ -126,7 +130,7 @@ var _seq_id uint64
 var _wait_ack map[uint64]chan []byte
 var _wait_ack_lock sync.Mutex
 
-//------------------------------------------------ IPC send should be seqential
+//------------------------------------------------ IPC call
 func _call(data []byte) (ret []byte) {
 	seq_id := atomic.AddUint64(&_seq_id, 1)
 
