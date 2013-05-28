@@ -27,7 +27,7 @@ func Execute(event *Event) (ret bool) {
 	return true
 }
 
-//------------------------------------------------ do the real work
+//------------------------------------------------ do the real work until complete or panic!!!
 func _do(event *Event) {
 	config := cfg.Get()
 	c := Mongo.DB(config["mongo_db"]).C(estate_tbl.COLLECTION)
