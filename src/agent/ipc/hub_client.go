@@ -124,6 +124,8 @@ func HubReceiver(conn net.Conn) {
 }
 
 // packet sequence number generator
+// assume we have 100,000 messages per second, _seq_id will overflow in
+// 2^64 / 100000 / 3600 / 24 / 365 = 5.8 million years
 var _seq_id uint64
 
 // waiting ACK queue.
