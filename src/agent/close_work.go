@@ -8,7 +8,7 @@ import (
 //----------------------------------------------- connection close cleanup work
 func close_work(sess *Session) {
 	if sess.LoggedIn {
-		// TODO: flush db 
+		// TODO: 持久化逻辑#3: 离线时，刷入数据库
 		ipc.UnregisterOnline(sess.Basic.Id)
 	}
 }

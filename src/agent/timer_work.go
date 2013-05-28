@@ -15,7 +15,7 @@ import (
 //----------------------------------------------- timer work
 func timer_work(sess *Session) {
 	// check whether the user is logged in
-	if ! sess.LoggedIn {
+	if !sess.LoggedIn {
 		return
 	}
 
@@ -28,13 +28,14 @@ func timer_work(sess *Session) {
 			for k := range Estates {
 				if CDs[i].OID == Estates[k].OID { // if it is the oid
 					Estates[k].Status = estate.STATUS_NORMAL
+					sess.OpCount++
 				}
 			}
 			delete(CDs, i)
 		}
 	}
 
-	// check whether flush timeout is reached.
+	// TODO: 持久化逻辑#2： 超过一定的时间，刷入数据库
 	config := cfg.Get()
 	ivl, _ := strconv.Atoi(config["flush_interval"])
 	if time.Now().Unix()-sess.LastFlush > int64(ivl) {

@@ -3,10 +3,12 @@ package agent
 import (
 	"fmt"
 	"net"
+	"strconv"
 	"time"
 )
 
 import (
+	"cfg"
 	. "types"
 )
 
@@ -46,6 +48,10 @@ func StartAgent(in chan []byte, conn net.Conn) {
 	buf := NewBuffer(conn, bufctrl)
 	go buf.Start()
 
+	// max #operartion before flush
+	config := cfg.Get()
+	flush_ops, _ := strconv.Atoi(config["flush_ops"])
+
 	// cleanup work
 	defer func() {
 		close_work(&sess)
@@ -84,6 +90,11 @@ func StartAgent(in chan []byte, conn net.Conn) {
 			}
 		case _ = <-std_timer:
 			timer_work(&sess)
+		}
+
+		// TODO: 持久化逻辑#1： 超过一定的操作数量，刷入数据库
+		if sess.OpCount > flush_ops {
+			sess.OpCount = 0
 		}
 	}
 }
