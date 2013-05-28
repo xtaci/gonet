@@ -13,7 +13,7 @@ import (
 
 //------------------------------------------------ 登陆后的数据加载
 func LoginWork(sess *Session) bool {
-	// 从数据库中载入玩家数据
+	// TODO: 从数据库中载入玩家数据
 	sess.EstateManager = estate_tbl.Get(sess.Basic.Id)
 	// 载入建筑表
 	// 载入离线消息，并push到MQ, 这里小心MQ的buffer长度
@@ -27,6 +27,8 @@ func LoginWork(sess *Session) bool {
 			sess.MQ <- *obj
 		}
 	}
+
+	sess.LastFlush = time.Now().Unix()
 
 	return true
 }

@@ -1,16 +1,19 @@
 package agent
 
 import (
+	"fmt"
+	"strconv"
 	"time"
 )
 
 import (
+	"cfg"
 	. "types"
 	"types/estate"
 )
 
-//----------------------------------------------- session timeout
-func event_work(sess *Session) {
+//----------------------------------------------- timer work
+func timer_work(sess *Session) {
 	// check building upgrades
 	CDs := sess.EstateManager.CDs
 	Estates := sess.EstateManager.Estates
@@ -24,5 +27,13 @@ func event_work(sess *Session) {
 			}
 			delete(CDs, i)
 		}
+	}
+
+	// check whether flush timeout is reached.
+	config := cfg.Get()
+	ivl, _ := strconv.Atoi(config["flush_interval"])
+	if time.Now().Unix()-sess.LastFlush > int64(ivl) {
+		fmt.Println("TODO: flush all to db")
+		sess.LastFlush = time.Now().Unix()
 	}
 }

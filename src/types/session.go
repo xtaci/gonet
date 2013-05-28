@@ -14,11 +14,15 @@ type IPCObject struct {
 
 type Session struct {
 	MQ            chan IPCObject // Player's Internal Message Queue
-	Basic         *Basic         //Basic Info
-	Res           *Res           // Resource table
-	Bitmap        *grid.Grid
-	EstateManager *estate.Manager
+	Basic         Basic          //Basic Info
+	Res           Res            // Resource table
+	Bitmap        grid.Grid
+	EstateManager estate.Manager
 	Moves         []estate.Move
-	HeartBeat     int64
 	IsLoggedOut   bool // represents user logout or connection failure
+
+	ConnectTime int64
+	LastPing    int64
+	LastFlush   int64 // last flush to db time
+	OpCount     int   // num of operations since last sync
 }

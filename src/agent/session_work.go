@@ -19,8 +19,8 @@ func session_work(sess *Session) bool {
 		session_timeout, _ = strconv.Atoi(config["session_timeout"])
 	}
 
-	if time.Now().Unix()-sess.HeartBeat > int64(session_timeout) {
-		log.Printf("timeout of user %v, occured\n", sess.Basic.Id)
+	if time.Now().Unix()-sess.LastPing > int64(session_timeout) {
+		log.Printf("timeout: user %v, connected at: %v\n", sess.Basic.Id, time.Unix(sess.ConnectTime, 0))
 		return true
 	}
 

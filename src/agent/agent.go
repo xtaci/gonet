@@ -30,14 +30,16 @@ func _timer(interval int, ch chan bool) {
 func StartAgent(in chan []byte, conn net.Conn) {
 	var sess Session
 	sess.MQ = make(chan IPCObject, DEFAULT_MQ_SIZE)
+	sess.ConnectTime = time.Now().Unix()
+	sess.LastPing = time.Now().Unix()
 
 	// session timeout
 	session_timeout := make(chan bool)
 	go _timer(5, session_timeout)
 
-	// event_timeout(such as, upgrades...)
-	event_timer := make(chan bool)
-	go _timer(1, event_timer)
+	// event_timeout(such as, upgrade, flush)
+	std_timer := make(chan bool)
+	go _timer(1, std_timer)
 
 	// write buffer
 	bufctrl := make(chan bool)
@@ -48,7 +50,7 @@ func StartAgent(in chan []byte, conn net.Conn) {
 	defer func() {
 		close_work(&sess)
 		close(session_timeout)
-		close(event_timer)
+		close(std_timer)
 		close(sess.MQ)
 		bufctrl <- false
 		conn.Close()
@@ -62,13 +64,13 @@ func StartAgent(in chan []byte, conn net.Conn) {
 				return
 			}
 
-			sess.HeartBeat = time.Now().Unix()
 			if result := UserRequestProxy(&sess, msg); result != nil {
 				fmt.Println(result)
 				err := buf.Send(result)
 				if err != nil {
 					return
 				}
+				sess.LastPing = time.Now().Unix()
 			}
 		case msg, ok := <-sess.MQ: // async
 			if !ok {
@@ -80,8 +82,8 @@ func StartAgent(in chan []byte, conn net.Conn) {
 			if session_work(&sess) {
 				return
 			}
-		case _ = <-event_timer:
-			event_work(&sess)
+		case _ = <-std_timer:
+			timer_work(&sess)
 		}
 	}
 }
