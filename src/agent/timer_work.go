@@ -14,6 +14,11 @@ import (
 
 //----------------------------------------------- timer work
 func timer_work(sess *Session) {
+	// check whether the user is logged in
+	if ! sess.LoggedIn {
+		return
+	}
+
 	// check building upgrades
 	CDs := sess.EstateManager.CDs
 	Estates := sess.EstateManager.Estates

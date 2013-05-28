@@ -19,7 +19,7 @@ type Session struct {
 	Bitmap        grid.Grid
 	EstateManager estate.Manager
 	Moves         []estate.Move
-	IsLoggedOut   bool // represents user logout or connection failure
+	LoggedIn      bool // flag for weather the user is logged in
 
 	ConnectTime int64
 	LastPing    int64
