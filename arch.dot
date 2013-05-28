@@ -1,0 +1,18 @@
+digraph G {
+	size ="4,4";
+	Agent1 [shape=box];
+	Agent2 [shape=box];
+	Agent1->GS1;
+	Agent2->GS2;
+	Hub [style=filled,color=gray];
+	Event [style=filled,color=gray];
+	MongoDB [style=filled,color=cyan];
+	GS1->Hub;
+	GS2->Hub;
+	GS1->Event;
+	GS2->Event;
+	Hub->MongoDB
+	Event->MongoDB
+	GS1->MongoDB
+	GS2->MongoDB
+}
