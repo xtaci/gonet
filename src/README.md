@@ -1,6 +1,5 @@
 ###GONET 总体设计
 
-gonet是一个游戏服务器，满足类似于与clash of clans这种游戏类型的应用。
 <pre>
 
 
