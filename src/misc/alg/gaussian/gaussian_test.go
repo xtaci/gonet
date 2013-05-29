@@ -12,9 +12,10 @@ func TestGauss(t *testing.T) {
 	gen := rand.New(src)
 
 	// gaussian
-	gaussian := Dist{}
+	gaussian := NewDist(128)
 	for i := 0; i < 1000; i++ {
-		v := int16(gen.Int31n(10))
+		v := int16(gen.Int31n(200))
+		fmt.Println(v)
 		gaussian.Add(v)
 	}
 
@@ -22,15 +23,15 @@ func TestGauss(t *testing.T) {
 	fmt.Println("Samples:", gaussian.samples)
 
 	// testing
-	fmt.Println("range [0,10]")
+	fmt.Println("range [0,200]")
 	for i := 0; i < 10; i++ {
-		v := int16(gen.Int31n(10))
+		v := int16(gen.Int31n(200))
 		fmt.Println(v, ":", gaussian.P(v))
 	}
 
-	fmt.Println("range [0,20]")
+	fmt.Println("range [0,1000]")
 	for i := 0; i < 10; i++ {
-		v := int16(gen.Int31n(20))
+		v := int16(gen.Int31n(1000))
 		fmt.Println(v, ":", gaussian.P(v))
 	}
 }

@@ -3,21 +3,26 @@ package gaussian
 import "math"
 
 const (
-	SQRT2PI     = float64(2.506628274631001)
-	SIGMA       = float64(1.0)
-	MU          = float64(0.0)
-	MAX_SAMPLES = 128
+	SQRT2PI = float64(2.506628274631001)
+	SIGMA   = float64(1.0)
+	MU      = float64(0.0)
 )
 
 type Dist struct {
-	samples [MAX_SAMPLES]int16
+	samples []int16
 	ptr     int
 	n       int
 	sigma   float64
 }
 
+func NewDist(num_samples int) *Dist {
+	dist := &Dist{}
+	dist.samples = make([]int16, num_samples)
+	return dist
+}
+
 func (dist *Dist) IsSampleOk() bool {
-	if dist.n >= MAX_SAMPLES {
+	if dist.n >= len(dist.samples) {
 		return true
 	} else {
 		return false
@@ -26,11 +31,11 @@ func (dist *Dist) IsSampleOk() bool {
 
 func (dist *Dist) Add(x int16) {
 	dist.samples[dist.ptr] = x
-	if dist.ptr++; dist.ptr >= MAX_SAMPLES {
+	if dist.ptr++; dist.ptr >= len(dist.samples) {
 		dist.ptr = 0
 	}
 
-	if dist.n < MAX_SAMPLES {
+	if dist.n < len(dist.samples) {
 		dist.n++
 	}
 
