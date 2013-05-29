@@ -16,6 +16,14 @@ type Dist struct {
 	sigma   float64
 }
 
+func (dist *Dist) IsSampleOk() bool {
+	if dist.n >= MAX_SAMPLES {
+		return true
+	} else {
+		return false
+	}
+}
+
 func (dist *Dist) Add(x int16) {
 	dist.samples[dist.ptr] = x
 	if dist.ptr++; dist.ptr >= MAX_SAMPLES {
