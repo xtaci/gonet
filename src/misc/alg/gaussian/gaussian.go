@@ -39,23 +39,25 @@ func (dist *Dist) Add(x int16) {
 		dist.n++
 	}
 
-	// caculate mean
-	sum := int64(0)
-	for i := 0; i < dist.n; i++ {
-		sum += int64(dist.samples[i])
+	if dist.n >= len(dist.samples) {
+		// caculate mean
+		sum := int64(0)
+		for i := 0; i < dist.n; i++ {
+			sum += int64(dist.samples[i])
+		}
+
+		mean := float64(sum) / float64(dist.n)
+
+		// caculate standard deviation
+		sum2 := float64(0.0)
+		for i := 0; i < dist.n; i++ {
+			v := float64(dist.samples[i]) - mean
+			v = v * v
+			sum2 += v
+		}
+
+		dist.sigma = math.Sqrt(sum2 / float64(dist.n))
 	}
-
-	mean := float64(sum) / float64(dist.n)
-
-	// caculate standard deviation
-	sum2 := float64(0.0)
-	for i := 0; i < dist.n; i++ {
-		v := float64(dist.samples[i]) - mean
-		v = v * v
-		sum2 += v
-	}
-
-	dist.sigma = math.Sqrt(sum2 / float64(dist.n))
 }
 
 func (dist *Dist) P(x int16) float64 {
