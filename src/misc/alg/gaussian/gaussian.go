@@ -46,7 +46,7 @@ func (dist *Dist) Add(x int16) {
 		dist.n++
 	}
 
-	if dist.n >= len(dist.samples) {
+	if dist.n == len(dist.samples) {
 		// caculate mean
 		sum := int64(0)
 		for i := 0; i < dist.n; i++ {
