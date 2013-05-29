@@ -4,8 +4,6 @@ import "math"
 
 const (
 	SQRT2PI = float64(2.506628274631001)
-	SIGMA   = float64(1.0)
-	MU      = float64(0.0)
 )
 
 type Dist struct {
@@ -13,12 +11,21 @@ type Dist struct {
 	ptr     int
 	n       int
 	sigma   float64
+	mean    float64
 }
 
 func NewDist(num_samples int) *Dist {
 	dist := &Dist{}
 	dist.samples = make([]int16, num_samples)
 	return dist
+}
+
+func (dist *Dist) Sigma() float64 {
+	return dist.sigma
+}
+
+func (dist *Dist) Mean() float64 {
+	return dist.mean
 }
 
 func (dist *Dist) IsSampleOk() bool {
@@ -46,12 +53,12 @@ func (dist *Dist) Add(x int16) {
 			sum += int64(dist.samples[i])
 		}
 
-		mean := float64(sum) / float64(dist.n)
+		dist.mean = float64(sum) / float64(dist.n)
 
 		// caculate standard deviation
 		sum2 := float64(0.0)
 		for i := 0; i < dist.n; i++ {
-			v := float64(dist.samples[i]) - mean
+			v := float64(dist.samples[i]) - dist.mean
 			v = v * v
 			sum2 += v
 		}
@@ -63,6 +70,6 @@ func (dist *Dist) Add(x int16) {
 func (dist *Dist) P(x int16) float64 {
 	X := float64(x)
 	A := 1.0 / (dist.sigma * SQRT2PI)
-	B := math.Exp(-(X * X) / (2 * dist.sigma * dist.sigma))
+	B := math.Exp(-((X - dist.mean) * (X - dist.mean)) / (2 * dist.sigma * dist.sigma))
 	return A * B
 }
