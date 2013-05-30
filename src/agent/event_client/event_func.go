@@ -23,9 +23,10 @@ func Ping() bool {
 	return true
 }
 
-func Add(oid uint32, user_id int32, timeout int64) uint32 {
+func Add(tblname string, oid uint32, user_id int32, timeout int64) uint32 {
 	defer _event_err()
 	req := event.ADD_REQ{}
+	req.F_tblname = tblname
 	req.F_oid = oid
 	req.F_user_id = user_id
 	req.F_timeout = timeout

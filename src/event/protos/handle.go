@@ -53,7 +53,7 @@ func P_ping_req(reader *packet.Packet) []byte {
 
 func P_add_req(reader *packet.Packet) []byte {
 	tbl, _ := PKT_ADD_REQ(reader)
-	event_id := core.Add(tbl.F_oid, tbl.F_user_id, tbl.F_timeout)
+	event_id := core.Add(tbl.F_tblname, tbl.F_oid, tbl.F_user_id, tbl.F_timeout)
 	ret := INT{event_id}
 
 	return packet.Pack(Code["add_ack"], ret, nil)
