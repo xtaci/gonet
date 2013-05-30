@@ -36,5 +36,16 @@ OK，无法避免的欺诈发生了，纯粹靠数据包自己的timestamp判断
 
 	timestamp(B-A) ~= latency(B-A)
 	
-方法1：
-	latency(B-A) ± N
+方法：
+	Abs(timestamp(B-A) - latency(B-A)) < N
+	
+如何确定N的值呢，最简单方法是，固定值，例如设定N=5, 但是，我更倾向于用概率方法来做，因为 :    
+高延迟的，必然有高的误差率， 这个误差率，可以用概率分布描述。    
+
+我们统计若干个sample，例如32个64个sample。这个sample 等于 timestamp(B-A) - latency(B-A).  
+
+高斯分布可以计算出误差的σ。根据高斯分布的3-sigma性质。误差 > 2-sigma的都是小概率事件，即可判定。
+
+方法：
+
+	Abs(timestamp(B-A) - latency(B-A)) < 2σ
