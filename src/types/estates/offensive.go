@@ -15,11 +15,8 @@ type Offensive struct {
 }
 
 type OffManager struct {
-	UserId     int32
 	Offensives []*Offensive
 	CDs        map[string]*CD
-	NextVal    uint32
-	Version    uint32
 }
 
 func (m *OffManager) Append(estate *Offensive) {

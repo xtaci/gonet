@@ -15,10 +15,8 @@ type Basic struct {
 }
 
 type BasManager struct {
-	UserId  int32
-	Basics  []*Basic
-	CDs     map[string]*CD
-	Version uint32
+	Basics []*Basic
+	CDs    map[string]*CD
 }
 
 func (m *BasManager) Append(estate *Basic) {

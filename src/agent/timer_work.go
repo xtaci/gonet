@@ -19,7 +19,7 @@ func timer_work(sess *Session) {
 	}
 
 	// check building upgrades
-	sess.OpCount += sess.DEF.CheckCD()
+	sess.OpCount += sess.Estates.CheckAllCD()
 
 	// TODO: 持久化逻辑#2： 超过一定的时间，刷入数据库
 	config := cfg.Get()

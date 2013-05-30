@@ -15,11 +15,8 @@ type Defensive struct {
 }
 
 type DefManager struct {
-	UserId     int32
 	Defensives []*Defensive
 	CDs        map[string]*CD
-	NextVal    uint32
-	Version    uint32
 }
 
 func (m *DefManager) Append(estate *Defensive) {

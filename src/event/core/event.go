@@ -48,7 +48,7 @@ func _expire() {
 //------------------------------------------------ Add a timeout for a object-id
 func Add(tblname string, oid uint32, user_id int32, timeout int64) uint32 {
 	_event_id := timer.Add(timeout, _event_ch)
-	event := &Event{tblname:tblname, oid: oid, user_id: user_id, timeout: timeout}
+	event := &Event{tblname: tblname, oid: oid, user_id: user_id, timeout: timeout}
 
 	_events_lock.Lock()
 	_events[_event_id] = event
