@@ -19,12 +19,12 @@ func TestGauss(t *testing.T) {
 		gaussian.Add(v)
 	}
 
-	fmt.Println("N-samples:", gaussian.n, ", σ:", gaussian.sigma)
+	fmt.Println("N-samples:", gaussian.N, ", σ:", gaussian.Sigma)
 
 	// testing
 	fmt.Println("range [0,200]")
-	sigma := gaussian.Sigma()
-	mean := gaussian.Mean()
+	sigma := gaussian.Sigma
+	mean := gaussian.Mean
 	for i := 0; i < 10; i++ {
 		v := int16(gen.Int31n(200))
 		fmt.Printf("X:%4d: P(v)=%0.4f, deriv:%.2fσ\n", v, gaussian.P(v), math.Abs(float64(v)-mean)/sigma)

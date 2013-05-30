@@ -47,5 +47,5 @@ func EstateNew(sess *Session, name string, X, Y uint16) bool {
 	sess.EstateManager.AppendCD(event_id, E)
 
 	// 持久化
-	return estate_tbl.Set(sess.EstateManager)
+	return estate_tbl.Set(&sess.EstateManager)
 }

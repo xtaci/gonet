@@ -3,33 +3,25 @@ package gaussian
 import "math"
 
 const (
-	SQRT2PI = float64(2.506628274631001)
+	SQRT2PI = float64(2.50662827463100050241576528481)
 )
 
 type Dist struct {
-	samples []int16
-	ptr     int
-	n       int
-	sigma   float64
-	mean    float64
+	Samples []int16
+	Ptr     int
+	N       int
+	Sigma   float64
+	Mean    float64
 }
 
 func NewDist(num_samples int) *Dist {
 	dist := &Dist{}
-	dist.samples = make([]int16, num_samples)
+	dist.Samples = make([]int16, num_samples)
 	return dist
 }
 
-func (dist *Dist) Sigma() float64 {
-	return dist.sigma
-}
-
-func (dist *Dist) Mean() float64 {
-	return dist.mean
-}
-
 func (dist *Dist) IsSampleOk() bool {
-	if dist.n >= len(dist.samples) {
+	if dist.N >= len(dist.Samples) {
 		return true
 	} else {
 		return false
@@ -37,39 +29,39 @@ func (dist *Dist) IsSampleOk() bool {
 }
 
 func (dist *Dist) Add(x int16) {
-	dist.samples[dist.ptr] = x
-	if dist.ptr++; dist.ptr >= len(dist.samples) {
-		dist.ptr = 0
+	dist.Samples[dist.Ptr] = x
+	if dist.Ptr++; dist.Ptr >= len(dist.Samples) {
+		dist.Ptr = 0
 	}
 
-	if dist.n < len(dist.samples) {
-		dist.n++
+	if dist.N < len(dist.Samples) {
+		dist.N++
 	}
 
-	if dist.n == len(dist.samples) {
+	if dist.N == len(dist.Samples) {
 		// caculate mean
 		sum := int64(0)
-		for i := 0; i < dist.n; i++ {
-			sum += int64(dist.samples[i])
+		for i := 0; i < dist.N; i++ {
+			sum += int64(dist.Samples[i])
 		}
 
-		dist.mean = float64(sum) / float64(dist.n)
+		dist.Mean = float64(sum) / float64(dist.N)
 
 		// caculate standard deviation
 		sum2 := float64(0.0)
-		for i := 0; i < dist.n; i++ {
-			v := float64(dist.samples[i]) - dist.mean
+		for i := 0; i < dist.N; i++ {
+			v := float64(dist.Samples[i]) - dist.Mean
 			v = v * v
 			sum2 += v
 		}
 
-		dist.sigma = math.Sqrt(sum2 / float64(dist.n))
+		dist.Sigma = math.Sqrt(sum2 / float64(dist.N))
 	}
 }
 
 func (dist *Dist) P(x int16) float64 {
 	X := float64(x)
-	A := 1.0 / (dist.sigma * SQRT2PI)
-	B := math.Exp(-((X - dist.mean) * (X - dist.mean)) / (2 * dist.sigma * dist.sigma))
+	A := 1.0 / (dist.Sigma * SQRT2PI)
+	B := math.Exp(-((X - dist.Mean) * (X - dist.Mean)) / (2 * dist.Sigma * dist.Sigma))
 	return A * B
 }
