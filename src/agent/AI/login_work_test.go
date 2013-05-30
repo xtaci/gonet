@@ -22,7 +22,7 @@ func TestLoginWork(t *testing.T) {
 	sess := &Session{}
 	sess.MQ = make(chan IPCObject, 100)
 	go _recv(sess.MQ)
-	sess.Basic = Basic{Id: 1}
+	sess.User = User{Id: 1}
 	LoginWork(sess)
 	time.Sleep(time.Second)
 	close(sess.MQ)

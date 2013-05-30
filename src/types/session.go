@@ -15,7 +15,7 @@ type IPCObject struct {
 type Session struct {
 	MQ      chan IPCObject // Player's Internal Message Queue
 	User    User
-	Estates *estates.Manager
+	Estates estates.Manager
 	Bitmap  grid.Grid // Building's bitmap, online constructing...
 
 	// Session Info
