@@ -13,17 +13,19 @@ type IPCObject struct {
 }
 
 type Session struct {
-	MQ      chan IPCObject // Player's Internal Message Queue
+	MQ chan IPCObject // Player's Internal Message Queue
+	// user data	
 	User    User
 	Estates estates.Manager
 	Bitmap  grid.Grid // Building's bitmap, online constructing...
 
-	// Session Info
+	// login related
 	LoggedIn bool // flag for weather the user is logged in
+	KickOut  bool // flag for is kicked out
 
-	ConnectTime int64
-	LastPing    int64
-	LastFlush   int64 // last flush to db time
-	OpCount     int   // num of operations since last sync
-	KickOut     bool  // flag for is kicked out
+	// time related 
+	ConnectTime    int64 // tcp connection establish time
+	LastPacketTime int64 // last packet arrive time
+	LastFlushTime  int64 // last flush to db time
+	OpCount        int   // num of operations since last sync
 }

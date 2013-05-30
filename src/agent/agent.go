@@ -33,7 +33,7 @@ func StartAgent(in chan []byte, conn net.Conn) {
 	var sess Session
 	sess.MQ = make(chan IPCObject, DEFAULT_MQ_SIZE)
 	sess.ConnectTime = time.Now().Unix()
-	sess.LastPing = time.Now().Unix()
+	sess.LastPacketTime = time.Now().Unix()
 
 	// session timeout
 	session_timeout := make(chan bool)
@@ -76,8 +76,9 @@ func StartAgent(in chan []byte, conn net.Conn) {
 				if err != nil {
 					return
 				}
-				sess.LastPing = time.Now().Unix()
 			}
+			sess.LastPacketTime = time.Now().Unix()
+
 		case msg, ok := <-sess.MQ: // async
 			if !ok {
 				return
