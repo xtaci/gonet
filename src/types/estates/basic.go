@@ -12,6 +12,7 @@ type Basic struct {
 	Y      uint16 // coordinate Y
 	Level  uint8
 	Status byte
+	Spec   map[string]string
 }
 
 type BasManager struct {
