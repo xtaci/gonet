@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	COLLECTION = "HEROES"
+	COLLECTION    = "HEROES"
 	STATUS_NORMAL = byte(0)
 	STATUS_CD     = 1
 )
@@ -18,9 +18,9 @@ type CD struct {
 }
 
 type Hero struct {
-	TYPE string // type in string
+	TYPE   string // type in string
 	Status byte
-	Spec map[string]string
+	Spec   map[string]string
 }
 
 type Manager struct {

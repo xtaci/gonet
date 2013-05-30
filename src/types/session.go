@@ -19,9 +19,9 @@ type Session struct {
 	Estates estates.Manager
 	Bitmap  grid.Grid // Building's bitmap, online constructing...
 
-	// login related
+	// session related
 	LoggedIn bool // flag for weather the user is logged in
-	KickOut  bool // flag for is kicked out
+	KickOut  bool // flag for player is kicked out
 
 	// time related 
 	ConnectTime    int64 // tcp connection establish time

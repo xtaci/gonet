@@ -8,7 +8,10 @@ import (
 
 import (
 	"cfg"
+	"db/data_tbl"
+	"db/user_tbl"
 	. "types"
+	"types/estates"
 )
 
 //----------------------------------------------- timer work
@@ -26,6 +29,12 @@ func timer_work(sess *Session) {
 	ivl, _ := strconv.Atoi(config["flush_interval"])
 	if time.Now().Unix()-sess.LastFlushTime > int64(ivl) {
 		fmt.Println("TODO: flush all to db")
-		sess.LastFlushTime = time.Now().Unix()
+		flag1 := user_tbl.Set(&sess.User)
+		flag2 := data_tbl.Set(estates.COLLECTION, &sess.Estates)
+
+		// 成功后才设置
+		if flag1 && flag2 {
+			sess.LastFlushTime = time.Now().Unix()
+		}
 	}
 }

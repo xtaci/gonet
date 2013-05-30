@@ -34,6 +34,7 @@ func StartAgent(in chan []byte, conn net.Conn) {
 	sess.MQ = make(chan IPCObject, DEFAULT_MQ_SIZE)
 	sess.ConnectTime = time.Now().Unix()
 	sess.LastPacketTime = time.Now().Unix()
+	sess.KickOut = false
 
 	// session timeout
 	session_timeout := make(chan bool)
@@ -96,6 +97,11 @@ func StartAgent(in chan []byte, conn net.Conn) {
 		// TODO: 持久化逻辑#1： 超过一定的操作数量，刷入数据库
 		if sess.OpCount > flush_ops {
 			sess.OpCount = 0
+		}
+
+		// 是否被逻辑踢出
+		if sess.KickOut {
+			return
 		}
 	}
 }

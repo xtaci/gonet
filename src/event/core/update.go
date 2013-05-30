@@ -28,17 +28,15 @@ func Execute(event *Event) (ret bool) {
 
 func _do(event *Event) {
 	switch event.tblname {
-	case "ESTATES":
+	case estates.COLLECTION:
 		_do_estates(event)
-	case "ARMY{":
-		_do_army(event)
 	}
 }
 
 //------------------------------------------------ do the real work until complete or panic!!!
 func _do_estates(event *Event) {
 	config := cfg.Get()
-	c := Mongo.DB(config["mongo_db"]).C("ESTATES")
+	c := Mongo.DB(config["mongo_db"]).C(estates.COLLECTION)
 
 	manager := &estates.Manager{}
 	err := c.Find(bson.M{"id": event.user_id}).One(manager)
@@ -54,27 +52,5 @@ func _do_estates(event *Event) {
 	_, err = c.Find(bson.M{"id": event.user_id, "version": manager.Version}).Apply(change, manager)
 	if err != nil { // repeat
 		_do_estates(event)
-	}
-}
-
-//------------------------------------------------ do the real work until complete or panic!!!
-func _do_army(event *Event) {
-	config := cfg.Get()
-	c := Mongo.DB(config["mongo_db"]).C("ARMY")
-
-	manager := &estates.Manager{}
-	err := c.Find(bson.M{"id": event.user_id}).One(manager)
-
-	change := mgo.Change{
-		Update:    bson.M{"$inc": bson.M{"version": 1}},
-		ReturnNew: true,
-	}
-
-	fmt.Println("TODO : change value here")
-
-	// find & update
-	_, err = c.Find(bson.M{"id": event.user_id, "version": manager.Version}).Apply(change, manager)
-	if err != nil { // repeat
-		_do_army(event)
 	}
 }

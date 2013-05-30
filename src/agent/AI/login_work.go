@@ -10,12 +10,13 @@ import (
 	"db/data_tbl"
 	"db/forward_tbl"
 	. "types"
+	"types/estates"
 )
 
 //------------------------------------------------ 登陆后的数据加载
 func LoginWork(sess *Session) bool {
 	// 载入建筑表
-	data_tbl.Get("ESTATES", sess.User.Id, &sess.Estates)
+	data_tbl.Get(estates.COLLECTION, sess.User.Id, &sess.Estates)
 
 	// 最后, 载入离线消息，并push到MQ, 这里小心MQ的buffer长度
 	objs := forward_tbl.PopAll(sess.User.Id)
