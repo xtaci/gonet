@@ -20,7 +20,7 @@ func session_work(sess *Session) bool {
 	}
 
 	if time.Now().Unix()-sess.LastPing > int64(session_timeout) {
-		log.Printf("timeout: user %v, connected at: %v\n", sess.Basic.Id, time.Unix(sess.ConnectTime, 0))
+		log.Printf("timeout: user %v, connected at: %v\n", sess.User.Id, time.Unix(sess.ConnectTime, 0))
 		return true
 	}
 

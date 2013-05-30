@@ -1,10 +1,6 @@
 package types
 
-import (
-	"encoding/json"
-)
-
-type Basic struct {
+type User struct {
 	Id             int32
 	Name           string
 	Pass           []byte
@@ -14,9 +10,4 @@ type Basic struct {
 	IsProtecting   bool
 	LoginCount     int32
 	LastLogin      int64
-}
-
-func (b *Basic) JSON() string {
-	val, _ := json.Marshal(b)
-	return string(val)
 }

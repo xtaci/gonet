@@ -9,7 +9,6 @@ import (
 import (
 	"cfg"
 	. "types"
-	"types/estate"
 )
 
 //----------------------------------------------- timer work
@@ -20,20 +19,7 @@ func timer_work(sess *Session) {
 	}
 
 	// check building upgrades
-	CDs := sess.EstateManager.CDs
-	Estates := sess.EstateManager.Estates
-
-	for i := range CDs {
-		if CDs[i].Timeout <= time.Now().Unix() { // times up
-			for k := range Estates {
-				if CDs[i].OID == Estates[k].OID { // if it is the oid
-					Estates[k].Status = estate.STATUS_NORMAL
-					sess.OpCount++
-				}
-			}
-			delete(CDs, i)
-		}
-	}
+	sess.OpCount += sess.DEF.CheckCD()
 
 	// TODO: 持久化逻辑#2： 超过一定的时间，刷入数据库
 	config := cfg.Get()

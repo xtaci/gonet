@@ -1,4 +1,4 @@
-package estate_tbl
+package defensive_tbl
 
 import (
 	"labix.org/v2/mgo/bson"
@@ -8,14 +8,14 @@ import (
 import (
 	"cfg"
 	. "db"
-	"types/estate"
+	"types/defensive"
 )
 
 const (
-	COLLECTION = "ESTATE"
+	COLLECTION = "DEFENSIVE"
 )
 
-func Set(manager *estate.Manager) bool {
+func Set(manager *defensive.Manager) bool {
 	config := cfg.Get()
 	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
 
@@ -29,11 +29,11 @@ func Set(manager *estate.Manager) bool {
 	return true
 }
 
-func Get(user_id int32) *estate.Manager {
+func Get(user_id int32) *defensive.Manager {
 	config := cfg.Get()
 	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
 
-	manager := &estate.Manager{}
+	manager := &defensive.Manager{}
 	err := c.Find(bson.M{"id": user_id}).One(manager)
 	if err != nil {
 		log.Println(err)

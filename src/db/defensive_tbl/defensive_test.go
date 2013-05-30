@@ -1,14 +1,14 @@
-package estate_tbl
+package defensive_tbl
 
 import "testing"
-import "types/estate"
+import "types/defensive"
 import "fmt"
 
 func TestEstate(t *testing.T) {
-	data := &estate.Manager{}
-	e1 := &estate.Estate{}
-	data.AppendEstate(e1)
-	cd1 := &estate.CD{}
+	data := &defensive.Manager{}
+	e1 := &defensive.Defensive{}
+	data.AppendDefensive(e1)
+	cd1 := &defensive.CD{}
 	data.AppendCD(1, cd1)
 	data.Id = 1
 	Set(data)

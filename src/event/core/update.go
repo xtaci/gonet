@@ -10,8 +10,8 @@ import (
 import (
 	"cfg"
 	. "db"
-	"db/estate_tbl"
-	"types/estate"
+	"db/defensive_tbl"
+	"types/defensive"
 )
 
 //------------------------------------------------ perform changes & save back, atomic
@@ -30,9 +30,9 @@ func Execute(event *Event) (ret bool) {
 //------------------------------------------------ do the real work until complete or panic!!!
 func _do(event *Event) {
 	config := cfg.Get()
-	c := Mongo.DB(config["mongo_db"]).C(estate_tbl.COLLECTION)
+	c := Mongo.DB(config["mongo_db"]).C(defensive_tbl.COLLECTION)
 
-	manager := &estate.Manager{}
+	manager := &defensive.Manager{}
 	err := c.Find(bson.M{"id": event.user_id}).One(manager)
 
 	change := mgo.Change{

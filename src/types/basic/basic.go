@@ -1,7 +1,6 @@
-package estate
+package basic
 
 import (
-	"encoding/json"
 	"fmt"
 	"sync/atomic"
 )
@@ -11,7 +10,7 @@ const (
 	STATUS_CD     = 1
 )
 
-type Estate struct {
+type Basic struct {
 	TYPE   string // Object Type
 	OID    uint32 // Object ID
 	X      uint16 // coordinate X
@@ -20,14 +19,14 @@ type Estate struct {
 	Status uint8
 }
 
-//----------------------------------------------- Estate Move event records
+//----------------------------------------------- Basic Move event records
 type Move struct {
 	OID uint32
 	X   uint16
 	Y   uint16
 }
 
-//----------------------------------------------- Estate Cooldown event records
+//----------------------------------------------- Basic Cooldown event records
 type CD struct {
 	OID     uint32
 	Timeout int64
@@ -35,14 +34,14 @@ type CD struct {
 
 type Manager struct {
 	Id      int32
-	Estates []Estate
+	Basics []Basic
 	CDs     map[string]*CD
 	NextVal uint32
 	Version uint32
 }
 
-func (m *Manager) AppendEstate(estate *Estate) {
-	m.Estates = append(m.Estates, *estate)
+func (m *Manager) AppendBasic(estate *Basic) {
+	m.Basics = append(m.Basics, *estate)
 }
 
 func (m *Manager) AppendCD(event_id uint32, cd *CD) {
@@ -50,11 +49,6 @@ func (m *Manager) AppendCD(event_id uint32, cd *CD) {
 		m.CDs = make(map[string]*CD)
 	}
 	m.CDs[fmt.Sprint(event_id)] = cd
-}
-
-func (m *Manager) JSON() string {
-	val, _ := json.Marshal(m)
-	return string(val)
 }
 
 func (m *Manager) GENID() uint32 {

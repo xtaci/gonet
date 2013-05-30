@@ -25,11 +25,11 @@ type NextVal struct {
 }
 
 //----------------------------------------------- Change
-func Set(basic *Basic) bool {
+func Set(user *User) bool {
 	config := cfg.Get()
 	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
 
-	info, err := c.Upsert(bson.M{"id": basic.Id}, basic)
+	info, err := c.Upsert(bson.M{"id": user.Id}, user)
 	if err != nil {
 		log.Println(info, err)
 		return false
@@ -39,72 +39,72 @@ func Set(basic *Basic) bool {
 }
 
 //----------------------------------------------- login with (name, password) pair
-func Login(name string, pass string) *Basic {
+func Login(name string, pass string) *User {
 	config := cfg.Get()
 	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
 
-	basic := &Basic{}
-	err := c.Find(bson.M{"name": name, "pass": _md5(pass)}).One(basic)
+	user := &User{}
+	err := c.Find(bson.M{"name": name, "pass": _md5(pass)}).One(user)
 	if err != nil {
 		log.Println(err)
 		return nil
 	}
 
-	return basic
+	return user
 }
 
 //----------------------------------------------- Create a new user
-func New(name, pass string) *Basic {
+func New(name, pass string) *User {
 	config := cfg.Get()
 	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
 
-	basic := &Basic{}
-	err := c.Find(bson.M{"name": name}).One(basic)
+	user := &User{}
+	err := c.Find(bson.M{"name": name}).One(user)
 	if err != nil {
-		basic.Id = _nextval()
-		basic.Name = name
-		basic.Pass = _md5(pass)
-		basic.LoginCount = 1
-		basic.LastLogin = time.Now().Unix()
-		err := c.Insert(basic)
+		user.Id = _nextval()
+		user.Name = name
+		user.Pass = _md5(pass)
+		user.LoginCount = 1
+		user.LastLogin = time.Now().Unix()
+		err := c.Insert(user)
 		if err != nil {
 			log.Println(err)
 			return nil
 		}
-		return basic
+		return user
 	}
 
 	return nil
 }
 
-//----------------------------------------------- Load a user's basic info
-func Get(id int32) *Basic {
+//----------------------------------------------- Load a user's user info
+func Get(id int32) *User {
 	config := cfg.Get()
 	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
 
-	basic := &Basic{}
-	err := c.Find(bson.M{"id": id}).One(basic)
+	user := &User{}
+	err := c.Find(bson.M{"id": id}).One(user)
 	if err != nil {
 		log.Println(err)
 		return nil
 	}
 
-	return basic
+	return user
 }
 
-//----------------------------------------------- Load all users's basic info
-func GetAll() []Basic {
+//----------------------------------------------- Load all users's user info
+func GetAll() []User {
 	config := cfg.Get()
 	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
 
-	var basis []Basic
-	err := c.Find(nil).All(&basis)
+	var users []User
+	err := c.Find(nil).All(&users)
 	if err != nil {
 		log.Println(err)
 		return nil
 	}
 
-	return basis
+	return users
 }
 
 func _md5(str string) []byte {
