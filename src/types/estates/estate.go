@@ -34,6 +34,8 @@ type Estate struct {
 }
 
 type Manager struct {
+	UserId  int32
+	Version uint32
 	Estates map[uint32]*Estate // OID->Estate
 	CDs     map[string]*CD     // waiting CoolDown
 }
