@@ -15,13 +15,13 @@ type Basic struct {
 }
 
 type BasManager struct {
-	Id      int32
+	UserId  int32
 	Basics  []*Basic
 	CDs     map[string]*CD
 	Version uint32
 }
 
-func (m *BasManager) AppendBasic(estate *Basic) {
+func (m *BasManager) Append(estate *Basic) {
 	m.Basics = append(m.Basics, estate)
 }
 

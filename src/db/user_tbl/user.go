@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	COLLECTION = "BASIC"
+	COLLECTION = "USER"
 	NEXTVAL    = "NEXTVAL"
 )
 

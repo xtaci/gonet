@@ -15,14 +15,14 @@ type Offensive struct {
 }
 
 type OffManager struct {
-	Id         int32
+	UserId     int32
 	Offensives []*Offensive
 	CDs        map[string]*CD
 	NextVal    uint32
 	Version    uint32
 }
 
-func (m *OffManager) AppendOffensive(estate *Offensive) {
+func (m *OffManager) Append(estate *Offensive) {
 	m.Offensives = append(m.Offensives, estate)
 }
 

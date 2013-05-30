@@ -15,14 +15,14 @@ type Defensive struct {
 }
 
 type DefManager struct {
-	Id         int32
+	UserId     int32
 	Defensives []*Defensive
 	CDs        map[string]*CD
 	NextVal    uint32
 	Version    uint32
 }
 
-func (m *DefManager) AppendDefensive(estate *Defensive) {
+func (m *DefManager) Append(estate *Defensive) {
 	m.Defensives = append(m.Defensives, estate)
 }
 

@@ -10,7 +10,6 @@ import (
 import (
 	"cfg"
 	. "db"
-	"db/defensive_tbl"
 	"types/estates"
 )
 
@@ -30,7 +29,7 @@ func Execute(event *Event) (ret bool) {
 //------------------------------------------------ do the real work until complete or panic!!!
 func _do(event *Event) {
 	config := cfg.Get()
-	c := Mongo.DB(config["mongo_db"]).C(defensive_tbl.COLLECTION)
+	c := Mongo.DB(config["mongo_db"]).C(event.tblname)
 
 	manager := &estates.DefManager{}
 	err := c.Find(bson.M{"id": event.user_id}).One(manager)

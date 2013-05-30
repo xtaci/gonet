@@ -15,14 +15,14 @@ type Resource struct {
 }
 
 type ResManager struct {
-	Id        int32
+	UserId    int32
 	Resources []*Resource
 	CDs       map[string]*CD
 	NextVal   uint32
 	Version   uint32
 }
 
-func (m *ResManager) AppendResource(estate *Resource) {
+func (m *ResManager) Append(estate *Resource) {
 	m.Resources = append(m.Resources, estate)
 }
 
