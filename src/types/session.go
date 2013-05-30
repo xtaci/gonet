@@ -17,7 +17,7 @@ type Session struct {
 	// user data	
 	User    User
 	Estates estates.Manager
-	Bitmap  grid.Grid // Building's bitmap, online constructing...
+	Grid	*grid.Grid // Building's bitmap, online constructing...
 
 	// session related
 	LoggedIn bool // flag for weather the user is logged in

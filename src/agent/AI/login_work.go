@@ -11,12 +11,19 @@ import (
 	"db/forward_tbl"
 	. "types"
 	"types/estates"
+	"types/grid"
 )
 
 //------------------------------------------------ 登陆后的数据加载
 func LoginWork(sess *Session) bool {
 	// 载入建筑表
 	data_tbl.Get(estates.COLLECTION, sess.User.Id, &sess.Estates)
+	// 建立位图的格子信息
+	sess.Grid = grid.New()
+	for k, v := range sess.Estates.Estates {
+		// TODO :  读gamedata,建立grid信息
+		fmt.Println(k, v)
+	}
 
 	// 最后, 载入离线消息，并push到MQ, 这里小心MQ的buffer长度
 	objs := forward_tbl.PopAll(sess.User.Id)
@@ -30,7 +37,7 @@ func LoginWork(sess *Session) bool {
 		}
 	}
 
-	sess.LastFlush = time.Now().Unix()
+	sess.LastFlushTime = time.Now().Unix()
 
 	return true
 }

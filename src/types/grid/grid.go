@@ -10,7 +10,7 @@ type Grid struct {
 }
 
 //----------------------------------------------- Create a new grid struc
-func NewGrid() *Grid {
+func New() *Grid {
 	m := &Grid{}
 	m.Bitset = make([]byte, GRID_W*GRID_H)
 	return m
