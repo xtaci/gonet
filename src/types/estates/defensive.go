@@ -1,14 +1,9 @@
-package defensive
+package estates
 
 import (
 	"fmt"
 	"sync/atomic"
 	"time"
-)
-
-const (
-	STATUS_NORMAL = 0
-	STATUS_CD     = 1
 )
 
 type Defensive struct {
@@ -20,20 +15,7 @@ type Defensive struct {
 	Status uint8
 }
 
-//----------------------------------------------- Defensive Move event records
-type Move struct {
-	OID uint32
-	X   uint16
-	Y   uint16
-}
-
-//----------------------------------------------- Defensive Cooldown event records
-type CD struct {
-	OID     uint32
-	Timeout int64
-}
-
-type Manager struct {
+type DefManager struct {
 	Id      int32
 	Defensives []Defensive
 	CDs     map[string]*CD
@@ -41,22 +23,23 @@ type Manager struct {
 	Version uint32
 }
 
-func (m *Manager) AppendDefensive(estate *Defensive) {
+func (m *DefManager) AppendDefensive(estate *Defensive) {
 	m.Defensives = append(m.Defensives, *estate)
 }
 
-func (m *Manager) AppendCD(event_id uint32, cd *CD) {
+func (m *DefManager) AppendCD(event_id uint32, cd *CD) {
 	if m.CDs == nil {
 		m.CDs = make(map[string]*CD)
 	}
 	m.CDs[fmt.Sprint(event_id)] = cd
 }
 
-func (m *Manager) GENID() uint32 {
+func (m *DefManager) GENID() uint32 {
 	return atomic.AddUint32(&m.NextVal, 1)
 }
 
-func (m *Manager) CheckCD() int {
+//------------------------------------------------ return num of changes
+func (m *DefManager) CheckCD() int {
 	opcount := 0
 	for i := range m.CDs {
 		if m.CDs[i].Timeout <= time.Now().Unix() { // times up

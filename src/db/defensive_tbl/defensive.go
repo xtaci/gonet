@@ -8,14 +8,14 @@ import (
 import (
 	"cfg"
 	. "db"
-	"types/defensive"
+	"types/estates"
 )
 
 const (
 	COLLECTION = "DEFENSIVE"
 )
 
-func Set(manager *defensive.Manager) bool {
+func Set(manager *estates.DefManager) bool {
 	config := cfg.Get()
 	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
 
@@ -29,11 +29,11 @@ func Set(manager *defensive.Manager) bool {
 	return true
 }
 
-func Get(user_id int32) *defensive.Manager {
+func Get(user_id int32) *estates.DefManager {
 	config := cfg.Get()
 	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
 
-	manager := &defensive.Manager{}
+	manager := &estates.DefManager{}
 	err := c.Find(bson.M{"id": user_id}).One(manager)
 	if err != nil {
 		log.Println(err)

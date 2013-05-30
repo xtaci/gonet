@@ -11,7 +11,7 @@ import (
 	"cfg"
 	. "db"
 	"db/defensive_tbl"
-	"types/defensive"
+	"types/estates"
 )
 
 //------------------------------------------------ perform changes & save back, atomic
@@ -32,7 +32,7 @@ func _do(event *Event) {
 	config := cfg.Get()
 	c := Mongo.DB(config["mongo_db"]).C(defensive_tbl.COLLECTION)
 
-	manager := &defensive.Manager{}
+	manager := &estates.DefManager{}
 	err := c.Find(bson.M{"id": event.user_id}).One(manager)
 
 	change := mgo.Change{

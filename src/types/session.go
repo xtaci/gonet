@@ -1,10 +1,8 @@
 package types
 
 import (
-	"types/basic"
-	"types/defensive"
+	"types/estates"
 	"types/grid"
-	"types/offensive"
 )
 
 type IPCObject struct {
@@ -18,12 +16,12 @@ type Session struct {
 	MQ   chan IPCObject // Player's Internal Message Queue
 	User User
 	// Resources Info
-	Res Res
+	Res estates.ResManager
 	// Building Info
-	BAS    basic.Manager
-	DEF    defensive.Manager
-	OFS    offensive.Manager
-	Bitmap grid.Grid // Building's bitmap
+	BAS    estates.BasManager
+	DEF    estates.DefManager
+	OFF		estates.OffManager
+	Bitmap grid.Grid // Building's bitmap, online constructing...
 
 	// Session Info
 	LoggedIn bool // flag for weather the user is logged in
