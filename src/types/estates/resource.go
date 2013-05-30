@@ -11,15 +11,15 @@ type Resource struct {
 	X      uint16 // coordinate X
 	Y      uint16 // coordinate Y
 	Level  uint8
-	Status uint8
+	Status byte
 }
 
 type ResManager struct {
-	Id      int32
+	Id        int32
 	Resources []Resource
-	CDs     map[string]*CD
-	NextVal uint32
-	Version uint32
+	CDs       map[string]*CD
+	NextVal   uint32
+	Version   uint32
 }
 
 func (m *ResManager) AppendResource(estate *Resource) {
@@ -30,6 +30,8 @@ func (m *ResManager) AppendCD(event_id uint32, cd *CD) {
 	if m.CDs == nil {
 		m.CDs = make(map[string]*CD)
 	}
+
+	cd.CDType = CDTYPE_RESOURCE
 	m.CDs[fmt.Sprint(event_id)] = cd
 }
 

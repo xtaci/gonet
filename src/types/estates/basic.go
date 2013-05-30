@@ -11,12 +11,12 @@ type Basic struct {
 	X      uint16 // coordinate X
 	Y      uint16 // coordinate Y
 	Level  uint8
-	Status uint8
+	Status byte
 }
 
 type BasManager struct {
 	Id      int32
-	Basics []Basic
+	Basics  []Basic
 	CDs     map[string]*CD
 	Version uint32
 }
@@ -29,6 +29,7 @@ func (m *BasManager) AppendCD(event_id uint32, cd *CD) {
 	if m.CDs == nil {
 		m.CDs = make(map[string]*CD)
 	}
+	cd.CDType = CDTYPE_BASIC
 	m.CDs[fmt.Sprint(event_id)] = cd
 }
 
