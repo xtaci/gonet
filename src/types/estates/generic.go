@@ -19,7 +19,6 @@ type Move struct {
 
 //----------------------------------------------- Generic Cooldown event records
 type CD struct {
-	CDType  byte
 	OID     uint32
 	Timeout int64
 }

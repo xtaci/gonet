@@ -16,21 +16,20 @@ type Defensive struct {
 
 type DefManager struct {
 	Id         int32
-	Defensives []Defensive
+	Defensives []*Defensive
 	CDs        map[string]*CD
 	NextVal    uint32
 	Version    uint32
 }
 
 func (m *DefManager) AppendDefensive(estate *Defensive) {
-	m.Defensives = append(m.Defensives, *estate)
+	m.Defensives = append(m.Defensives, estate)
 }
 
 func (m *DefManager) AppendCD(event_id uint32, cd *CD) {
 	if m.CDs == nil {
 		m.CDs = make(map[string]*CD)
 	}
-	cd.CDType = CDTYPE_DEFENSIVE
 	m.CDs[fmt.Sprint(event_id)] = cd
 }
 

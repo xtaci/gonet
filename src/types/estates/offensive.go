@@ -16,22 +16,20 @@ type Offensive struct {
 
 type OffManager struct {
 	Id         int32
-	Offensives []Offensive
+	Offensives []*Offensive
 	CDs        map[string]*CD
 	NextVal    uint32
 	Version    uint32
 }
 
 func (m *OffManager) AppendOffensive(estate *Offensive) {
-	m.Offensives = append(m.Offensives, *estate)
+	m.Offensives = append(m.Offensives, estate)
 }
 
 func (m *OffManager) AppendCD(event_id uint32, cd *CD) {
 	if m.CDs == nil {
 		m.CDs = make(map[string]*CD)
 	}
-
-	cd.CDType = CDTYPE_OFFENSIVE
 	m.CDs[fmt.Sprint(event_id)] = cd
 }
 

@@ -16,22 +16,20 @@ type Resource struct {
 
 type ResManager struct {
 	Id        int32
-	Resources []Resource
+	Resources []*Resource
 	CDs       map[string]*CD
 	NextVal   uint32
 	Version   uint32
 }
 
 func (m *ResManager) AppendResource(estate *Resource) {
-	m.Resources = append(m.Resources, *estate)
+	m.Resources = append(m.Resources, estate)
 }
 
 func (m *ResManager) AppendCD(event_id uint32, cd *CD) {
 	if m.CDs == nil {
 		m.CDs = make(map[string]*CD)
 	}
-
-	cd.CDType = CDTYPE_RESOURCE
 	m.CDs[fmt.Sprint(event_id)] = cd
 }
 

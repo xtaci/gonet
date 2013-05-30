@@ -16,20 +16,19 @@ type Basic struct {
 
 type BasManager struct {
 	Id      int32
-	Basics  []Basic
+	Basics  []*Basic
 	CDs     map[string]*CD
 	Version uint32
 }
 
 func (m *BasManager) AppendBasic(estate *Basic) {
-	m.Basics = append(m.Basics, *estate)
+	m.Basics = append(m.Basics, estate)
 }
 
 func (m *BasManager) AppendCD(event_id uint32, cd *CD) {
 	if m.CDs == nil {
 		m.CDs = make(map[string]*CD)
 	}
-	cd.CDType = CDTYPE_BASIC
 	m.CDs[fmt.Sprint(event_id)] = cd
 }
 
