@@ -1,6 +1,6 @@
-### GS <---> HUB 
+### GS与HUB通信协议
 
-#### 通信协议
+#### 包结构
 <pre>
 |LENGTH|SEQNUM|PROTO|PAYLOAD|
 
