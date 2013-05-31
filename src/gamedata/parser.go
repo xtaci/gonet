@@ -12,6 +12,7 @@ func parse(file *os.File) {
 
 	isLineOne := true
 	var names []string
+	var tblname string
 
 	for {
 		line, e := r.ReadString('\n')
@@ -35,13 +36,14 @@ func parse(file *os.File) {
 			for k, v := range fields {
 				names[k] = v
 			}
+			tblname = names[0]
 			isLineOne = false
 			continue
 		}
 
 		// 第一列包含特殊含义
 		for i := 1; i < len(fields); i++ {
-			Set(names[0], fields[0], names[i], fields[i])
+			Set(tblname, fields[0], names[i], fields[i])
 		}
 	}
 }
