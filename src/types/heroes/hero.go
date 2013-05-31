@@ -20,7 +20,7 @@ type CD struct {
 type Hero struct {
 	TYPE   string // type in string
 	Status byte
-	Spec   map[string]string
+	DB     map[string]string
 }
 
 type Manager struct {

@@ -22,7 +22,7 @@ type Estate struct {
 	X      uint8  // coordinate X
 	Y      uint8  // coordinate Y
 	Status byte
-	Spec   map[string]string // unit's private data
+	DB     map[string]string // unit's private data
 }
 
 type Manager struct {
