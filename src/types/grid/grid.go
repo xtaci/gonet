@@ -12,16 +12,26 @@ type Grid struct {
 //------------------------------------------------ Create a new grid struct
 func New() *Grid {
 	g := &Grid{}
-	g.M= make([]uint32, int(W)*int(H))
+	g.M = make([]uint32, int(W)*int(H))
 	return g
 }
 
 //------------------------------------------------ Set v->[X,Y]
-func (g *Grid) Set(X,Y byte, v uint32) {
-	g.M[Y*W + X]= v
+func (g *Grid) Set(X, Y byte, v uint32) {
+	if X >= 0 && X <= W {
+		if Y >= 0 && Y <= H {
+			g.M[Y*W+X] = v
+		}
+	}
 }
 
 //------------------------------------------------ Get <-[X,Y]
-func (g *Grid) Get(X,Y byte) uint32 {
-	return g.M[Y*W + X]
+func (g *Grid) Get(X, Y byte) uint32 {
+	if X >= 0 && X <= W {
+		if Y >= 0 && Y <= H {
+			return g.M[Y*W+X]
+		}
+	}
+
+	return 0
 }

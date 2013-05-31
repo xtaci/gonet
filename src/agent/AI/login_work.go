@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"log"
 	"time"
+	"strings"
+	"strconv"
 )
 
 import (
@@ -12,6 +14,7 @@ import (
 	. "types"
 	"types/estates"
 	"types/grid"
+	"gamedata"
 )
 
 //------------------------------------------------ 登陆后的数据加载
@@ -23,8 +26,16 @@ func LoginWork(sess *Session) bool {
 	for _, v := range sess.Estates.Estates {
 		// TODO :  读gamedata,建立grid信息
 		name := gamedata.Query(v.TYPE)
-		gamedata.GetString("建筑规格",
-		sess.Grid.Set(v.X, v.Y, v.TYPE)
+		cell := gamedata.GetString("建筑规格",name, "占用格子数")
+		wh := strings.Split(cell, "X")
+		w,_ := strconv.Atoi(wh[0])
+		h,_ := strconv.Atoi(wh[1])
+
+		for x:=v.X;x<v.X+byte(w);x++ {
+			for y:=v.Y;y<v.Y+byte(h);y++ {
+				sess.Grid.Set(x, y, v.TYPE)
+			}
+		}
 	}
 
 	// 最后, 载入离线消息，并push到MQ, 这里小心MQ的buffer长度
@@ -33,7 +44,7 @@ func LoginWork(sess *Session) bool {
 		obj := &IPCObject{}
 		err := json.Unmarshal(objs[k], obj)
 		if err != nil {
-			log.Println("illegal IPCObject", objs[k])
+			log.Println("Illegal IPCObject", objs[k])
 		} else {
 			sess.MQ <- *obj
 		}
