@@ -1,18 +1,19 @@
 package core
 
 import (
-	"fmt"
-	"labix.org/v2/mgo"
-	"labix.org/v2/mgo/bson"
-	"log"
+//"fmt"
+//"labix.org/v2/mgo"
+//"labix.org/v2/mgo/bson"
+//"log"
 )
 
 import (
-	"cfg"
-	. "db"
-	"misc/naming"
+	//"cfg"
+	//	. "db"
+	//	"misc/naming"
 	. "misc/stack"
-	"types/estates"
+
+//	"types/estates"
 )
 
 //------------------------------------------------ perform changes & save back, atomic
@@ -23,11 +24,15 @@ func Execute(event *Event, event_id uint32) (ret bool) {
 }
 
 func _do(event *Event, event_id uint32) {
-	switch event.tblname {
-	case naming.FNV1a(estates.COLLECTION):
-		_do_estates(event, event_id)
-	}
+	/*
+		switch event.tblname {
+		case naming.FNV1a(estates.COLLECTION):
+			_do_estates(event, event_id)
+		}
+	*/
 }
+
+/*
 
 //------------------------------------------------ do the real work until complete or panic!!!
 func _do_estates(event *Event, event_id uint32) {
@@ -68,3 +73,4 @@ func _do_estates(event *Event, event_id uint32) {
 
 	log.Printf("Event Exec: [%v]\n", event_id)
 }
+*/

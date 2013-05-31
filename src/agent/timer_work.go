@@ -21,9 +21,6 @@ func timer_work(sess *Session) {
 		return
 	}
 
-	// check building upgrades
-	sess.OpCount += sess.Estates.CheckCD()
-
 	// TODO: 持久化逻辑#2： 超过一定的时间，刷入数据库
 	config := cfg.Get()
 	ivl, _ := strconv.Atoi(config["flush_interval"])
