@@ -11,6 +11,7 @@ import (
 	"db/forward_tbl"
 	"hub/accounts"
 	"misc/packet"
+	. "misc/stack"
 )
 
 var (
@@ -36,7 +37,7 @@ func _send(seqid uint64, data []byte, output chan []byte) {
 }
 
 func HandleRequest(hostid int32, reader *packet.Packet, output chan []byte) {
-	defer _HandleError()
+	defer PrintPanicStack()
 
 	seqid, err := reader.ReadU64() // read seqid
 	if err != nil {
@@ -226,17 +227,5 @@ func checkErr(err error) {
 		}
 
 		panic("error occured in HUB ipc module")
-	}
-}
-
-func _HandleError() {
-	if x := recover(); x != nil {
-		log.Printf("run time panic when processing HUB request: %v", x)
-		for i := 0; i < 10; i++ {
-			funcName, file, line, ok := runtime.Caller(i)
-			if ok {
-				log.Printf("frame %v:[func:%v,file:%v,line:%v]\n", i, runtime.FuncForPC(funcName).Name(), file, line)
-			}
-		}
 	}
 }

@@ -18,7 +18,7 @@ desc:添加一个cooldown请求
 packet_type:1001
 name:add_ack
 payload:INT
-desc:返回这个cooldown编号
+desc:返回0
 
 packet_type:2
 name:cancel_req

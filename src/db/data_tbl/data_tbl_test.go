@@ -10,7 +10,7 @@ import (
 
 func TestEstate(t *testing.T) {
 	data := &estates.Manager{}
-	e1 := &estates.Estate{TYPE: naming.FNV1a("工人小屋")}
+	e1 := &estates.Estate{TYPE: naming.FNV1a("工人小屋"), Status: estates.STATUS_CD}
 	data.Append(100, e1)
 	cd1 := &estates.CD{OID: 100, Timeout: time.Now().Unix()}
 	data.AppendCD(1, cd1)
@@ -27,7 +27,7 @@ func TestEstate(t *testing.T) {
 		fmt.Println("CD:", value.CDs[k])
 	}
 
-	all := []estates.Manager{}
+	var all []estates.Manager
 	GetAll(estates.COLLECTION, &all)
 	fmt.Println("GetAll")
 	fmt.Println(value)

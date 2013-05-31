@@ -9,6 +9,7 @@ import (
 import (
 	"event/core"
 	"misc/packet"
+	. "misc/stack"
 )
 
 //--------------------------------------------------------- send
@@ -21,7 +22,7 @@ func _send(seqid uint64, data []byte, output chan []byte) {
 }
 
 func HandleRequest(reader *packet.Packet, output chan []byte) {
-	defer _HandleError()
+	defer PrintPanicStack()
 
 	seqid, err := reader.ReadU64() // read seqid
 	if err != nil {
@@ -75,17 +76,5 @@ func checkErr(err error) {
 		}
 
 		panic("error occured in Event Protocol Module")
-	}
-}
-
-func _HandleError() {
-	if x := recover(); x != nil {
-		log.Printf("run time panic when processing Event request: %v", x)
-		for i := 0; i < 10; i++ {
-			funcName, file, line, ok := runtime.Caller(i)
-			if ok {
-				log.Printf("frame %v:[func:%v,file:%v,line:%v]\n", i, runtime.FuncForPC(funcName).Name(), file, line)
-			}
-		}
 	}
 }

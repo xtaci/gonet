@@ -1,21 +1,21 @@
 package agent
 
 import (
-	"agent/client_protos"
-	"agent/ipc"
-	"misc/packet"
-	. "types"
+	"fmt"
+	"log"
 )
 
 import (
-	"fmt"
-	"log"
-	"runtime"
+	"agent/client_protos"
+	"agent/ipc"
+	"misc/packet"
+	. "misc/stack"
+	. "types"
 )
 
 //----------------------------------------------- client protocol handle proxy
 func UserRequestProxy(sess *Session, p []byte) []byte {
-	defer _ProxyError()
+	defer PrintPanicStack()
 
 	reader := packet.Reader(p)
 	b, err := reader.ReadU16()
@@ -40,23 +40,11 @@ func UserRequestProxy(sess *Session, p []byte) []byte {
 
 //----------------------------------------------- IPC proxy
 func IPCRequestProxy(sess *Session, p *IPCObject) {
-	defer _ProxyError()
+	defer PrintPanicStack()
 	handle := ipc.IPCHandler[p.Service]
 	log.Printf("ipc:%v,user:%v\n", p.Service, sess.User.Id)
 
 	if handle != nil {
 		handle(sess, p)
-	}
-}
-
-func _ProxyError() {
-	if x := recover(); x != nil {
-		log.Printf("run time panic when processing request: %v", x)
-		for i := 0; i < 10; i++ {
-			funcName, file, line, ok := runtime.Caller(i)
-			if ok {
-				log.Printf("frame %v:[func:%v,file:%v,line:%v]\n", i, runtime.FuncForPC(funcName).Name(), file, line)
-			}
-		}
 	}
 }

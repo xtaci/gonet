@@ -1,21 +1,23 @@
 package core
 
 import (
+	"misc/naming"
 	"misc/timer"
-	"sync"
 )
 
 type Event struct {
-	tblname string
-	oid     uint32
+	tblname uint32
 	user_id int32
+	oid     uint32
 	timeout int64
 }
 
 var (
-	_event_ch    chan uint32
-	_events      map[uint32]*Event
-	_events_lock sync.Mutex
+	_event_ch     chan uint32
+	_events       map[uint32]*Event // mapping from  event_id-> Event
+	_event_id_gen uint32
+
+	_hashtbl map[uint32]string // mapping from hash(tblname)-> tblname
 )
 
 const (
@@ -25,43 +27,52 @@ const (
 func init() {
 	_event_ch = make(chan uint32, EVENT_CHAN_MAX)
 	_events = make(map[uint32]*Event)
+	_hashtbl = make(map[uint32]string)
 	go _expire()
 }
 
 func _expire() {
 	for {
 		event_id := <-_event_ch
-
-		_events_lock.Lock()
 		event := _events[event_id]
-		_events_lock.Unlock()
 
 		// process event, sequentially
-		if Execute(event) {
-			_events_lock.Lock()
+		if Execute(event, event_id) {
 			delete(_events, event_id)
-			_events_lock.Unlock()
 		}
 	}
 }
 
-//------------------------------------------------ Add a timeout for a object-id
+//------------------------------------------------ Add a timeout event
 func Add(tblname string, oid uint32, user_id int32, timeout int64) uint32 {
-	_event_id := timer.Add(timeout, _event_ch)
-	event := &Event{tblname: tblname, oid: oid, user_id: user_id, timeout: timeout}
+	h_tblname := naming.FNV1a(tblname)
+	_hashtbl[h_tblname] = tblname
 
-	_events_lock.Lock()
-	_events[_event_id] = event
-	_events_lock.Unlock()
+	_event_id_gen++
+	event_id := _event_id_gen
+	timer.Add(event_id, timeout, _event_ch)
 
-	return _event_id
+	event := &Event{tblname: h_tblname, user_id: user_id, oid: oid, timeout: timeout}
+	_events[event_id] = event
+
+	return event_id
 }
 
-//------------------------------------------------ cancel an timeout
+//------------------------------------------------ Load a timeout event
+func Load(tblname string, oid uint32, user_id int32, timeout int64, event_id uint32) {
+	h_tblname := naming.FNV1a(tblname)
+	_hashtbl[h_tblname] = tblname
+
+	timer.Add(event_id, timeout, _event_ch)
+
+	event := &Event{tblname: h_tblname, user_id: user_id, oid: oid, timeout: timeout}
+	_events[event_id] = event
+
+	return
+}
+
+//------------------------------------------------ cancel an oid's timeout
 func Cancel(event_id uint32) {
 	timer.Cancel(event_id)
-
-	_events_lock.Lock()
 	delete(_events, event_id)
-	_events_lock.Unlock()
 }

@@ -8,11 +8,11 @@ func TestTimer(t *testing.T) {
 	ch := make(chan uint32, 100)
 
 	now := time.Now().Unix()
-	Add(now+1, ch)
-	Add(now+2, ch)
-	Add(now+3, ch)
-	Add(now+4, ch)
-	Add(now+5, ch)
+	Add(1, now+1, ch)
+	Add(2, now+2, ch)
+	Add(3, now+3, ch)
+	Add(4, now+4, ch)
+	Add(5, now+5, ch)
 	//	Add(now+10, ch)
 	//	Add(now+60, ch)
 

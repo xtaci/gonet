@@ -38,8 +38,8 @@ func FNV1a(str string) uint32 {
 	octects := []byte(str)
 
 	hash := offset_basis
-	for _,v := range octects {
-		hash = hash ^  uint32(v)
+	for _, v := range octects {
+		hash = hash ^ uint32(v)
 		hash = hash * FNV_prime
 	}
 

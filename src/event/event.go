@@ -24,6 +24,7 @@ func EventStart() {
 	}
 
 	log.Println("Starting Event Server")
+	startup_work()
 
 	// Listen
 	service := DEFAULT_SERVICE

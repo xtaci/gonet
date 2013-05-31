@@ -2,6 +2,7 @@ package accounts
 
 import (
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -71,6 +72,8 @@ var (
 	_raids     map[uint32]*PlayerInfo
 	_raidslock sync.Mutex
 	_raids_ch  chan uint32
+
+	_event_id_gen uint32
 )
 
 func init() {
@@ -182,7 +185,9 @@ func Raid(id int32) bool {
 
 		if state&OFFLINE != 0 && state&(RAID|PROTECTED) == 0 { // when offline and free
 			timeout := time.Now().Unix() + RAID_TIME
-			event_id := timer.Add(timeout, _raids_ch) // generate timer
+
+			event_id := atomic.AddUint32(&_event_id_gen, 1)
+			timer.Add(event_id, timeout, _raids_ch) // generate timer
 
 			player.State = int32(OFFLINE | RAID)
 			player.RaidTimeout = timeout
@@ -231,7 +236,8 @@ func Protect(id int32, until time.Time) bool {
 	if player != nil {
 		player.LCK.Lock()
 		if player.State&RAID == 0 { // when not being raid
-			event_id := timer.Add(until.Unix(), _raids_ch)
+			event_id := atomic.AddUint32(&_event_id_gen, 1)
+			timer.Add(event_id, until.Unix(), _raids_ch)
 
 			player.State |= PROTECTED
 			player.ProtectTimeout = until.Unix()

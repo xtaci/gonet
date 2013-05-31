@@ -25,9 +25,9 @@ type CD struct {
 }
 
 type Estate struct {
-	TYPE   uint32// Object Type
-	X      uint8 // coordinate X
-	Y      uint8 // coordinate Y
+	TYPE   uint32 // Object Type
+	X      uint8  // coordinate X
+	Y      uint8  // coordinate Y
 	Level  uint8
 	Status byte
 	Spec   map[string]string // unit's private data
@@ -37,7 +37,7 @@ type Manager struct {
 	UserId  int32
 	Version uint32
 	Estates map[string]*Estate // OID->Estate
-	CDs     map[string]*CD     // waiting CoolDown
+	CDs     map[string]*CD     // EventId->CD
 }
 
 func (m *Manager) Append(oid uint32, estate *Estate) {

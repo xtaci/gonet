@@ -1,8 +1,8 @@
 package naming
 
 import (
-	"testing"
 	"fmt"
+	"testing"
 )
 
 func TestCamelcase(t *testing.T) {

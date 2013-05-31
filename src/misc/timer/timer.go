@@ -2,7 +2,6 @@ package timer
 
 import (
 	"sync"
-	"sync/atomic"
 	"time"
 )
 
@@ -16,7 +15,6 @@ const (
 )
 
 var (
-	_incr      uint32                         // event id generator
 	_eventlist [TIMER_LEVEL]map[uint32]*Event // 2^n based time interval
 
 	_eventqueue      map[uint32]*Event // add queue
@@ -116,14 +114,12 @@ func _trigger(level uint) {
 }
 
 //------------------------------------------------ add a timeout event
-func Add(timeout int64, ch chan uint32) uint32 {
-	event_id := atomic.AddUint32(&_incr, 1)
+func Add(id uint32, timeout int64, ch chan uint32) {
 	event := &Event{CH: ch, Timeout: timeout}
 
 	_eventqueue_lock.Lock()
-	_eventqueue[event_id] = event
+	_eventqueue[id] = event
 	_eventqueue_lock.Unlock()
-	return event_id
 }
 
 //------------------------------------------------ cancel an event

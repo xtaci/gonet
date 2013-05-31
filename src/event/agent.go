@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	MAXCHAN = 200000
+	MAXCHAN = 1000000
 )
 
 func init() {
@@ -45,7 +45,7 @@ func EventAgent(incoming chan []byte, conn net.Conn) {
 			}
 
 			reader := packet.Reader(msg)
-			go protos.HandleRequest(reader, output)
+			protos.HandleRequest(reader, output)
 		}
 	}
 }
