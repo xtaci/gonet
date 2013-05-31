@@ -54,3 +54,17 @@ func Get(collection string, user_id int32, data interface{}) bool {
 
 	return true
 }
+
+//------------------------------------------------ pass-in the POINTER!!!!!
+func GetAll(collection string, all interface{}) bool {
+	config := cfg.Get()
+	c := Mongo.DB(config["mongo_db"]).C(collection)
+
+	err := c.Find(nil).All(all)
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+
+	return true
+}
