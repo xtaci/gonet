@@ -1,1 +1,1 @@
-connection to event server
+Event服务器的函数封装
