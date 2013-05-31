@@ -2,8 +2,8 @@
 GO=go
 
 PROGS = hub \
-	 gate \
-	 event
+	 event \
+	 agent 
 
 SRCDIR = ./src
 
