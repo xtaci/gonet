@@ -3,7 +3,6 @@ package gamedata
 import (
 	"bufio"
 	"os"
-	"strconv"
 	"strings"
 )
 
@@ -40,11 +39,9 @@ func parse(file *os.File) {
 			continue
 		}
 
-		// the first column represents the level
-		lv, _ := strconv.Atoi(fields[0])
-
+		// 第一列包含特殊含义
 		for i := 1; i < len(fields); i++ {
-			Set(names[0], lv, names[i], fields[i])
+			Set(names[0], fields[0], names[i], fields[i])
 		}
 	}
 }

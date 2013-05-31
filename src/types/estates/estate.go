@@ -14,8 +14,8 @@ const (
 //----------------------------------------------- Generic Move event records
 type Move struct {
 	OID uint32
-	X   uint16
-	Y   uint16
+	X   uint8
+	Y   uint8
 }
 
 //----------------------------------------------- Generic Cooldown event records
@@ -26,8 +26,8 @@ type CD struct {
 
 type Estate struct {
 	TYPE   string // Object Type
-	X      uint16 // coordinate X
-	Y      uint16 // coordinate Y
+	X      uint8 // coordinate X
+	Y      uint8 // coordinate Y
 	Level  uint8
 	Status byte
 	Spec   map[string]string // unit's private data

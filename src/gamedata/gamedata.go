@@ -16,7 +16,7 @@ type Record struct {
 
 //----------------------------------------------- Numerical Table for a object
 type Table struct {
-	Records map[int]*Record
+	Records map[string]*Record
 }
 
 func init() {
@@ -43,34 +43,34 @@ func init() {
 }
 
 //----------------------------------------------- Set Field value
-func Set(tblname string, level int, fieldname string, value string) {
+func Set(tblname string, rowname string, fieldname string, value string) {
 	tbl := _tables[tblname]
 
 	if tbl == nil {
 		tbl = &Table{}
-		tbl.Records = make(map[int]*Record)
+		tbl.Records = make(map[string]*Record)
 		_tables[tblname] = tbl
 	}
 
-	rec := tbl.Records[level]
+	rec := tbl.Records[rowname]
 	if rec == nil {
 		rec = &Record{}
 		rec.Fields = make(map[string]string)
-		tbl.Records[level] = rec
+		tbl.Records[rowname] = rec
 	}
 
 	rec.Fields[fieldname] = value
 }
 
 //----------------------------------------------- Get Field value
-func _get(tblname string, level int, fieldname string) string {
+func _get(tblname string, rowname string, fieldname string) string {
 	tbl := _tables[tblname]
 
 	if tbl == nil {
 		return ""
 	}
 
-	rec := tbl.Records[level]
+	rec := tbl.Records[rowname]
 	if rec == nil {
 		return ""
 	}
@@ -78,8 +78,8 @@ func _get(tblname string, level int, fieldname string) string {
 	return rec.Fields[fieldname]
 }
 
-func GetInt(tblname string, level int, fieldname string) int32 {
-	val := _get(tblname, level, fieldname)
+func GetInt(tblname string, rowname string, fieldname string) int32 {
+	val := _get(tblname, rowname, fieldname)
 	if val == "" {
 		return ^int32(0) // return MAX INT
 	}
@@ -89,8 +89,8 @@ func GetInt(tblname string, level int, fieldname string) int32 {
 	return int32(v)
 }
 
-func GetFloat(tblname string, level int, fieldname string) float32 {
-	val := _get(tblname, level, fieldname)
+func GetFloat(tblname string, rowname string, fieldname string) float32 {
+	val := _get(tblname, rowname, fieldname)
 	if val == "" {
 		return 0.0
 	}
@@ -103,35 +103,7 @@ func GetFloat(tblname string, level int, fieldname string) float32 {
 	return float32(f)
 }
 
-func FieldNames(tblname string) []string {
-	tbl := _tables[tblname]
-
-	if tbl == nil {
-		return nil
-	}
-
-	rec := tbl.Records[1]
-	if rec == nil {
-		return nil
-	}
-
-	ret := make([]string, len(rec.Fields))
-	count := 0
-	for k := range rec.Fields {
-		ret[count] = k
-		count++
-	}
-
-	return ret
-}
-
-//------------------------------------------------ Get Num of Levels
-func NumLevels(tblname string) int {
-	tbl := _tables[tblname]
-
-	if tbl == nil {
-		return 0
-	}
-
-	return len(tbl.Records)
+//----------------------------------------------- Get Field value as string
+func GetString(tblname string, rowname string, fieldname string) string {
+	return _get(tblname, rowname, fieldname)
 }
