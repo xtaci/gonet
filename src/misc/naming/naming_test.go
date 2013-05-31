@@ -27,3 +27,9 @@ func TestNaming(t *testing.T) {
 		t.Error("FNV hash failed")
 	}
 }
+
+func BenchmarkFNV(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		FNV1a("foobar")
+	}
+}
