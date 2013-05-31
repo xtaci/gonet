@@ -2,25 +2,28 @@ package gamedata
 
 import (
 	"log"
+	"misc/naming"
 	"os"
 	"path/filepath"
 	"strconv"
 )
 
 var _tables map[string]*Table
+var _hashtbl map[uint32]string // hash->string
 
 //----------------------------------------------- info for a level
 type Record struct {
-	Fields map[string]string
+	Fields map[uint32]string
 }
 
 //----------------------------------------------- Numerical Table for a object
 type Table struct {
-	Records map[string]*Record
+	Records map[uint32]*Record
 }
 
 func init() {
 	_tables = make(map[string]*Table)
+	_hashtbl = make(map[uint32]string)
 
 	pattern := os.Getenv("GOPATH") + "/src/gamedata/data/*.csv"
 	files, err := filepath.Glob(pattern)
@@ -42,24 +45,38 @@ func init() {
 	}
 }
 
+//------------------------------------------------ Query a name by hash
+func Query(hash uint32) string {
+	return _hashtbl[hash]
+}
+
 //----------------------------------------------- Set Field value
 func Set(tblname string, rowname string, fieldname string, value string) {
+	// store hashing
+	h_rowname := naming.FNV1a(rowname)
+	h_fieldname := naming.FNV1a(fieldname)
+	h_tblname := naming.FNV1a(tblname)
+	_hashtbl[h_rowname] = rowname
+	_hashtbl[h_fieldname] = fieldname
+	_hashtbl[h_tblname] = tblname
+
+	//
 	tbl := _tables[tblname]
 
 	if tbl == nil {
 		tbl = &Table{}
-		tbl.Records = make(map[string]*Record)
+		tbl.Records = make(map[uint32]*Record)
 		_tables[tblname] = tbl
 	}
 
-	rec := tbl.Records[rowname]
+	rec := tbl.Records[h_rowname]
 	if rec == nil {
 		rec = &Record{}
-		rec.Fields = make(map[string]string)
-		tbl.Records[rowname] = rec
+		rec.Fields = make(map[uint32]string)
+		tbl.Records[h_rowname] = rec
 	}
 
-	rec.Fields[fieldname] = value
+	rec.Fields[h_fieldname] = value
 }
 
 //----------------------------------------------- Get Field value
@@ -70,12 +87,12 @@ func _get(tblname string, rowname string, fieldname string) string {
 		return ""
 	}
 
-	rec := tbl.Records[rowname]
+	rec := tbl.Records[naming.FNV1a(rowname)]
 	if rec == nil {
 		return ""
 	}
 
-	return rec.Fields[fieldname]
+	return rec.Fields[naming.FNV1a(fieldname)]
 }
 
 func GetInt(tblname string, rowname string, fieldname string) int32 {
