@@ -19,6 +19,7 @@ func TestCamelcase(t *testing.T) {
 	}
 
 	fmt.Println("FNV-1a Hashing:")
-	fmt.Printf("%x\n", FNV1a("abc"))
-	fmt.Printf("%x\n", FNV1a("工人小屋"))
+	fmt.Printf("%x\n", FNV1a(""))
+	fmt.Printf("%x\n", FNV1a("a"))
+	fmt.Printf("%x\n", FNV1a("foobar"))
 }
