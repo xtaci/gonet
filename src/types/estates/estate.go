@@ -25,7 +25,7 @@ type CD struct {
 }
 
 type Estate struct {
-	TYPE   string // Object Type
+	TYPE   uint32// Object Type
 	X      uint8 // coordinate X
 	Y      uint8 // coordinate Y
 	Level  uint8

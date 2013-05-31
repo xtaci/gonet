@@ -12,7 +12,6 @@ import (
 	. "types"
 	"types/estates"
 	"types/grid"
-	"misc/naming"
 )
 
 //------------------------------------------------ 登陆后的数据加载
@@ -23,7 +22,7 @@ func LoginWork(sess *Session) bool {
 	sess.Grid = grid.New()
 	for _, v := range sess.Estates.Estates {
 		// TODO :  读gamedata,建立grid信息
-		sess.Grid.Set(v.X, v.Y, naming.FNV1a(v.TYPE))
+		sess.Grid.Set(v.X, v.Y, v.TYPE)
 	}
 
 	// 最后, 载入离线消息，并push到MQ, 这里小心MQ的buffer长度
