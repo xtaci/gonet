@@ -1,10 +1,11 @@
 ### GS <---> HUB 
 
 #### 通信协议
-
+<pre>
 |LENGTH|SEQNUM|PROTO|PAYLOAD|
 
 |16|64|16|...|
+</pre>
 
 #### 包测试：
 <pre>
