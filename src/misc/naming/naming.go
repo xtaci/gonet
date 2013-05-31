@@ -34,10 +34,9 @@ func CamelCase(str string) string {
 //------------------------------------------------ FNV-1a 32-bit String Hash
 func FNV1a(str string) uint32 {
 	FNV_prime := uint32(16777619)
-	offset_basis := uint32(2166136261)
+	hash := uint32(2166136261)
 	octects := []byte(str)
 
-	hash := offset_basis
 	for _, v := range octects {
 		hash = hash ^ uint32(v)
 		hash = hash * FNV_prime

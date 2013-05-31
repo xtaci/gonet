@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestCamelcase(t *testing.T) {
+func TestNaming(t *testing.T) {
 	if CamelCase("foo_bar") != "FooBar" {
 		t.Error("failed foo_bar")
 	}
@@ -22,4 +22,8 @@ func TestCamelcase(t *testing.T) {
 	fmt.Printf("%x\n", FNV1a(""))
 	fmt.Printf("%x\n", FNV1a("a"))
 	fmt.Printf("%x\n", FNV1a("foobar"))
+
+	if FNV1a("foobar") != 0xbf9cf968 {
+		t.Error("FNV hash failed")
+	}
 }
