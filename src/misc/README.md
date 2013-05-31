@@ -6,4 +6,8 @@ naming --> 命名
 
 packet --> 二进制包处理
 
-...
+crypto --> 密码
+
+timer --> 定时器
+
+
