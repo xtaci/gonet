@@ -24,7 +24,7 @@ func LoginWork(sess *Session) bool {
 	data_tbl.Get(estates.COLLECTION, sess.User.Id, &sess.Estates)
 	// 建立位图的格子信息
 	sess.Grid = grid.New()
-	for _, v := range sess.Estates.Estates {
+	for k, v := range sess.Estates.Estates {
 		// TODO :  读gamedata,建立grid信息
 		name := gamedata.Query(v.TYPE)
 		cell := gamedata.GetString("建筑规格", name, "占用格子数")
@@ -32,10 +32,11 @@ func LoginWork(sess *Session) bool {
 		w, _ := strconv.Atoi(wh[0])
 		h, _ := strconv.Atoi(wh[1])
 
+		oid, _ := strconv.Atoi(k)
 		//	fmt.Println(w,h, wh, cell, v)
 		for x := v.X; x < v.X+byte(w); x++ {
 			for y := v.Y; y < v.Y+byte(h); y++ {
-				sess.Grid.Set(x, y, v.TYPE)
+				sess.Grid.Set(x, y, uint32(oid))
 			}
 		}
 	}
