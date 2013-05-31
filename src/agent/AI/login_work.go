@@ -22,7 +22,8 @@ func LoginWork(sess *Session) bool {
 	sess.Grid = grid.New()
 	for _, v := range sess.Estates.Estates {
 		// TODO :  读gamedata,建立grid信息
-		gamedata.GetString("建筑规格", 
+		name := gamedata.Query(v.TYPE)
+		gamedata.GetString("建筑规格",
 		sess.Grid.Set(v.X, v.Y, v.TYPE)
 	}
 

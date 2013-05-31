@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-var _tables map[string]*Table
+var _tables map[uint32]*Table
 var _hashtbl map[uint32]string // hash->string
 
 //----------------------------------------------- info for a level
@@ -22,7 +22,7 @@ type Table struct {
 }
 
 func init() {
-	_tables = make(map[string]*Table)
+	_tables = make(map[uint32]*Table)
 	_hashtbl = make(map[uint32]string)
 
 	pattern := os.Getenv("GOPATH") + "/src/gamedata/data/*.csv"
@@ -61,12 +61,12 @@ func Set(tblname string, rowname string, fieldname string, value string) {
 	_hashtbl[h_tblname] = tblname
 
 	//
-	tbl := _tables[tblname]
+	tbl := _tables[h_tblname]
 
 	if tbl == nil {
 		tbl = &Table{}
 		tbl.Records = make(map[uint32]*Record)
-		_tables[tblname] = tbl
+		_tables[h_tblname] = tbl
 	}
 
 	rec := tbl.Records[h_rowname]
@@ -80,19 +80,24 @@ func Set(tblname string, rowname string, fieldname string, value string) {
 }
 
 //----------------------------------------------- Get Field value
-func _get(tblname string, rowname string, fieldname string) string {
-	tbl := _tables[tblname]
+func _gethash(h_tblname uint32, h_rowname uint32, h_fieldname uint32) string {
+	tbl := _tables[h_tblname]
 
 	if tbl == nil {
 		return ""
 	}
 
-	rec := tbl.Records[naming.FNV1a(rowname)]
+	rec := tbl.Records[h_rowname]
 	if rec == nil {
 		return ""
 	}
 
-	return rec.Fields[naming.FNV1a(fieldname)]
+	return rec.Fields[h_fieldname]
+
+}
+
+func _get(tblname string, rowname string, fieldname string) string {
+	return _gethash(naming.FNV1a(tblname), naming.FNV1a(rowname), naming.FNV1a(fieldname))
 }
 
 func GetInt(tblname string, rowname string, fieldname string) int32 {
