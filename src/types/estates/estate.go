@@ -28,7 +28,6 @@ type Estate struct {
 	TYPE   uint32 // Object Type
 	X      uint8  // coordinate X
 	Y      uint8  // coordinate Y
-	Level  uint8
 	Status byte
 	Spec   map[string]string // unit's private data
 }
