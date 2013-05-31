@@ -1,51 +1,27 @@
 package grid
 
 const (
-	GRID_W = 40
-	GRID_H = 40
+	W = byte(50)
+	H = 50
 )
 
 type Grid struct {
-	Bitset []byte
+	M []uint32
 }
 
-//----------------------------------------------- Create a new grid struc
+//------------------------------------------------ Create a new grid struct
 func New() *Grid {
-	m := &Grid{}
-	m.Bitset = make([]byte, GRID_W*GRID_H)
-	return m
+	g := &Grid{}
+	g.M= make([]uint32, int(W)*int(H))
+	return g
 }
 
-//----------------------------------------------- test whether a (X,Y) is set
-func (m *Grid) Test(X, Y int) bool {
-	if X < GRID_W && Y < GRID_H {
-		bit := Y*GRID_W + X
-		n := bit / 8
-		off := uint(bit % 8)
-		if (m.Bitset[n] & (byte(128) >> off)) != 0 {
-			return true
-		}
-	}
-
-	return false
+//------------------------------------------------ Set v->[X,Y]
+func (g *Grid) Set(X,Y byte, v uint32) {
+	g.M[Y*W + X]= v
 }
 
-//----------------------------------------------- Set (X,Y) -> 1
-func (m *Grid) Set(X, Y int) {
-	if X < GRID_W && Y < GRID_H {
-		bit := Y*GRID_W + X
-		n := bit / 8
-		off := uint(bit % 8)
-		m.Bitset[n] |= byte(128) >> off
-	}
-}
-
-//----------------------------------------------- Set (X,Y) -> 0
-func (m *Grid) Unset(X, Y uint) {
-	if X < GRID_W && Y < GRID_H {
-		bit := Y*GRID_W + X
-		n := bit / 8
-		off := uint(bit % 8)
-		m.Bitset[n] &= ^(byte(128) >> off)
-	}
+//------------------------------------------------ Get <-[X,Y]
+func (g *Grid) Get(X,Y byte) uint32 {
+	return g.M[Y*W + X]
 }

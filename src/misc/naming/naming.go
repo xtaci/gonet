@@ -1,7 +1,9 @@
 package naming
 
-import "regexp"
-import "strings"
+import (
+	"regexp"
+	"strings"
+)
 
 //----------------------------------------------- "FooBar" => "foo_bar"
 var regexp1 = regexp.MustCompile(`([A-Z]+)([A-Z][a-z])`)
@@ -27,4 +29,19 @@ func CamelCase(str string) string {
 	})
 
 	return string(ret)
+}
+
+//------------------------------------------------ FNV-1a 32-bit String Hash
+func FNV1a(str string) uint32 {
+	FNV_prime := uint32(16777619)
+	offset_basis := uint32(2166136261)
+	octects := []byte(str)
+
+	hash := offset_basis
+	for _,v := range octects {
+		hash = hash ^  uint32(v)
+		hash = hash * FNV_prime
+	}
+
+	return hash
 }
