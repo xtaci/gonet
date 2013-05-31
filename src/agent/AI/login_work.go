@@ -3,18 +3,19 @@ package AI
 import (
 	"encoding/json"
 	"log"
-	"time"
-	"strings"
 	"strconv"
+	"strings"
+	"time"
+	//"fmt"
 )
 
 import (
 	"db/data_tbl"
 	"db/forward_tbl"
+	"gamedata"
 	. "types"
 	"types/estates"
 	"types/grid"
-	"gamedata"
 )
 
 //------------------------------------------------ 登陆后的数据加载
@@ -26,13 +27,14 @@ func LoginWork(sess *Session) bool {
 	for _, v := range sess.Estates.Estates {
 		// TODO :  读gamedata,建立grid信息
 		name := gamedata.Query(v.TYPE)
-		cell := gamedata.GetString("建筑规格",name, "占用格子数")
+		cell := gamedata.GetString("建筑规格", name, "占用格子数")
 		wh := strings.Split(cell, "X")
-		w,_ := strconv.Atoi(wh[0])
-		h,_ := strconv.Atoi(wh[1])
+		w, _ := strconv.Atoi(wh[0])
+		h, _ := strconv.Atoi(wh[1])
 
-		for x:=v.X;x<v.X+byte(w);x++ {
-			for y:=v.Y;y<v.Y+byte(h);y++ {
+		//	fmt.Println(w,h, wh, cell, v)
+		for x := v.X; x < v.X+byte(w); x++ {
+			for y := v.Y; y < v.Y+byte(h); y++ {
 				sess.Grid.Set(x, y, v.TYPE)
 			}
 		}
