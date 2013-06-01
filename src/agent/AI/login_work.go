@@ -36,7 +36,7 @@ func LoginWork(sess *Session) bool {
 		//	fmt.Println(w,h, wh, cell, v)
 		for x := v.X; x < v.X+byte(w); x++ {
 			for y := v.Y; y < v.Y+byte(h); y++ {
-				sess.Grid.Set(x, y, uint32(oid))
+				sess.Grid.Set(x, y, uint16(oid))
 			}
 		}
 	}

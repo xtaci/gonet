@@ -2,6 +2,7 @@ package estates
 
 import (
 	"fmt"
+	"sync/atomic"
 )
 
 const (
@@ -12,7 +13,7 @@ const (
 
 //----------------------------------------------- Generic Move event records
 type Move struct {
-	OID uint32
+	OID uint16
 	X   uint8
 	Y   uint8
 }
@@ -29,9 +30,23 @@ type Manager struct {
 	UserId  int32
 	Version uint32
 	Estates map[string]*Estate // OID->Estate
+	NextVal uint32
 }
 
-func (m *Manager) Append(oid uint32, estate *Estate) {
+//------------------------------------------------ Generate Estate object-id
+func (m *Manager) NextID() uint16 {
+	v := atomic.AddUint32(&m.NextVal, 1)
+	oid := uint16(v)
+
+	// collision? loop!
+	if m.Estates[fmt.Sprint(oid)] != nil {
+		return m.NextID()
+	}
+
+	return oid
+}
+
+func (m *Manager) Append(oid uint16, estate *Estate) {
 	if m.Estates == nil {
 		m.Estates = make(map[string]*Estate)
 	}

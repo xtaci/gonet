@@ -13,11 +13,13 @@ import (
 	//	"db/user_tbl"
 	"misc/packet"
 	. "types"
+	"agent/AI"
 )
 
 var EPOCH = time.Unix(0, 0)
 
 func P_user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err error) {
+	AI.LoginWork(sess)
 	/*
 		tbl, _ := PKT_user_login_info(reader)
 		writer := packet.Writer()
