@@ -60,7 +60,6 @@ func StartAgent(in chan []byte, conn net.Conn) {
 		close(std_timer)
 		close(sess.MQ)
 		bufctrl <- false
-		conn.Close()
 	}()
 
 	// the main message loop

@@ -17,8 +17,7 @@ type Buffer struct {
 	ctrl    chan bool   // receive exit signal
 	pending chan []byte // pending Packet
 	max     int         // max queue size
-
-	conn net.Conn // connection
+	conn    net.Conn    // connection
 }
 
 const (
@@ -42,10 +41,15 @@ func (buf *Buffer) Start() {
 
 	for {
 		select {
-		case data := <-buf.pending:
-			buf.raw_send(data)
+		case data, ok := <-buf.pending:
+			if !ok {
+				buf.conn.Close()
+				return
+			} else {
+				buf.raw_send(data)
+			}
 		case _ = <-buf.ctrl:
-			return
+			close(buf.pending)
 		}
 	}
 }
