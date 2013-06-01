@@ -87,7 +87,7 @@ func HubReceiver(conn net.Conn) {
 			dest_id, err := reader.ReadS32()
 			if err != nil {
 				log.Println("forward: read dest_id failed.")
-				goto L
+				continue
 			}
 
 			sess := QueryOnline(dest_id)
@@ -119,7 +119,6 @@ func HubReceiver(conn net.Conn) {
 			}
 			_wait_ack_lock.Unlock()
 		}
-	L:
 	}
 }
 
