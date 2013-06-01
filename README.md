@@ -7,6 +7,6 @@
 3. export GOPATH='当前目录'
 
 ####安装
-sh$go get labix.org/v2/mgo     
-sh$make
-
+xtaci@ubuntu:~/gonet$ go get labix.org/v2/mgo      
+xtaci@ubuntu:~/gonet$ make    
+xtaci@ubuntu:~/gonet$ ./startall  
