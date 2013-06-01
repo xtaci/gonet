@@ -1,18 +1,21 @@
 digraph G {
-	size ="4,4";
-	Agent1 [shape=box];
-	Agent2 [shape=box];
+	size = "4,4";node [colorscheme=paired12];
+
+	Agent1,Agent2,Agent3,Agent4 [label=Agent style=dashed color=1];
 	Agent1->GS1;
-	Agent2->GS2;
-	Hub [style=filled,color=gray];
-	Event [style=filled,color=gray];
-	MongoDB [style=filled,color=cyan];
+	Agent2->GS1;
+	Agent3->GS2;
+	Agent4->GS2;
+	GS1,GS2 [label=GS style=filled color=2];
+	Event, Hub [style=filled color=3];
 	GS1->Hub;
 	GS2->Hub;
 	GS1->Event;
-	GS2->Event;
-	Hub->MongoDB
-	Event->MongoDB
-	GS1->MongoDB
-	GS2->MongoDB
+	GS2->Event; 
+	GS1->GS2 [dir=both label=IPCObject style=dashed color="red:blue"];
+	MongoDB [style=filled color=6];
+	Hub->MongoDB;
+	Event->MongoDB;
+	GS1->MongoDB;
+	GS2->MongoDB;
 }
