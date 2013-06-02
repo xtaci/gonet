@@ -37,11 +37,11 @@ func BenchmarkQueue(b *testing.B) {
 		q.Enqueue(i)
 	}
 
+	q.All()
 	for {
 		if _, ok := q.Dequeue(); ok {
 		} else {
 			break
 		}
 	}
-
 }
