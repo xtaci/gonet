@@ -103,7 +103,10 @@ func _trigger(level uint) {
 		if v.Timeout-now < 1<<level {
 			// move to one closer timer or just removal
 			if level == 0 {
-				v.CH <- k
+				func() {
+					defer recover() // ignore closed channel
+					v.CH <- k
+				}()
 			} else {
 				_eventlist[level-1][k] = v
 			}
