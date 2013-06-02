@@ -81,7 +81,6 @@ func Load(tblname string, oid uint32, user_id int32, timeout int64, event_id uin
 
 //------------------------------------------------ cancel an oid's timeout
 func Cancel(event_id uint32) {
-	timer.Cancel(event_id)
 	_events_lock.Lock()
 	delete(_events, event_id)
 	_events_lock.Unlock()

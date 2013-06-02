@@ -37,7 +37,9 @@ func (buf *Buffer) Send(data []byte) (err error) {
 
 //------------------------------------------------ packet sender goroutine
 func (buf *Buffer) Start() {
-	defer recover()
+	defer func() {
+		recover()
+	}()
 
 	for {
 		select {

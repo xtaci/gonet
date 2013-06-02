@@ -2,10 +2,12 @@ package timer
 
 import (
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
 type Event struct {
+	Id      uint32      // user specified Id 
 	Timeout int64       // timeout
 	CH      chan uint32 // event trigger channel
 }
@@ -22,6 +24,8 @@ var (
 
 	_cancelqueue      []uint32 // cancel queue
 	_cancelqueue_lock sync.Mutex
+
+	_timer_id uint32
 )
 
 func init() {
@@ -104,8 +108,11 @@ func _trigger(level uint) {
 			// move to one closer timer or just removal
 			if level == 0 {
 				func() {
-					defer recover() // ignore closed channel
-					v.CH <- k
+					defer func() {
+						recover() // ignore closed channel
+					}()
+
+					v.CH <- v.Id
 				}()
 			} else {
 				_eventlist[level-1][k] = v
@@ -116,18 +123,12 @@ func _trigger(level uint) {
 	}
 }
 
-//------------------------------------------------ add a timeout event
+//------------------------------------------------ add a timeout event, id will be send back 
 func Add(id uint32, timeout int64, ch chan uint32) {
-	event := &Event{CH: ch, Timeout: timeout}
+	event := &Event{Id: id, CH: ch, Timeout: timeout}
 
+	timer_id := atomic.AddUint32(&_timer_id, 1)
 	_eventqueue_lock.Lock()
-	_eventqueue[id] = event
+	_eventqueue[timer_id] = event
 	_eventqueue_lock.Unlock()
-}
-
-//------------------------------------------------ cancel an event
-func Cancel(event_id uint32) {
-	_cancelqueue_lock.Lock()
-	_cancelqueue = append(_cancelqueue, event_id)
-	_cancelqueue_lock.Unlock()
 }
