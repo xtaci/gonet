@@ -11,9 +11,9 @@ import (
 	//	"agent/ipc"
 	//	"cfg"
 	//	"db/user_tbl"
+	"agent/AI"
 	"misc/packet"
 	. "types"
-	"agent/AI"
 )
 
 var EPOCH = time.Unix(0, 0)
