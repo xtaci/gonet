@@ -3,6 +3,20 @@ package dos
 import "testing"
 import "fmt"
 
+func Benchmark(b *testing.B) {
+	tree := Tree{}
+	for i := 0; i < b.N; i++ {
+		tree.Insert(i, i)
+	}
+
+	for i := 0; i < b.N; i++ {
+		n := tree.Rank(i)
+		if n != nil {
+			tree.DeleteNode(n)
+		}
+	}
+}
+
 func TestDos(t *testing.T) {
 	tree := Tree{}
 
