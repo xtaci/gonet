@@ -31,3 +31,11 @@ func TestEventFunc(t *testing.T) {
 	fmt.Println(info)
 	fmt.Println(success)
 }
+
+func BenchmarkForward(b *testing.B) {
+	DialHub()
+	obj := &TMPObj{A: 10, B: 20, C: "test"}
+	for i := 0; i < b.N; i++ {
+		Send(0, 1, 1, obj)
+	}
+}
