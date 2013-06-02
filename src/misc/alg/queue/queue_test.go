@@ -21,10 +21,27 @@ func TestQueue(t *testing.T) {
 	}
 
 	fmt.Println("testing dequeue")
-	v := q.Dequeue()
-	fmt.Println(v)
-
-	for v = q.Dequeue(); v != nil; v = q.Dequeue() {
-		fmt.Println(v)
+	for {
+		if v, ok := q.Dequeue(); ok {
+			fmt.Println(v)
+		} else {
+			break
+		}
 	}
+}
+
+func BenchmarkQueue(b *testing.B) {
+	q := New(b.N)
+
+	for i := 0; i < b.N; i++ {
+		q.Enqueue(i)
+	}
+
+	for {
+		if _, ok := q.Dequeue(); ok {
+		} else {
+			break
+		}
+	}
+
 }
