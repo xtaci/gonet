@@ -115,7 +115,7 @@ func HubReceiver(conn net.Conn) {
 				ack <- data
 				delete(_wait_ack, seqval)
 			} else {
-				log.Println("Illegal packet sequence number from HUB")
+				log.Printf("Illegal packet sequence number [%x] from HUB", seqval)
 			}
 			_wait_ack_lock.Unlock()
 		}
@@ -133,6 +133,7 @@ var _wait_ack_lock sync.Mutex
 
 //------------------------------------------------ IPC call
 func _call(data []byte) (ret []byte) {
+	// packet creation
 	seq_id := atomic.AddUint64(&_seq_id, 1)
 
 	writer := packet.Writer()
@@ -140,17 +141,21 @@ func _call(data []byte) (ret []byte) {
 	writer.WriteU64(seq_id)
 	writer.WriteRawBytes(data)
 
-	_, err := _conn.Write(writer.Data())
-	if err != nil {
-		log.Println("Error send packet to HUB:", err)
-		return nil
-	}
-
-	// wait ack
+	// add seq_id to waiting queue
 	ACK := make(chan []byte)
 	_wait_ack_lock.Lock()
 	_wait_ack[seq_id] = ACK
 	_wait_ack_lock.Unlock()
+
+	// send the packet
+	_, err := _conn.Write(writer.Data())
+	if err != nil {
+		log.Println("Error send packet to HUB:", err)
+		_wait_ack_lock.Lock()
+		delete(_wait_ack, seq_id)
+		_wait_ack_lock.Unlock()
+		return nil
+	}
 
 	select {
 	case msg := <-ACK:
