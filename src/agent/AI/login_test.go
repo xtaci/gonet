@@ -18,12 +18,12 @@ func _recv(CH chan IPCObject) {
 	}
 }
 
-func TestLoginWork(t *testing.T) {
+func TestLoginProc(t *testing.T) {
 	sess := &Session{}
 	sess.MQ = make(chan IPCObject, 100)
 	go _recv(sess.MQ)
 	sess.User = User{Id: 1}
-	LoginWork(sess)
+	LoginProc(sess)
 	time.Sleep(time.Second)
 	close(sess.MQ)
 }

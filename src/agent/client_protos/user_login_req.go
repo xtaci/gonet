@@ -19,7 +19,7 @@ import (
 var EPOCH = time.Unix(0, 0)
 
 func P_user_login_req(sess *Session, reader *packet.Packet) (ret []byte, err error) {
-	AI.LoginWork(sess)
+	AI.LoginProc(sess)
 	/*
 		tbl, _ := PKT_user_login_info(reader)
 		writer := packet.Writer()
