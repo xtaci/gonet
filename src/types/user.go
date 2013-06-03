@@ -6,6 +6,7 @@ import (
 
 type User struct {
 	Id             int32
+	ClanId         int32
 	Name           string
 	Pass           []byte
 	Mac            string
