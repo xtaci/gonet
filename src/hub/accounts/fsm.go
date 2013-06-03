@@ -96,11 +96,13 @@ func _expire() {
 			delete(_protects, event_id)
 			_protectslock.Unlock()
 
-			player.LCK.Lock()
-			if player.WaitEventId == event_id { // check if it is the waiting event, or just ignore
-				player.State = player.State & (^PROTECTED)
+			if player != nil {
+				player.LCK.Lock()
+				if player.WaitEventId == event_id { // check if it is the waiting event, or just ignore
+					player.State = player.State & (^PROTECTED)
+				}
+				player.LCK.Unlock()
 			}
-			player.LCK.Unlock()
 
 		case event_id := <-_raids_ch:
 			_raidslock.Lock()
@@ -108,11 +110,13 @@ func _expire() {
 			delete(_raids, event_id)
 			_raidslock.Unlock()
 
-			player.LCK.Lock()
-			if player.WaitEventId == event_id {
-				player.State = player.State & (^RAID)
+			if player != nil {
+				player.LCK.Lock()
+				if player.WaitEventId == event_id {
+					player.State = player.State & (^RAID)
+				}
+				player.LCK.Unlock()
 			}
-			player.LCK.Unlock()
 		}
 	}
 }

@@ -63,6 +63,10 @@ func ChangeScore(id, oldscore, newscore int32) bool {
 
 //------------------------------------------------ get players from ranklist within [A,B]
 func GetList(A, B int) (id []int32, score []int32) {
+	if A <= 0 {
+		A = 1
+	}
+
 	_lock_ranklist.Lock()
 	defer _lock_ranklist.Unlock()
 
