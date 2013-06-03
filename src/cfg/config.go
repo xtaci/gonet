@@ -27,7 +27,8 @@ func Get() map[string]string {
 
 func Reload() {
 	path := os.Getenv("GOPATH") + "/" + CONFIG_FILE
-	log.Println("Read", CONFIG_FILE)
+	log.Println("Loading Config...")
+	defer log.Println("Config Loaded.")
 	_lock.Lock()
 	_map = _load_config(path)
 	_lock.Unlock()

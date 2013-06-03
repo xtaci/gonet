@@ -35,6 +35,9 @@ func Reload() {
 	_lock.Lock()
 	defer _lock.Unlock()
 
+	log.Println("Loading GameData...")
+	defer log.Println("GameData Loaded.")
+
 	_tables = make(map[uint32]*Table)
 	_hashtbl = make(map[uint32]string)
 

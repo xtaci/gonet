@@ -9,6 +9,7 @@ import (
 
 import (
 	"cfg"
+	"gamedata"
 )
 
 //----------------------------------------------- handle unix signals
@@ -20,5 +21,6 @@ func SignalProc() {
 		msg := <-ch
 		log.Println("Recevied signal:", msg)
 		cfg.Reload()
+		gamedata.Reload()
 	}
 }
