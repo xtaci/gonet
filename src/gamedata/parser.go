@@ -43,7 +43,7 @@ func parse(file *os.File) {
 
 		// 第一列包含特殊含义
 		for i := 1; i < len(fields); i++ {
-			Set(tblname, fields[0], names[i], fields[i])
+			_set(tblname, fields[0], names[i], fields[i])
 		}
 	}
 }

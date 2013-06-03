@@ -2,12 +2,17 @@ package gamedata
 
 import (
 	"log"
-	"misc/naming"
 	"os"
 	"path/filepath"
 	"strconv"
+	"sync"
 )
 
+import (
+	"misc/naming"
+)
+
+var _lock sync.RWMutex
 var _tables map[uint32]*Table
 var _hashtbl map[uint32]string // hash->string
 
@@ -22,6 +27,14 @@ type Table struct {
 }
 
 func init() {
+	Reload()
+}
+
+//------------------------------------------------ Reload *.csv
+func Reload() {
+	_lock.Lock()
+	defer _lock.Unlock()
+
 	_tables = make(map[uint32]*Table)
 	_hashtbl = make(map[uint32]string)
 
@@ -50,8 +63,8 @@ func Query(hash uint32) string {
 	return _hashtbl[hash]
 }
 
-//----------------------------------------------- Set Field value
-func Set(tblname string, rowname string, fieldname string, value string) {
+//----------------------------------------------- et Field value
+func _set(tblname string, rowname string, fieldname string, value string) {
 	// store hashing
 	h_rowname := naming.FNV1a(rowname)
 	h_fieldname := naming.FNV1a(fieldname)
@@ -81,6 +94,9 @@ func Set(tblname string, rowname string, fieldname string, value string) {
 
 //----------------------------------------------- Get Field value
 func _gethash(h_tblname uint32, h_rowname uint32, h_fieldname uint32) string {
+	_lock.RLock()
+	defer _lock.RUnlock()
+
 	tbl := _tables[h_tblname]
 
 	if tbl == nil {
@@ -93,7 +109,6 @@ func _gethash(h_tblname uint32, h_rowname uint32, h_fieldname uint32) string {
 	}
 
 	return rec.Fields[h_fieldname]
-
 }
 
 func _get(tblname string, rowname string, fieldname string) string {
