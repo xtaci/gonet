@@ -21,3 +21,9 @@ func init() {
 	session.SetMode(mgo.Monotonic, true)
 	Mongo = session
 }
+
+//------------------------------------------------ for very simple use
+func Collection(name string) *mgo.Collection {
+	config := cfg.Get()
+	return Mongo.DB(config["mongo_db"]).C(name)
+}

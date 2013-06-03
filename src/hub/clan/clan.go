@@ -10,8 +10,14 @@ import (
 
 import (
 	"cfg"
+	"db"
 	"hub/accounts"
+	"labix.org/v2/mgo/bson"
 	"misc/alg/queue"
+)
+
+const (
+	COLLECTION = "CLANS"
 )
 
 type MemberSlice struct {
@@ -19,7 +25,7 @@ type MemberSlice struct {
 }
 
 //------------------------------------------------ Add a member,make sure not twice added
-func (mem *MemberSlice) Add(user_id int32) {
+func (mem *MemberSlice) _add(user_id int32) {
 	for k := range mem.M {
 		if mem.M[k] == user_id {
 			return
@@ -29,7 +35,7 @@ func (mem *MemberSlice) Add(user_id int32) {
 	mem.M = append(mem.M, user_id)
 }
 
-func (mem *MemberSlice) Remove(user_id int32) {
+func (mem *MemberSlice) _remove(user_id int32) {
 	idx := -1
 	for k := range mem.M {
 		if mem.M[k] == user_id {
@@ -65,6 +71,7 @@ func (mem *MemberSlice) Swap(i, j int) {
 
 //------------------------------------------------ Clan
 type ClanInfo struct {
+	ClanId  uint32
 	Leader  int32
 	Members MemberSlice
 	MQ      *queue.Queue
@@ -91,14 +98,14 @@ func Create(creator_id int32, clanname string) (clanid uint32, succ bool) {
 
 	if _clan_names[clanname] == nil {
 		clanid := atomic.AddUint32(&_clanid_gen, 1)
-		clan := &ClanInfo{Name: clanname}
-		clan.Members.Add(creator_id)
+		clan := &ClanInfo{ClanId: clanid, Name: clanname}
+		clan.Members._add(creator_id)
 
 		// index
 		_clans[clanid] = clan
 		_clan_names[clanname] = clan
 
-		//
+		// clan message max
 		config := cfg.Get()
 		msg_max, err := strconv.Atoi(config["clan_msg_max"])
 		if err != nil {
@@ -106,6 +113,14 @@ func Create(creator_id int32, clanname string) (clanid uint32, succ bool) {
 		}
 
 		clan.MQ = queue.New(msg_max)
+
+		// save clanid->clanname
+		c := db.Collection(COLLECTION)
+		info, err := c.Upsert(bson.M{"clanid": clanid}, clan)
+		if err != nil {
+			log.Println(info, err)
+		}
+
 		return clanid, true
 	}
 
@@ -119,14 +134,14 @@ func Join(user_id int32, clanid uint32) bool {
 
 	clan := _clans[clanid]
 	if clan != nil {
-		clan.Members.Add(user_id)
+		clan.Members._add(user_id)
+		return true
 	}
-
 	return false
 }
 
 //------------------------------------------------ leave clan
-func Leave(user_id int32, clanid uint32) {
+func Leave(user_id int32, clanid uint32) bool {
 	_lock.Lock()
 	defer _lock.Unlock()
 
@@ -135,15 +150,21 @@ func Leave(user_id int32, clanid uint32) {
 	if clan != nil {
 		defer func() { // if no member, delete clan
 			if clan.Members.Len() == 0 {
-				delete(_clans, clanid) // TODO: persistent
+				delete(_clans, clanid)
 				delete(_clan_names, clan.Name)
+				c := db.Collection(COLLECTION)
+				err := c.Remove(bson.M{"clanid": clanid})
+				if err != nil {
+					log.Println(err)
+				}
 			}
 		}()
 
-		clan.Members.Remove(user_id)
+		clan.Members._remove(user_id)
+		return true
 	}
 
-	return
+	return false
 }
 
 //------------------------------------------------ get clan ranklist
