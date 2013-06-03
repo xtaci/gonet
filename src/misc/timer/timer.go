@@ -7,7 +7,7 @@ import (
 )
 
 type Event struct {
-	Id      uint32      // user specified Id 
+	Id      uint32      // user specified Id
 	Timeout int64       // timeout
 	CH      chan uint32 // event trigger channel
 }
@@ -123,7 +123,7 @@ func _trigger(level uint) {
 	}
 }
 
-//------------------------------------------------ add a timeout event, id will be send back 
+//------------------------------------------------ add a timeout event, id will be send back
 func Add(id uint32, timeout int64, ch chan uint32) {
 	event := &Event{Id: id, CH: ch, Timeout: timeout}
 

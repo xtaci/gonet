@@ -9,6 +9,11 @@ ID=
 id integer
 ===
 
+PROTECT=
+id integer
+protecttime long
+===
+
 #玩家信息
 INFO=
 flag bool

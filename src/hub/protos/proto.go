@@ -11,6 +11,11 @@ type ID struct {
 	F_id int32
 }
 
+type PROTECT struct {
+	F_id          int32
+	F_protecttime int64
+}
+
 type INFO struct {
 	F_flag        bool
 	F_id          int32
@@ -65,6 +70,16 @@ func PKT_FORWARDIPC(reader *packet.Packet) (tbl FORWARDIPC, err error) {
 
 func PKT_ID(reader *packet.Packet) (tbl ID, err error) {
 	tbl.F_id, err = reader.ReadS32()
+	checkErr(err)
+
+	return
+}
+
+func PKT_PROTECT(reader *packet.Packet) (tbl PROTECT, err error) {
+	tbl.F_id, err = reader.ReadS32()
+	checkErr(err)
+
+	tbl.F_protecttime, err = reader.ReadS64()
 	checkErr(err)
 
 	return

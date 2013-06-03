@@ -67,7 +67,7 @@ payload:INT
 
 packet_type:6
 name:protect_req
-payload:id
+payload:PROTECT
 desc:加保护
 
 packet_type:1006

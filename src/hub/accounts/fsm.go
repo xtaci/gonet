@@ -228,7 +228,7 @@ func Free(id int32) bool {
 
 //----------------------------------------------- PROTECT
 // A->B->A
-func Protect(id int32, until time.Time) bool {
+func Protect(id int32, until int64) bool {
 	_lock_players.RLock()
 	player := _players[id]
 	_lock_players.RUnlock()
@@ -237,10 +237,10 @@ func Protect(id int32, until time.Time) bool {
 		player.LCK.Lock()
 		if player.State&RAID == 0 { // when not being raid
 			event_id := atomic.AddUint32(&_event_id_gen, 1)
-			timer.Add(event_id, until.Unix(), _raids_ch)
+			timer.Add(event_id, until, _raids_ch)
 
 			player.State |= PROTECTED
-			player.ProtectTimeout = until.Unix()
+			player.ProtectTimeout = until
 			player.WaitEventId = event_id
 			player.LCK.Unlock()
 

@@ -128,10 +128,10 @@ func P_raid_req(hostid int32, pkt *packet.Packet) []byte {
 }
 
 func P_protect_req(hostid int32, pkt *packet.Packet) []byte {
-	tbl, _ := PKT_ID(pkt)
+	tbl, _ := PKT_PROTECT(pkt)
 	ret := INT{F_v: 0}
 
-	if accounts.Raid(tbl.F_id) {
+	if accounts.Protect(tbl.F_id, tbl.F_protecttime) {
 		ret.F_v = 1
 	}
 
