@@ -71,7 +71,7 @@ func StartAgent(in chan []byte, conn net.Conn) {
 
 		case _ = <-std_timer:
 			timer_work(&sess)
-			if session_work(&sess) {
+			if session_timeout(&sess) {
 				return
 			}
 			timer.Add(1, time.Now().Unix()+1, std_timer)

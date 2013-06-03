@@ -12,14 +12,14 @@ import (
 )
 
 //----------------------------------------------- session timeout
-func session_work(sess *Session) bool {
+func session_timeout(sess *Session) bool {
 	config := cfg.Get()
-	session_timeout := 30 // sec
+	timeout := 30 // sec
 	if config["session_timeout"] != "" {
-		session_timeout, _ = strconv.Atoi(config["session_timeout"])
+		timeout, _ = strconv.Atoi(config["session_timeout"])
 	}
 
-	if time.Now().Unix()-sess.LastPacketTime > int64(session_timeout) {
+	if time.Now().Unix()-sess.LastPacketTime > int64(timeout) {
 		log.Printf("timeout: user %v, connected at: %v\n", sess.User.Id, time.Unix(sess.ConnectTime, 0))
 		return true
 	}
