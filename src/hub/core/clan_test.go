@@ -38,11 +38,11 @@ func TestClan(t *testing.T) {
 
 	fmt.Println("testing send & recv")
 
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 200; i++ {
 		Send(nil, 1)
 	}
 
-	result := Recv(95, 1)
+	result := Recv(195, 1)
 
 	fmt.Println(len(result))
 
