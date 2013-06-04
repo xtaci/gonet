@@ -174,7 +174,7 @@ func Ranklist(clanid int32) []int32 {
 }
 
 //------------------------------------------------  send message to clan
-func Send(obj *IPCObject, clanid int32) {
+func Send(obj *IPCObject, clanid int32) bool {
 	_lock.Lock()
 	defer _lock.Unlock()
 
@@ -194,28 +194,31 @@ func Send(obj *IPCObject, clanid int32) {
 		clan.Messages = append(clan.Messages, obj)
 		clan.MaxMsgId += 1
 		_save(clan)
+		return true
 	}
+
+	return false
 }
 
-func Recv(lastmsg_id uint32, clanid int32) []*IPCObject {
+func Recv(lastmsg_id uint32, clanid int32) ([]*IPCObject, bool) {
 	_lock.RLock()
 	defer _lock.RUnlock()
 
 	clan := _clans[clanid]
 	if clan != nil {
 		if lastmsg_id >= clan.MaxMsgId {
-			return nil
+			return nil, false
 		}
 
 		count := int(clan.MaxMsgId - lastmsg_id)
 		if count > len(clan.Messages) {
-			return clan.Messages
+			return clan.Messages, true
 		} else {
-			return clan.Messages[len(clan.Messages)-count:]
+			return clan.Messages[len(clan.Messages)-count:], true
 		}
 	}
 
-	return nil
+	return nil, false
 }
 
 //------------------------------------------------

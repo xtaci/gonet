@@ -1,6 +1,7 @@
 package protos
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"runtime"
@@ -12,6 +13,7 @@ import (
 	. "helper"
 	"hub/core"
 	"misc/packet"
+	. "types"
 )
 
 var (
@@ -203,6 +205,35 @@ func P_forward_req(hostid int32, pkt *packet.Packet) []byte {
 
 	ret := INT{F_v: 1}
 	return packet.Pack(Code["forward_ack"], ret, nil)
+}
+
+func P_forwardclan_req(hostid int32, pkt *packet.Packet) (r []byte) {
+	tbl, _ := PKT_FORWARDIPC(pkt)
+	ret := INT{F_v: 1}
+
+	defer func() {
+		if x := recover(); x != nil {
+			log.Println("forward clan packet error")
+		}
+
+		r = packet.Pack(Code["forwardclan_ack"], ret, nil)
+	}()
+
+	obj := &IPCObject{}
+	err := json.Unmarshal(tbl.F_IPC, obj)
+	if err != nil {
+		ret.F_v = 0
+		log.Println("decode clan IPCObject error")
+		return
+	}
+
+	if !core.Send(obj, tbl.F_dest_id) {
+		ret.F_v = 0
+		log.Println("forward ipc: no such clan")
+		return
+	}
+
+	return
 }
 
 func P_adduser_req(hostid int32, pkt *packet.Packet) []byte {

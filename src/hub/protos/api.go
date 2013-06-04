@@ -27,6 +27,8 @@ var Code map[string]int16 = map[string]int16{
 	"adduser_ack":     1011, //
 	"forward_req":     100,  // 转发IPC消息
 	"forward_ack":     1100, //
+	"forwardclan_req": 101,  // 转发IPC消息到联盟
+	"forwardclan_ack": 1101, //
 }
 
 var RCode map[int16]string = map[int16]string{
@@ -54,6 +56,8 @@ var RCode map[int16]string = map[int16]string{
 	1011: "adduser_ack",     //
 	100:  "forward_req",     // 转发IPC消息
 	1100: "forward_ack",     //
+	101:  "forwardclan_req", // 转发IPC消息到联盟
+	1101: "forwardclan_ack", //
 }
 
 var ProtoHandler map[uint16]func(int32, *packet.Packet) []byte = map[uint16]func(int32, *packet.Packet) []byte{
@@ -69,4 +73,5 @@ var ProtoHandler map[uint16]func(int32, *packet.Packet) []byte = map[uint16]func
 	9:   P_getinfo_req,
 	11:  P_adduser_req,
 	100: P_forward_req,
+	101: P_forwardclan_req,
 }

@@ -39,12 +39,12 @@ func TestClan(t *testing.T) {
 	fmt.Println("testing send & recv")
 
 	for i := 0; i < 200; i++ {
-		Send(nil, 1)
+		Send(nil, clanid)
 	}
 
-	result := Recv(195, 1)
+	result, ok := Recv(195, clanid)
 
-	fmt.Println(len(result))
+	fmt.Println(len(result), ok)
 
 	if len(result) != 5 {
 		t.Error("send recv failed on size")

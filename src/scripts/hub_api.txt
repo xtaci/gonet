@@ -125,3 +125,12 @@ desc:转发IPC消息
 packet_type:1100
 name:forward_ack
 payload:INT
+
+packet_type:101
+name:forwardclan_req
+payload:FORWARDIPC
+desc:转发IPC消息到联盟
+
+packet_type:1101
+name:forwardclan_ack
+payload:INT
