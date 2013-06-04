@@ -221,8 +221,6 @@ func Recv(lastmsg_id uint32, clanid int32) ([]*IPCObject, bool) {
 	return nil, false
 }
 
-//------------------------------------------------
-
 //------------------------------------------------ Save to db
 func _save(clan *ClanInfo) {
 	c := db.Collection(COLLECTION)
