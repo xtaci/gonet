@@ -54,8 +54,9 @@ func (mem *MemberSlice) Len() int {
 	return len(mem.M)
 }
 
+//------------------------------------------------ sort in descending order
 func (mem *MemberSlice) Less(i, j int) bool {
-	return Score(mem.M[i]) < Score(mem.M[j])
+	return Score(mem.M[i]) > Score(mem.M[j])
 }
 
 func (mem *MemberSlice) Sort() {
@@ -178,7 +179,7 @@ func Leave(user_id int32, clanid uint32) bool {
 }
 
 //------------------------------------------------ get clan ranklist
-func RankList(clanid uint32) []int32 {
+func Ranklist(clanid uint32) []int32 {
 	_lock.Lock()
 	defer _lock.Unlock()
 

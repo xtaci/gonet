@@ -51,7 +51,7 @@ func TestRanklist(t *testing.T) {
 	}
 }
 
-func BenchmarkRanklist(b *testing.B) {
+func BenchmarkGlobalRanklist(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		user := &User{Id: int32(i), Score: int32(i)}
 		_add_rank(user)
