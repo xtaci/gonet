@@ -3,7 +3,6 @@ package user_tbl
 import (
 	"crypto/md5"
 	"io"
-	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"log"
 	"time"
@@ -16,13 +15,9 @@ import (
 )
 
 const (
-	COLLECTION = "USER"
-	NEXTVAL    = "NEXTVAL"
+	COLLECTION   = "USER"
+	COUNTER_NAME = "USERID_GEN"
 )
-
-type NextVal struct {
-	ID int32
-}
 
 //----------------------------------------------- Change
 func Set(user *User) bool {
@@ -61,7 +56,7 @@ func New(name, pass string) *User {
 	user := &User{}
 	err := c.Find(bson.M{"name": name}).One(user)
 	if err != nil {
-		user.Id = _nextval()
+		user.Id = NextVal(COUNTER_NAME)
 		user.Name = name
 		user.Pass = _md5(pass)
 		user.LoginCount = 1
@@ -111,23 +106,4 @@ func _md5(str string) []byte {
 	h := md5.New()
 	io.WriteString(h, str)
 	return h.Sum(nil)
-}
-
-func _nextval() int32 {
-	config := cfg.Get()
-	c := Mongo.DB(config["mongo_db"]).C(NEXTVAL)
-
-	change := mgo.Change{
-		Update:    bson.M{"$inc": bson.M{"n": 1}},
-		ReturnNew: true,
-	}
-
-	next := &NextVal{}
-	info, err := c.Find(nil).Apply(change, &next)
-	if err != nil {
-		log.Println(info, err)
-		return -1
-	}
-
-	return next.ID
 }

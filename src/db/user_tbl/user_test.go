@@ -1,10 +1,15 @@
 package user_tbl
 
-import "testing"
-import "fmt"
+import (
+	"fmt"
+	"math/rand"
+	"testing"
+	"time"
+)
 
 func TestUser(t *testing.T) {
-	basic := New("xtaci", "qwer1234")
+	rand.Seed(time.Now().UnixNano())
+	basic := New(fmt.Sprintf("test%v", rand.Int()), fmt.Sprint(rand.Int()))
 	fmt.Println("New:", basic)
 	fmt.Println("Existing:")
 	all := GetAll()

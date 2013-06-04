@@ -18,6 +18,7 @@ import (
 
 const (
 	COLLECTION = "CLANS"
+	CLANGEN = "CLANGEN"
 )
 
 type MemberSlice struct {
@@ -72,7 +73,7 @@ func (mem *MemberSlice) Swap(i, j int) {
 
 //------------------------------------------------ Clan
 type ClanInfo struct {
-	ClanId   uint32
+	ClanId   int32
 	Leader   int32
 	Name     string
 	Desc     string
@@ -88,7 +89,7 @@ var (
 	_clan_names map[string]*ClanInfo // name-> claninfo
 	_lock       sync.RWMutex
 
-	_clanid_gen uint32
+	_clanid_gen int32
 )
 
 func init() {
@@ -102,7 +103,7 @@ func Create(creator_id int32, clanname string) (clanid uint32, succ bool) {
 	defer _lock.Unlock()
 
 	if _clan_names[clanname] == nil {
-		clanid := atomic.AddUint32(&_clanid_gen, 1)
+		clanid := atomic.AddInt32(&_clanid_gen, 1)
 		clan := &ClanInfo{ClanId: clanid, Name: clanname, Leader: creator_id}
 		clan._members._add(creator_id)
 
@@ -229,4 +230,22 @@ func _save(clan *ClanInfo) {
 	if err != nil {
 		log.Println(info, err)
 	}
+}
+
+func _nextval() int32 {
+	c := Mongo.DB(config["mongo_db"]).C(CLANGEN)
+
+	change := mgo.Change{
+		Update:    bson.M{"$inc": bson.M{"n": 1}},
+		ReturnNew: true,
+	}
+
+	next := &NextVal{}
+	info, err := c.Find(nil).Apply(change, &next)
+	if err != nil {
+		log.Println(info, err)
+		return -1
+	}
+
+	return next.ID
 }
