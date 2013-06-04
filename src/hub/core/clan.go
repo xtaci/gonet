@@ -2,6 +2,7 @@ package core
 
 import (
 	//"fmt"
+	"labix.org/v2/mgo/bson"
 	"log"
 	"sort"
 	"strconv"
@@ -12,8 +13,7 @@ import (
 import (
 	"cfg"
 	"db"
-	"labix.org/v2/mgo/bson"
-	"misc/alg/queue"
+	. "types"
 )
 
 const (
@@ -72,11 +72,12 @@ func (mem *MemberSlice) Swap(i, j int) {
 
 //------------------------------------------------ Clan
 type ClanInfo struct {
-	ClanId uint32
-	Leader int32
-	Name   string
-	Desc   string
-	MQ     *queue.Queue
+	ClanId   uint32
+	Leader   int32
+	Name     string
+	Desc     string
+	Messages []*IPCObject
+	MaxMsgId uint32
 
 	// runtime
 	_members MemberSlice
@@ -109,21 +110,8 @@ func Create(creator_id int32, clanname string) (clanid uint32, succ bool) {
 		_clans[clanid] = clan
 		_clan_names[clanname] = clan
 
-		// clan message max
-		config := cfg.Get()
-		msg_max, err := strconv.Atoi(config["clan_msg_max"])
-		if err != nil {
-			log.Println("clan:", err)
-		}
-
-		clan.MQ = queue.New(msg_max)
-
-		// save clanid->clanname
-		c := db.Collection(COLLECTION)
-		info, err := c.Upsert(bson.M{"clanid": clanid}, clan)
-		if err != nil {
-			log.Println(info, err)
-		}
+		// save
+		_save(clan)
 
 		return clanid, true
 	}
@@ -140,12 +128,7 @@ func Join(user_id int32, clanid uint32) bool {
 	clan := _clans[clanid]
 	if clan != nil {
 		clan._members._add(user_id)
-		c := db.Collection(COLLECTION)
-		info, err := c.Upsert(bson.M{"clanid": clanid}, clan)
-		if err != nil {
-			log.Println(info, err)
-		}
-
+		_save(clan)
 		return true
 	}
 	return false
@@ -193,16 +176,57 @@ func Ranklist(clanid uint32) []int32 {
 }
 
 //------------------------------------------------  send message to clan
-func Send(msg interface{}, clanid uint32) {
+func Send(obj *IPCObject, clanid uint32) {
 	_lock.Lock()
 	defer _lock.Unlock()
 
 	clan := _clans[clanid]
+	// clan message max
+	config := cfg.Get()
+	msg_max, err := strconv.Atoi(config["clan_msg_max"])
+	if err != nil {
+		log.Println("clan_msg_max:", err)
+	}
 
 	if clan != nil {
-		if !clan.MQ.Enqueue(msg) {
-			clan.MQ.Dequeue()
-			clan.MQ.Enqueue(msg)
+		if len(clan.Messages) >= msg_max {
+			clan.Messages = clan.Messages[1:]
 		}
+
+		clan.Messages = append(clan.Messages, obj)
+		clan.MaxMsgId += 1
+		_save(clan)
+	}
+}
+
+func Recv(lastmsg_id uint32, clanid uint32) []*IPCObject {
+	_lock.RLock()
+	defer _lock.RUnlock()
+
+	clan := _clans[clanid]
+	if clan != nil {
+		if lastmsg_id >= clan.MaxMsgId {
+			return nil
+		}
+
+		count := int(clan.MaxMsgId - lastmsg_id)
+		if count > len(clan.Messages) {
+			return clan.Messages
+		} else {
+			return clan.Messages[len(clan.Messages)-count:]
+		}
+	}
+
+	return nil
+}
+
+//------------------------------------------------
+
+//------------------------------------------------ Save to db
+func _save(clan *ClanInfo) {
+	c := db.Collection(COLLECTION)
+	info, err := c.Upsert(bson.M{"clanid": clan.ClanId}, clan)
+	if err != nil {
+		log.Println(info, err)
 	}
 }

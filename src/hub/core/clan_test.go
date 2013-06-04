@@ -35,6 +35,20 @@ func TestClan(t *testing.T) {
 			t.Error("cannot leave join")
 		}
 	}
+
+	fmt.Println("testing send & recv")
+
+	for i := 0; i < 100; i++ {
+		Send(nil, 1)
+	}
+
+	result := Recv(95, 1)
+
+	fmt.Println(len(result))
+
+	if len(result) != 5 {
+		t.Error("send recv failed on size")
+	}
 }
 
 var clanid uint32
