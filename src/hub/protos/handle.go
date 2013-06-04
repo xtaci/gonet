@@ -10,7 +10,7 @@ import (
 import (
 	"db/forward_tbl"
 	. "helper"
-	"hub/accounts"
+	"hub/core"
 	"misc/packet"
 )
 
@@ -72,7 +72,7 @@ func P_login_req(hostid int32, pkt *packet.Packet) []byte {
 	tbl, _ := PKT_ID(pkt)
 	ret := INT{F_v: 0}
 
-	if accounts.Login(tbl.F_id, hostid) {
+	if core.Login(tbl.F_id, hostid) {
 		ret.F_v = 1
 	}
 
@@ -83,7 +83,7 @@ func P_logout_req(hostid int32, pkt *packet.Packet) []byte {
 	tbl, _ := PKT_ID(pkt)
 	ret := INT{F_v: 0}
 
-	if accounts.Logout(tbl.F_id) {
+	if core.Logout(tbl.F_id) {
 		ret.F_v = 1
 	}
 
@@ -94,7 +94,7 @@ func P_changescore_req(hostid int32, pkt *packet.Packet) []byte {
 	tbl, _ := PKT_CHGSCORE(pkt)
 	ret := INT{F_v: 0}
 
-	if accounts.ChangeScore(tbl.F_id, tbl.F_oldscore, tbl.F_newscore) {
+	if core.ChangeScore(tbl.F_id, tbl.F_oldscore, tbl.F_newscore) {
 		ret.F_v = 1
 	}
 
@@ -105,7 +105,7 @@ func P_getlist_req(hostid int32, pkt *packet.Packet) []byte {
 	tbl, _ := PKT_GETLIST(pkt)
 	ret := LIST{}
 
-	ids, scores := accounts.GetList(int(tbl.F_A), int(tbl.F_B))
+	ids, scores := core.GetList(int(tbl.F_A), int(tbl.F_B))
 	ret.F_items = make([]ID_SCORE, len(ids))
 
 	for k := range ids {
@@ -120,7 +120,7 @@ func P_raid_req(hostid int32, pkt *packet.Packet) []byte {
 	tbl, _ := PKT_ID(pkt)
 	ret := INT{F_v: 0}
 
-	if accounts.Raid(tbl.F_id) {
+	if core.Raid(tbl.F_id) {
 		ret.F_v = 1
 	}
 
@@ -131,7 +131,7 @@ func P_protect_req(hostid int32, pkt *packet.Packet) []byte {
 	tbl, _ := PKT_PROTECT(pkt)
 	ret := INT{F_v: 0}
 
-	if accounts.Protect(tbl.F_id, tbl.F_protecttime) {
+	if core.Protect(tbl.F_id, tbl.F_protecttime) {
 		ret.F_v = 1
 	}
 
@@ -142,7 +142,7 @@ func P_unprotect_req(hostid int32, pkt *packet.Packet) []byte {
 	tbl, _ := PKT_ID(pkt)
 	ret := INT{F_v: 0}
 
-	if accounts.UnProtect(tbl.F_id) {
+	if core.UnProtect(tbl.F_id) {
 		ret.F_v = 1
 	}
 
@@ -153,7 +153,7 @@ func P_free_req(hostid int32, pkt *packet.Packet) []byte {
 	tbl, _ := PKT_ID(pkt)
 	ret := INT{F_v: 0}
 
-	if accounts.Free(tbl.F_id) {
+	if core.Free(tbl.F_id) {
 		ret.F_v = 1
 	}
 
@@ -164,11 +164,11 @@ func P_getinfo_req(hostid int32, pkt *packet.Packet) []byte {
 	tbl, _ := PKT_ID(pkt)
 	ret := INFO{}
 	ret.F_id = tbl.F_id
-	ret.F_state = accounts.State(tbl.F_id)
-	ret.F_score = accounts.Score(tbl.F_id)
-	ret.F_clan = accounts.Score(tbl.F_id)
-	ret.F_protecttime = accounts.ProtectTimeout(tbl.F_id)
-	ret.F_name = accounts.Name(tbl.F_id)
+	ret.F_state = core.State(tbl.F_id)
+	ret.F_score = core.Score(tbl.F_id)
+	ret.F_clan = core.Score(tbl.F_id)
+	ret.F_protecttime = core.ProtectTimeout(tbl.F_id)
+	ret.F_name = core.Name(tbl.F_id)
 	if ret.F_state == 0 {
 		ret.F_flag = false
 	} else {
@@ -188,11 +188,11 @@ func P_forward_req(hostid int32, pkt *packet.Packet) []byte {
 	tbl, _ := PKT_FORWARDIPC(pkt)
 
 	// if user is online, send to the server, or else send to database
-	state := accounts.State(tbl.F_dest_id)
-	host := accounts.Host(tbl.F_dest_id)
+	state := core.State(tbl.F_dest_id)
+	host := core.Host(tbl.F_dest_id)
 
 	fmt.Println(tbl.F_dest_id, tbl.F_IPC)
-	if state&accounts.ONLINE != 0 {
+	if state&core.ONLINE != 0 {
 		ServerLock.RLock()
 		ch := Servers[host]
 		ServerLock.RUnlock()
@@ -211,8 +211,8 @@ func P_adduser_req(hostid int32, pkt *packet.Packet) []byte {
 	tbl, _ := PKT_ID(pkt)
 	ret := INT{F_v: 0}
 
-	if accounts.LoadUser(tbl.F_id) {
-		accounts.Login(tbl.F_id, hostid)
+	if core.LoadUser(tbl.F_id) {
+		core.Login(tbl.F_id, hostid)
 		ret.F_v = 1
 	}
 
