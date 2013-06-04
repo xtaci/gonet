@@ -12,7 +12,6 @@ type User struct {
 	Mac            string
 	Score          int32
 	ProtectTimeout int64
-	IsProtecting   bool
 	LoginCount     int32
 	LastLogin      int64
 	NextVal        uint32
