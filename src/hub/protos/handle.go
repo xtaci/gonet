@@ -166,9 +166,7 @@ func P_getinfo_req(hostid int32, pkt *packet.Packet) []byte {
 	ret.F_id = tbl.F_id
 	ret.F_state = core.State(tbl.F_id)
 	ret.F_score = core.Score(tbl.F_id)
-	ret.F_clan = core.Score(tbl.F_id)
 	ret.F_protecttime = core.ProtectTimeout(tbl.F_id)
-	ret.F_name = core.Name(tbl.F_id)
 	if ret.F_state == 0 {
 		ret.F_flag = false
 	} else {

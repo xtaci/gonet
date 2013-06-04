@@ -21,9 +21,7 @@ type INFO struct {
 	F_id          int32
 	F_state       int32
 	F_score       int32
-	F_clan        int32
 	F_protecttime int64
-	F_name        string
 }
 
 type CHGSCORE struct {
@@ -98,13 +96,7 @@ func PKT_INFO(reader *packet.Packet) (tbl INFO, err error) {
 	tbl.F_score, err = reader.ReadS32()
 	checkErr(err)
 
-	tbl.F_clan, err = reader.ReadS32()
-	checkErr(err)
-
 	tbl.F_protecttime, err = reader.ReadS64()
-	checkErr(err)
-
-	tbl.F_name, err = reader.ReadString()
 	checkErr(err)
 
 	return

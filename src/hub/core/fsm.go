@@ -37,11 +37,9 @@ const (
 type PlayerInfo struct {
 	Id             int32
 	State          int32
-	ProtectTimeout int64 // unix time
-	RaidTimeout    int64 // unix time
-	Clan           int32 // clan info
-	Host           int32 // host
-	Name           string
+	ProtectTimeout int64      // unix time
+	RaidTimeout    int64      // unix time
+	Host           int32      // host
 	WaitEventId    uint32     // current waiting event id, a user will only wait on ONE timeout event,  PROTECTTIMEOUT of RAID TIMEOUT
 	LCK            sync.Mutex // Record lock
 }
@@ -123,7 +121,7 @@ func _expire() {
 
 //------------------------------------------------ add a user to finite state machine manager
 func _add_fsm(user *User) {
-	info := &PlayerInfo{Id: user.Id, Name: user.Name, State: OFFLINE}
+	info := &PlayerInfo{Id: user.Id, State: OFFLINE}
 
 	_lock_players.Lock()
 	_players[user.Id] = info
@@ -308,19 +306,6 @@ func ProtectTimeout(id int32) (ret int64) {
 	return
 }
 
-func Name(id int32) (ret string) {
-	_lock_players.RLock()
-	player := _players[id]
-	_lock_players.RUnlock()
-
-	if player != nil {
-		player.LCK.Lock()
-		ret = player.Name
-		player.LCK.Unlock()
-	}
-	return
-}
-
 func Host(id int32) (ret int32) {
 	_lock_players.RLock()
 	player := _players[id]
@@ -329,20 +314,6 @@ func Host(id int32) (ret int32) {
 	if player != nil {
 		player.LCK.Lock()
 		ret = player.Host
-		player.LCK.Unlock()
-	}
-
-	return
-}
-
-func Clan(id int32) (ret int32) {
-	_lock_players.RLock()
-	player := _players[id]
-	_lock_players.RUnlock()
-
-	if player != nil {
-		player.LCK.Lock()
-		ret = player.Clan
 		player.LCK.Unlock()
 	}
 

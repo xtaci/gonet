@@ -20,9 +20,7 @@ flag bool
 id integer
 state integer
 score integer
-clan integer
 protecttime long
-name string
 ===
 
 #改变分数

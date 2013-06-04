@@ -139,9 +139,7 @@ func GetInfo(id int32) (info Info, flag bool) {
 		info.Id = tbl.F_id
 		info.State = tbl.F_state
 		info.Score = tbl.F_score
-		info.Clan = tbl.F_clan
 		info.ProtectTime = tbl.F_protecttime
-		info.Name = tbl.F_name
 		flag = true
 		return
 	}
