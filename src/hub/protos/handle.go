@@ -189,10 +189,11 @@ func P_forward_req(hostid int32, pkt *packet.Packet) []byte {
 
 	// if user is online, send to the server, or else send to database
 	state := core.State(tbl.F_dest_id)
-	host := core.Host(tbl.F_dest_id)
 
-	fmt.Println(tbl.F_dest_id, tbl.F_IPC)
+	//fmt.Println(tbl.F_dest_id, tbl.F_IPC)
 	if state&core.ONLINE != 0 {
+		host := core.Host(tbl.F_dest_id)
+
 		ServerLock.RLock()
 		ch := Servers[host]
 		ServerLock.RUnlock()
@@ -227,10 +228,29 @@ func P_forwardclan_req(hostid int32, pkt *packet.Packet) (r []byte) {
 		return
 	}
 
-	if !core.Send(obj, tbl.F_dest_id) {
+	clan := core.Clan(tbl.F_dest_id)
+	if clan == nil {
 		ret.F_v = 0
 		log.Println("forward ipc: no such clan")
 		return
+	}
+	clan.Send(obj)
+
+	// send to online users directly
+	members := clan.Members()
+	for _, user_id := range members {
+		// if user is online, send to the server, or else send to database
+		state := core.State(user_id)
+		//fmt.Println(tbl.F_dest_id, tbl.F_IPC)
+		if state&core.ONLINE != 0 {
+			host := core.Host(user_id)
+
+			ServerLock.RLock()
+			ch := Servers[host]
+			ServerLock.RUnlock()
+
+			ch <- tbl.F_IPC
+		}
 	}
 
 	return

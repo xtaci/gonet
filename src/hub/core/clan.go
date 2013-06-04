@@ -117,68 +117,68 @@ func Create(creator_id int32, clanname string) (clanid int32, succ bool) {
 	return 0, false
 }
 
+func Clan(clanid int32) *ClanInfo {
+	_lock.Lock()
+	defer _lock.Unlock()
+	return _clans[clanid]
+}
+
+func (clan *ClanInfo) Members() []int32 {
+	_lock.RLock()
+	defer _lock.RUnlock()
+
+	m := make([]int32, len(clan._members.M))
+	copy(m, clan._members.M)
+
+	return m
+}
+
 //------------------------------------------------ Join clan
-func Join(user_id int32, clanid int32) bool {
+func (clan *ClanInfo) Join(user_id int32) {
 	_lock.Lock()
 	defer _lock.Unlock()
 
-	//fmt.Println(_clans, clanid)
-	clan := _clans[clanid]
-	if clan != nil {
-		clan._members._add(user_id)
-		_save(clan)
-		return true
-	}
-	return false
+	clan._members._add(user_id)
+	_save(clan)
 }
 
 //------------------------------------------------ leave clan
-func Leave(user_id int32, clanid int32) bool {
+func (clan *ClanInfo) Leave(user_id int32) {
 	_lock.Lock()
 	defer _lock.Unlock()
 
-	clan := _clans[clanid]
-
-	if clan != nil {
-		defer func() { // if no member, delete clan
-			if clan._members.Len() == 0 {
-				delete(_clans, clanid)
-				delete(_clan_names, clan.Name)
-				c := db.Collection(COLLECTION)
-				err := c.Remove(bson.M{"clanid": clanid})
-				if err != nil {
-					log.Println(err)
-				}
+	defer func() { // if no member, delete clan
+		if clan._members.Len() == 0 {
+			delete(_clans, clan.ClanId)
+			delete(_clan_names, clan.Name)
+			c := db.Collection(COLLECTION)
+			err := c.Remove(bson.M{"clanid": clan.ClanId})
+			if err != nil {
+				log.Println(err)
 			}
-		}()
+		}
+	}()
 
-		clan._members._remove(user_id)
-		return true
-	}
-
-	return false
+	clan._members._remove(user_id)
 }
 
 //------------------------------------------------ get clan ranklist
-func Ranklist(clanid int32) []int32 {
-	_lock.Lock()
-	defer _lock.Unlock()
+func (clan *ClanInfo) Ranklist() []int32 {
+	_lock.RLock()
+	defer _lock.RUnlock()
 
-	clan := _clans[clanid]
-	if clan != nil {
-		clan._members.Sort()
-		return clan._members.M
-	}
+	clan._members.Sort()
+	m := make([]int32, len(clan._members.M))
+	copy(m, clan._members.M)
 
-	return nil
+	return m
 }
 
 //------------------------------------------------  send message to clan
-func Send(obj *IPCObject, clanid int32) bool {
+func (clan *ClanInfo) Send(obj *IPCObject) {
 	_lock.Lock()
 	defer _lock.Unlock()
 
-	clan := _clans[clanid]
 	// clan message max
 	config := cfg.Get()
 	msg_max, err := strconv.Atoi(config["clan_msg_max"])
@@ -186,39 +186,32 @@ func Send(obj *IPCObject, clanid int32) bool {
 		log.Println("clan_msg_max:", err)
 	}
 
-	if clan != nil {
-		if len(clan.Messages) >= msg_max {
-			clan.Messages = clan.Messages[1:]
-		}
-
-		clan.Messages = append(clan.Messages, obj)
-		clan.MaxMsgId += 1
-		_save(clan)
-		return true
+	if len(clan.Messages) >= msg_max {
+		clan.Messages = clan.Messages[1:]
 	}
 
-	return false
+	clan.Messages = append(clan.Messages, obj)
+	clan.MaxMsgId += 1
+	_save(clan)
 }
 
-func Recv(lastmsg_id uint32, clanid int32) ([]*IPCObject, bool) {
+func (clan *ClanInfo) Recv(lastmsg_id uint32) []*IPCObject {
 	_lock.RLock()
 	defer _lock.RUnlock()
 
-	clan := _clans[clanid]
-	if clan != nil {
-		if lastmsg_id >= clan.MaxMsgId {
-			return nil, false
-		}
-
-		count := int(clan.MaxMsgId - lastmsg_id)
-		if count > len(clan.Messages) {
-			return clan.Messages, true
-		} else {
-			return clan.Messages[len(clan.Messages)-count:], true
-		}
+	// QUEUE
+	if lastmsg_id >= clan.MaxMsgId {
+		return nil
 	}
 
-	return nil, false
+	count := int(clan.MaxMsgId - lastmsg_id)
+	if count > len(clan.Messages) {
+		return clan.Messages
+	} else {
+		return clan.Messages[len(clan.Messages)-count:]
+	}
+
+	return nil
 }
 
 //------------------------------------------------ Save to db

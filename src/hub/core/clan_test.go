@@ -12,39 +12,36 @@ func TestClan(t *testing.T) {
 		t.Error("cannot create clan")
 	}
 
+	clan := Clan(clanid)
 	fmt.Println(clanid, succ)
 
 	for i := 0; i < 100; i++ {
 		user := &User{Id: int32(i), Score: int32(i)}
 		_add_rank(user)
 
-		if !Join(int32(i), clanid) {
-			t.Error("cannot join clan")
-		}
+		clan.Join(int32(i))
 	}
 	fmt.Println(_clans[clanid]._members.M)
 
-	rl := Ranklist(clanid)
+	rl := clan.Ranklist()
 
 	if rl[0] != 99 || rl[99] != 0 {
 		t.Error("clan ranklist failed")
 	}
 
 	for i := 0; i < 100; i++ {
-		if !Leave(int32(i), clanid) {
-			t.Error("cannot leave join")
-		}
+		clan.Leave(int32(i))
 	}
 
 	fmt.Println("testing send & recv")
 
 	for i := 0; i < 200; i++ {
-		Send(nil, clanid)
+		clan.Send(nil)
 	}
 
-	result, ok := Recv(195, clanid)
+	result := clan.Recv(195)
 
-	fmt.Println(len(result), ok)
+	fmt.Println(len(result))
 
 	if len(result) != 5 {
 		t.Error("send recv failed on size")
@@ -59,6 +56,7 @@ func init() {
 
 func BenchmarkClan(b *testing.B) {
 	fmt.Println("CLANID", clanid)
+	clan := Clan(clanid)
 
 	for i := 0; i < b.N; i++ {
 		user := &User{Id: int32(i), Score: int32(i)}
@@ -66,13 +64,13 @@ func BenchmarkClan(b *testing.B) {
 	}
 
 	for i := 0; i < b.N; i++ {
-		Join(int32(i), clanid)
+		clan.Join(int32(i))
 	}
 
-	Ranklist(clanid)
+	clan.Ranklist()
 
 	for i := 0; i < b.N; i++ {
-		Leave(int32(i), clanid)
+		clan.Leave(int32(i))
 	}
 
 }

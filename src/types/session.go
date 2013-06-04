@@ -6,10 +6,11 @@ import (
 )
 
 type IPCObject struct {
-	Sender  int32 // sender id
-	Service int16
-	Object  []byte // json formatted object
-	Time    int64  // send time
+	Sender    int32 // sender id
+	Multicast bool  // indicate wheather this message is a multicast message(group)
+	Service   int16
+	Object    []byte // json formatted object
+	Time      int64  // send time
 }
 
 type Session struct {
