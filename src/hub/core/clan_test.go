@@ -51,7 +51,7 @@ func TestClan(t *testing.T) {
 	}
 }
 
-var clanid uint32
+var clanid int32
 
 func init() {
 	clanid, _ = Create(1, "tap4funbenchmark")

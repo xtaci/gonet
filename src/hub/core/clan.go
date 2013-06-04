@@ -7,7 +7,6 @@ import (
 	"sort"
 	"strconv"
 	"sync"
-	"sync/atomic"
 )
 
 import (
@@ -18,7 +17,7 @@ import (
 
 const (
 	COLLECTION = "CLANS"
-	CLANGEN = "CLANGEN"
+	CLANGEN    = "CLANGEN"
 )
 
 type MemberSlice struct {
@@ -85,25 +84,23 @@ type ClanInfo struct {
 }
 
 var (
-	_clans      map[uint32]*ClanInfo // id -> claninfo
+	_clans      map[int32]*ClanInfo  // id -> claninfo
 	_clan_names map[string]*ClanInfo // name-> claninfo
 	_lock       sync.RWMutex
-
-	_clanid_gen int32
 )
 
 func init() {
-	_clans = make(map[uint32]*ClanInfo)
+	_clans = make(map[int32]*ClanInfo)
 	_clan_names = make(map[string]*ClanInfo)
 }
 
 //------------------------------------------------ create clan
-func Create(creator_id int32, clanname string) (clanid uint32, succ bool) {
+func Create(creator_id int32, clanname string) (clanid int32, succ bool) {
 	_lock.Lock()
 	defer _lock.Unlock()
 
 	if _clan_names[clanname] == nil {
-		clanid := atomic.AddInt32(&_clanid_gen, 1)
+		clanid := db.NextVal(CLANGEN)
 		clan := &ClanInfo{ClanId: clanid, Name: clanname, Leader: creator_id}
 		clan._members._add(creator_id)
 
@@ -121,7 +118,7 @@ func Create(creator_id int32, clanname string) (clanid uint32, succ bool) {
 }
 
 //------------------------------------------------ Join clan
-func Join(user_id int32, clanid uint32) bool {
+func Join(user_id int32, clanid int32) bool {
 	_lock.Lock()
 	defer _lock.Unlock()
 
@@ -136,7 +133,7 @@ func Join(user_id int32, clanid uint32) bool {
 }
 
 //------------------------------------------------ leave clan
-func Leave(user_id int32, clanid uint32) bool {
+func Leave(user_id int32, clanid int32) bool {
 	_lock.Lock()
 	defer _lock.Unlock()
 
@@ -163,7 +160,7 @@ func Leave(user_id int32, clanid uint32) bool {
 }
 
 //------------------------------------------------ get clan ranklist
-func Ranklist(clanid uint32) []int32 {
+func Ranklist(clanid int32) []int32 {
 	_lock.Lock()
 	defer _lock.Unlock()
 
@@ -177,7 +174,7 @@ func Ranklist(clanid uint32) []int32 {
 }
 
 //------------------------------------------------  send message to clan
-func Send(obj *IPCObject, clanid uint32) {
+func Send(obj *IPCObject, clanid int32) {
 	_lock.Lock()
 	defer _lock.Unlock()
 
@@ -200,7 +197,7 @@ func Send(obj *IPCObject, clanid uint32) {
 	}
 }
 
-func Recv(lastmsg_id uint32, clanid uint32) []*IPCObject {
+func Recv(lastmsg_id uint32, clanid int32) []*IPCObject {
 	_lock.RLock()
 	defer _lock.RUnlock()
 
@@ -230,22 +227,4 @@ func _save(clan *ClanInfo) {
 	if err != nil {
 		log.Println(info, err)
 	}
-}
-
-func _nextval() int32 {
-	c := Mongo.DB(config["mongo_db"]).C(CLANGEN)
-
-	change := mgo.Change{
-		Update:    bson.M{"$inc": bson.M{"n": 1}},
-		ReturnNew: true,
-	}
-
-	next := &NextVal{}
-	info, err := c.Find(nil).Apply(change, &next)
-	if err != nil {
-		log.Println(info, err)
-		return -1
-	}
-
-	return next.ID
 }
