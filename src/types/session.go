@@ -27,5 +27,6 @@ type Session struct {
 	ConnectTime    int64 // tcp connection establish time
 	LastPacketTime int64 // last packet arrive time
 	LastFlushTime  int64 // last flush to db time
+	Dirty          bool  // mark the data as dirty
 	OpCount        int   // num of operations since last sync
 }

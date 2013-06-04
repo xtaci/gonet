@@ -80,6 +80,7 @@ func StartAgent(in chan []byte, conn net.Conn) {
 		// TODO: 持久化逻辑#1： 超过一定的操作数量，刷入数据库
 		if sess.OpCount > flush_ops {
 			sess.OpCount = 0
+			sess.Dirty = false
 		}
 
 		// 是否被逻辑踢出

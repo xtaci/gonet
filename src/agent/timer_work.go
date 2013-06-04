@@ -24,7 +24,7 @@ func timer_work(sess *Session) {
 	// TODO: 持久化逻辑#2： 超过一定的时间，刷入数据库
 	config := cfg.Get()
 	ivl, _ := strconv.Atoi(config["flush_interval"])
-	if time.Now().Unix()-sess.LastFlushTime > int64(ivl) {
+	if sess.Dirty && time.Now().Unix()-sess.LastFlushTime > int64(ivl) {
 		fmt.Println("TODO: flush all to db")
 		flag1 := user_tbl.Set(&sess.User)
 		flag2 := data_tbl.Set(estates.COLLECTION, &sess.Estates)
