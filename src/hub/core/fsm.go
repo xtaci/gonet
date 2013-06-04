@@ -121,10 +121,15 @@ func _expire() {
 
 //------------------------------------------------ add a user to finite state machine manager
 func _add_fsm(user *User) {
-	info := &PlayerInfo{Id: user.Id, State: OFFLINE, ProtectTimeout: user.ProtectTimeout}
+	player := &PlayerInfo{Id: user.Id, State: OFFLINE}
+
+	if user.ProtectTimeout > time.Now().Unix() {
+		player.ProtectTimeout = user.ProtectTimeout
+		player.State |= PROTECTED
+	}
 
 	_lock_players.Lock()
-	_players[user.Id] = info
+	_players[user.Id] = player
 	_lock_players.Unlock()
 }
 

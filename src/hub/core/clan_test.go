@@ -25,7 +25,10 @@ func TestClan(t *testing.T) {
 	fmt.Println(_clans[clanid]._members.M)
 
 	rl := Ranklist(clanid)
-	fmt.Println(rl)
+
+	if rl[0] != 99 || rl[99] != 0 {
+		t.Error("clan ranklist failed")
+	}
 
 	for i := 0; i < 100; i++ {
 		if !Leave(int32(i), clanid) {
