@@ -71,11 +71,14 @@ func (mem *MemberSlice) Swap(i, j int) {
 
 //------------------------------------------------ Clan
 type ClanInfo struct {
-	ClanId   uint32
-	Leader   int32
+	ClanId uint32
+	Leader int32
+	Name   string
+	Desc   string
+	MQ     *queue.Queue
+
+	// runtime
 	_members MemberSlice
-	_mq      *queue.Queue
-	Name     string
 }
 
 var (
@@ -112,7 +115,7 @@ func Create(creator_id int32, clanname string) (clanid uint32, succ bool) {
 			log.Println("clan:", err)
 		}
 
-		clan._mq = queue.New(msg_max)
+		clan.MQ = queue.New(msg_max)
 
 		// save clanid->clanname
 		c := db.Collection(COLLECTION)
@@ -189,16 +192,16 @@ func RankList(clanid uint32) []int32 {
 }
 
 //------------------------------------------------  send message to clan
-func Send(msg string, clanid uint32) {
+func Send(msg interface{}, clanid uint32) {
 	_lock.Lock()
 	defer _lock.Unlock()
 
 	clan := _clans[clanid]
 
 	if clan != nil {
-		if !clan._mq.Enqueue(msg) {
-			clan._mq.Dequeue()
-			clan._mq.Enqueue(msg)
+		if !clan.MQ.Enqueue(msg) {
+			clan.MQ.Dequeue()
+			clan.MQ.Enqueue(msg)
 		}
 	}
 }
