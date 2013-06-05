@@ -76,6 +76,19 @@ func P_login_req(hostid int32, pkt *packet.Packet) []byte {
 
 	if core.Login(tbl.F_id, hostid) {
 		ret.F_v = 1
+
+		// 登陆后，将联盟消息push给玩家
+		clan := core.Clan(tbl.F_clan)
+		if clan != nil {
+			ServerLock.RLock()
+			ch := Servers[hostid]
+			ServerLock.RUnlock()
+
+			objs := clan.Recv(tbl.F_clanmsgmax + 1)
+			for _, v := range objs {
+				ch <- v.Json()
+			}
+		}
 	}
 
 	return packet.Pack(Code["login_ack"], ret, nil)

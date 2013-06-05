@@ -195,6 +195,24 @@ func (clan *ClanInfo) Push(obj *IPCObject) {
 	_save(clan)
 }
 
+func (clan *ClanInfo) Recv(lastmsg_id uint32) []*IPCObject {
+	_lock.RLock()
+	defer _lock.RUnlock()
+
+	if lastmsg_id >= clan.MaxMsgId {
+		return nil
+	}
+
+	count := int(clan.MaxMsgId - lastmsg_id)
+	if count > len(clan.Messages) {
+		return clan.Messages
+	} else {
+		return clan.Messages[len(clan.Messages)-count:]
+	}
+
+	return nil
+}
+
 //------------------------------------------------ Save to db
 func _save(clan *ClanInfo) {
 	c := db.Collection(COLLECTION)

@@ -8,7 +8,9 @@ type FORWARDIPC struct {
 }
 
 type ID struct {
-	F_id int32
+	F_id         int32
+	F_clan       int32
+	F_clanmsgmax uint32
 }
 
 type PROTECT struct {
@@ -68,6 +70,12 @@ func PKT_FORWARDIPC(reader *packet.Packet) (tbl FORWARDIPC, err error) {
 
 func PKT_ID(reader *packet.Packet) (tbl ID, err error) {
 	tbl.F_id, err = reader.ReadS32()
+	checkErr(err)
+
+	tbl.F_clan, err = reader.ReadS32()
+	checkErr(err)
+
+	tbl.F_clanmsgmax, err = reader.ReadU32()
 	checkErr(err)
 
 	return

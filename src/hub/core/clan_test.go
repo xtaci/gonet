@@ -38,6 +38,14 @@ func TestClan(t *testing.T) {
 	for i := 0; i < 200; i++ {
 		clan.Push(nil)
 	}
+
+	result := clan.Recv(195)
+
+	fmt.Println(len(result))
+
+	if len(result) != 5 {
+		t.Error("send recv failed on size")
+	}
 }
 
 var clanid int32

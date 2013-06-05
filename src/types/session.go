@@ -1,6 +1,10 @@
 package types
 
 import (
+	"encoding/json"
+)
+
+import (
 	"types/estates"
 	"types/grid"
 )
@@ -11,6 +15,11 @@ type IPCObject struct {
 	Service   int16
 	Object    []byte // json formatted object
 	Time      int64  // send time
+}
+
+func (obj *IPCObject) Json() []byte {
+	val, _ := json.Marshal(obj)
+	return val
 }
 
 type Session struct {
