@@ -1,6 +1,8 @@
 package core
 
 import (
+	"labix.org/v2/mgo/bson"
+	"log"
 	"strconv"
 	"sync"
 	"time"
@@ -49,7 +51,15 @@ func _writer() {
 		user_id := <-_stats_chan
 		record := _stats[user_id]
 		if record != nil {
-			_create_report(record)
+			summary := _create_summary(record)
+
+			// save to db
+			config := cfg.Get()
+			c := Mongo.DB(config["mongo_db_stats"]).C(STATS_COLLECTION)
+			info, err := c.Upsert(bson.M{"userid": summary.UserId}, summary)
+			if err != nil {
+				log.Println(info, err)
+			}
 		}
 	}
 }
@@ -73,12 +83,14 @@ func Collect(obj *StatsObject) {
 	}
 }
 
-func _create_report(record *Record) {
+//------------------------------------------------ create a summary and remove old data
+func _create_summary(record *Record) *Summary {
 	record.Lock()
 	defer record.Unlock()
 	// TODO: create a summary report
-	config := cfg.Get()
-	collection := Mongo.DB(config["mongo_db_stats"]).C(STATS_COLLECTION)
+	sum := &Summary{}
 	// empty the stats
 	record._stats = nil
+
+	return sum
 }
