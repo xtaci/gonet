@@ -53,8 +53,9 @@ func P_ping_req(reader *packet.Packet) []byte {
 
 func P_add_req(reader *packet.Packet) []byte {
 	tbl, _ := PKT_ADD_REQ(reader)
-	ret := INT{tbl.F_type}
+	ret := INT{0}
 
+	fmt.Println(tbl)
 	return packet.Pack(Code["add_ack"], ret, nil)
 }
 

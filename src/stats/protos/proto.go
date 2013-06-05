@@ -3,7 +3,6 @@ package protos
 import "misc/packet"
 
 type ADD_REQ struct {
-	F_type uint32
 	F_data []byte
 }
 
@@ -12,9 +11,6 @@ type INT struct {
 }
 
 func PKT_ADD_REQ(reader *packet.Packet)(tbl ADD_REQ, err error){
-	tbl.F_type,err = reader.ReadU32()
-	checkErr(err)
-
 	tbl.F_data, err = reader.ReadBytes()
 	checkErr(err)
 
