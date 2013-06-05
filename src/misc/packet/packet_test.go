@@ -2,7 +2,9 @@ package packet
 
 import (
 	"fmt"
+	"math/rand"
 	"testing"
+	"time"
 )
 
 func TestPacketWriter(t *testing.T) {
@@ -90,10 +92,14 @@ func TestPacketWriter(t *testing.T) {
 }
 
 func BenchmarkPacketWriter(b *testing.B) {
-	p := Writer()
 	a := byte(0xFF)
+	rand.Seed(time.Now().Unix())
 
 	for i := 0; i < b.N; i++ {
-		p.WriteByte(a)
+		p := Writer()
+		n := rand.Intn(128)
+		for j := 0; j < n; j++ {
+			p.WriteByte(a)
+		}
 	}
 }
