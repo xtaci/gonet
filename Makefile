@@ -11,7 +11,7 @@ SRCDIR = ./src
 all: $(PROGS)
 
 $(PROGS):
-	$(GO) install $@
+	$(GO) install -race $@
 
 
 clean:
