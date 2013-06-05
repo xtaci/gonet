@@ -270,5 +270,7 @@ func Reader(data []byte) *Packet {
 }
 
 func Writer() *Packet {
-	return &Packet{pos: 0}
+	pkt := &Packet{pos: 0}
+	pkt.data = make([]byte, 0, 128)
+	return pkt
 }

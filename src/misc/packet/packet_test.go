@@ -88,3 +88,12 @@ func TestPacketWriter(t *testing.T) {
 		t.Error("overflow check failed")
 	}
 }
+
+func BenchmarkPacketWriter(b *testing.B) {
+	p := Writer()
+	a := byte(0xFF)
+
+	for i := 0; i < b.N; i++ {
+		p.WriteByte(a)
+	}
+}
