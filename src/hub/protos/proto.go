@@ -7,10 +7,19 @@ type FORWARDIPC struct {
 	F_IPC     []byte
 }
 
-type ID struct {
+type LOGIN_REQ struct {
 	F_id         int32
 	F_clan       int32
 	F_clanmsgmax uint32
+}
+
+type LOGIN_ACK struct {
+	F_success    bool
+	F_clanmsgmax uint32
+}
+
+type ID struct {
+	F_id int32
 }
 
 type PROTECT struct {
@@ -68,7 +77,7 @@ func PKT_FORWARDIPC(reader *packet.Packet) (tbl FORWARDIPC, err error) {
 	return
 }
 
-func PKT_ID(reader *packet.Packet) (tbl ID, err error) {
+func PKT_LOGIN_REQ(reader *packet.Packet) (tbl LOGIN_REQ, err error) {
 	tbl.F_id, err = reader.ReadS32()
 	checkErr(err)
 
@@ -76,6 +85,23 @@ func PKT_ID(reader *packet.Packet) (tbl ID, err error) {
 	checkErr(err)
 
 	tbl.F_clanmsgmax, err = reader.ReadU32()
+	checkErr(err)
+
+	return
+}
+
+func PKT_LOGIN_ACK(reader *packet.Packet) (tbl LOGIN_ACK, err error) {
+	tbl.F_success, err = reader.ReadBool()
+	checkErr(err)
+
+	tbl.F_clanmsgmax, err = reader.ReadU32()
+	checkErr(err)
+
+	return
+}
+
+func PKT_ID(reader *packet.Packet) (tbl ID, err error) {
+	tbl.F_id, err = reader.ReadS32()
 	checkErr(err)
 
 	return

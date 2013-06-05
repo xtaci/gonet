@@ -4,5 +4,5 @@ data array byte
 ===
 
 INT=
-v uint32
+v int32
 ===

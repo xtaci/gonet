@@ -33,13 +33,13 @@ func Ping() bool {
 
 func Login(id int32) bool {
 	defer _hub_err()
-	req := hub.ID{}
+	req := hub.LOGIN_REQ{}
 	req.F_id = id
 	ret := _call(packet.Pack(hub.Code["login_req"], req, nil))
 	reader := packet.Reader(ret)
-	tbl, err := hub.PKT_INT(reader)
+	tbl, err := hub.PKT_LOGIN_ACK(reader)
 
-	if err != nil || tbl.F_v == 0 {
+	if err != nil || !tbl.F_success {
 		return false
 	}
 

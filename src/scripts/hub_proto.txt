@@ -1,46 +1,57 @@
 # 转发IPC消息
 FORWARDIPC=
-dest_id integer
+dest_id int32
 IPC array byte
 ===
 
 #用户登陆发包
-ID=
-id integer
-clan integer
+LOGIN_REQ=
+id int32
+clan int32
 clanmsgmax uint32 
 ===
 
+#用户登录回包
+LOGIN_ACK=
+success bool
+clanmsgmax uint32
+===
+
+#只携带ID的包
+ID=
+id int32
+===
+
 PROTECT=
-id integer
-protecttime long
+id int32
+protecttime int64
 ===
 
 #玩家信息
 INFO=
 flag bool
-id integer
-state integer
-score integer
-protecttime long
+id int32
+state int32
+score int32
+protecttime int64
 ===
 
 #改变分数
 CHGSCORE=
-id	integer
-oldscore integer
-newscore integer
+id	int32
+oldscore int32
+newscore int32
 ===
 
 #获取排行榜
 GETLIST=
-A integer
-B integer
+A int32
+B int32
 ===
 
 ID_SCORE=
-id integer
-score integer
+id int32
+score int32
 ===
 
 LIST=
@@ -48,7 +59,7 @@ items array ID_SCORE
 ===
 
 LONG=
-v long
+v int64
 ===
 
 STRING=
@@ -56,5 +67,5 @@ v string
 ===
 
 INT=
-v integer
+v int32
 ===

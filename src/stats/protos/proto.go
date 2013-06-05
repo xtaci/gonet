@@ -7,7 +7,7 @@ type ADD_REQ struct {
 }
 
 type INT struct {
-	F_v uint32
+	F_v int32
 }
 
 func PKT_ADD_REQ(reader *packet.Packet) (tbl ADD_REQ, err error) {
@@ -18,7 +18,7 @@ func PKT_ADD_REQ(reader *packet.Packet) (tbl ADD_REQ, err error) {
 }
 
 func PKT_INT(reader *packet.Packet) (tbl INT, err error) {
-	tbl.F_v, err = reader.ReadU32()
+	tbl.F_v, err = reader.ReadS32()
 	checkErr(err)
 
 	return

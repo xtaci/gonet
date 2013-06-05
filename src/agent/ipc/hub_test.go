@@ -11,7 +11,7 @@ type TMPObj struct {
 	C string
 }
 
-func TestEventFunc(t *testing.T) {
+func TestHub(t *testing.T) {
 	DialHub()
 	fmt.Println("testing PING")
 	if !Ping() {

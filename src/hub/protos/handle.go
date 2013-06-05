@@ -71,11 +71,11 @@ func P_ping_req(hostid int32, reader *packet.Packet) []byte {
 }
 
 func P_login_req(hostid int32, pkt *packet.Packet) []byte {
-	tbl, _ := PKT_ID(pkt)
-	ret := INT{F_v: 0}
+	tbl, _ := PKT_LOGIN_REQ(pkt)
+	ret := LOGIN_ACK{F_success: false}
 
 	if core.Login(tbl.F_id, hostid) {
-		ret.F_v = 1
+		ret.F_success = true
 
 		// 登陆后，将联盟消息push给玩家
 		clan := core.Clan(tbl.F_clan)
@@ -88,6 +88,8 @@ func P_login_req(hostid int32, pkt *packet.Packet) []byte {
 			for _, v := range objs {
 				ch <- v.Json()
 			}
+
+			ret.F_clanmsgmax = clan.MaxMsgId
 		}
 	}
 
