@@ -1,19 +1,19 @@
 package core
 
 import (
-	"sync"
 	"strconv"
+	"sync"
 	"time"
 )
 
 import (
-	"misc/timer"
 	"cfg"
+	"misc/timer"
 )
 
-type Record struct{
+type Record struct {
 	_stats []*StatsObject
-	_lock sync.Mutex
+	_lock  sync.Mutex
 }
 
 func (r *Record) Lock() {
@@ -25,7 +25,7 @@ func (r *Record) Unlock() {
 }
 
 var (
-	_stats map[int32]*Record
+	_stats      map[int32]*Record
 	_stats_lock sync.RWMutex
 	_stats_chan chan int32
 )
@@ -39,11 +39,14 @@ func init() {
 func _writer() {
 	for {
 		user_id := <-_stats_chan
-		collection := _stats[user_id]
+		record := _stats[user_id]
+		if record != nil {
+			_create_report(record)
+		}
 	}
 }
 
-//------------------------------------------------ Group StatsObject by user 
+//------------------------------------------------ Group StatsObject by user
 func Collect(obj *StatsObject) {
 	_stats_lock.RLock()
 	record := _stats[obj.UserId]
@@ -60,4 +63,13 @@ func Collect(obj *StatsObject) {
 		record._stats = append(record._stats, obj)
 		record.Unlock()
 	}
+}
+
+func _create_report(record *Record) {
+	record.Lock()
+	defer record.Unlock()
+	// create a summary report
+
+	// empty the stats
+	record._stats = nil
 }
