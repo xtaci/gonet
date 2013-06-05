@@ -14,9 +14,7 @@ type Info struct {
 	Id          int32
 	State       int32
 	Score       int32
-	Clan        int32
 	ProtectTime int64
-	Name        string
 }
 
 func Ping() bool {

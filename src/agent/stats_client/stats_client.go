@@ -1,4 +1,4 @@
-package event_client
+package stats_client
 
 import (
 	"io"
@@ -17,25 +17,25 @@ import (
 
 var _conn net.Conn
 
-//----------------------------------------------- connect to Event server
-func DialEvent() {
-	log.Println("Connecting to Event server")
+//----------------------------------------------- connect to Stats server
+func DialStats() {
+	log.Println("Connecting to Stats server")
 	config := cfg.Get()
 
-	conn, err := net.Dial("tcp", config["event_service"])
+	conn, err := net.Dial("tcp", config["stats_service"])
 	if err != nil {
-		log.Println("Cannot connect to Event server")
+		log.Println("Cannot connect to Stats server")
 		os.Exit(1)
 	}
 
 	_conn = conn
 
-	log.Println("Event Service Connected")
-	go EventReceiver(conn)
+	log.Println("Stats Service Connected")
+	go StatsReceiver(conn)
 }
 
-//----------------------------------------------- receive ack from Event Server
-func EventReceiver(conn net.Conn) {
+//----------------------------------------------- receive ack from Stats Server
+func StatsReceiver(conn net.Conn) {
 	defer conn.Close()
 
 	header := make([]byte, 2)
@@ -81,7 +81,7 @@ func EventReceiver(conn net.Conn) {
 			ack <- data
 			delete(_wait_ack, seqval)
 		} else {
-			log.Println("Illegal packet sequence number from Event Server")
+			log.Println("Illegal packet sequence number from Stats Server")
 		}
 		_wait_ack_lock.Unlock()
 	}
@@ -112,7 +112,7 @@ func _call(data []byte) (ret []byte) {
 	// send the packet
 	_, err := _conn.Write(writer.Data())
 	if err != nil {
-		log.Println("Error send packet to Event Server:", err)
+		log.Println("Error send packet to Stats Server:", err)
 		_wait_ack_lock.Lock()
 		delete(_wait_ack, seq_id)
 		_wait_ack_lock.Unlock()
