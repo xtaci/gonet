@@ -55,7 +55,7 @@ func _writer() {
 
 			// save to db
 			config := cfg.Get()
-			c := Mongo.DB(config["mongo_db_stats"]).C(STATS_COLLECTION)
+			c := Mongo.DB(config["mongo_db"]).C(STATS_COLLECTION)
 			info, err := c.Upsert(bson.M{"userid": summary.UserId}, summary)
 			if err != nil {
 				log.Println(info, err)
