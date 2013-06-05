@@ -94,7 +94,7 @@ var _seq_id uint64
 var _wait_ack map[uint64]chan []byte
 var _wait_ack_lock sync.Mutex
 
-//------------------------------------------------ IPC send should be seqential
+//------------------------------------------------ call remote function
 func _call(data []byte) (ret []byte) {
 	seq_id := atomic.AddUint64(&_seq_id, 1)
 
