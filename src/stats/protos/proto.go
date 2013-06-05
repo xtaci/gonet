@@ -1,0 +1,30 @@
+package protos
+
+import "misc/packet"
+
+type ADD_REQ struct {
+	F_type uint32
+	F_data []byte
+}
+
+type INT struct {
+	F_v uint32
+}
+
+func PKT_ADD_REQ(reader *packet.Packet)(tbl ADD_REQ, err error){
+	tbl.F_type,err = reader.ReadU32()
+	checkErr(err)
+
+	tbl.F_data, err = reader.ReadBytes()
+	checkErr(err)
+
+	return
+}
+
+func PKT_INT(reader *packet.Packet)(tbl INT, err error){
+	tbl.F_v,err = reader.ReadU32()
+	checkErr(err)
+
+	return
+}
+

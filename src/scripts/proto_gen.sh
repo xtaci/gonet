@@ -66,3 +66,25 @@ printf "}" >> api.go
 
 mv -f proto.go ../event/protos
 mv -f api.go ../event/protos
+
+##################################################
+### stats proto & api
+##################################################
+printf "package protos\n" > proto.go 
+awk -f proto.awk stats_proto.txt >> proto.go 
+awk -f proto_func.awk stats_proto.txt >> proto.go 
+
+printf "package protos\n" > api.go
+printf "\n" >> api.go
+printf "import \"misc/packet\"\n" >> api.go
+printf "\n" >> api.go
+
+awk -f api.awk stats_api.txt >> api.go 
+awk -f api_rcode.awk stats_api.txt >> api.go 
+
+printf "var ProtoHandler map[uint16]func(*packet.Packet) []byte = map[uint16]func(*packet.Packet) []byte {\n" >> api.go
+awk -f api_bind_req.awk stats_api.txt >> api.go 
+printf "}" >> api.go
+
+mv -f proto.go ../stats/protos
+mv -f api.go ../stats/protos
