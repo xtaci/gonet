@@ -41,7 +41,15 @@ type PlayerInfo struct {
 	RaidTimeout    int64      // unix time
 	Host           int32      // host
 	WaitEventId    int32      // current waiting event id, a user will only wait on ONE timeout event,  PROTECTTIMEOUT of RAID TIMEOUT
-	LCK            sync.Mutex // Record lock
+	_lock          sync.Mutex // Record lock
+}
+
+func (p *PlayerInfo) Lock() {
+	p._lock.Lock()
+}
+
+func (p *PlayerInfo) Unlock() {
+	p._lock.Unlock()
 }
 
 /**********************************************************
@@ -95,11 +103,11 @@ func _expire() {
 			_protectslock.Unlock()
 
 			if player != nil {
-				player.LCK.Lock()
+				player.Lock()
 				if player.WaitEventId == event_id { // check if it is the waiting event, or just ignore
 					player.State = player.State & (^PROTECTED)
 				}
-				player.LCK.Unlock()
+				player.Unlock()
 			}
 
 		case event_id := <-_raids_ch:
@@ -109,11 +117,11 @@ func _expire() {
 			_raidslock.Unlock()
 
 			if player != nil {
-				player.LCK.Lock()
+				player.Lock()
 				if player.WaitEventId == event_id {
 					player.State = player.State & (^RAID)
 				}
-				player.LCK.Unlock()
+				player.Unlock()
 			}
 		}
 	}
@@ -142,8 +150,8 @@ func Login(id, host int32) bool {
 	_lock_players.RUnlock()
 
 	if player != nil {
-		player.LCK.Lock()
-		defer player.LCK.Unlock()
+		player.Lock()
+		defer player.Unlock()
 		state := player.State
 
 		if state&OFFLINE != 0 && state&RAID == 0 { // when offline & not being raid
@@ -164,8 +172,8 @@ func Logout(id int32) bool {
 	_lock_players.RUnlock()
 
 	if player != nil {
-		player.LCK.Lock()
-		defer player.LCK.Unlock()
+		player.Lock()
+		defer player.Unlock()
 
 		state := player.State
 
@@ -186,7 +194,7 @@ func Raid(id int32) bool {
 	_lock_players.RUnlock()
 
 	if player != nil {
-		player.LCK.Lock()
+		player.Lock()
 
 		state := player.State
 
@@ -199,7 +207,7 @@ func Raid(id int32) bool {
 			player.State = int32(OFFLINE | RAID)
 			player.RaidTimeout = timeout
 			player.WaitEventId = event_id
-			player.LCK.Unlock()
+			player.Unlock()
 
 			_raidslock.Lock()
 			_raids[event_id] = player
@@ -207,7 +215,7 @@ func Raid(id int32) bool {
 			return true
 		}
 
-		player.LCK.Unlock()
+		player.Unlock()
 	}
 
 	return false
@@ -221,8 +229,8 @@ func Free(id int32) bool {
 	_lock_players.RUnlock()
 
 	if player != nil {
-		player.LCK.Lock()
-		defer player.LCK.Unlock()
+		player.Lock()
+		defer player.Unlock()
 
 		if player.State&RAID != 0 { // when being raid
 			player.State = int32(OFFLINE)
@@ -241,7 +249,7 @@ func Protect(id int32, until int64) bool {
 	_lock_players.RUnlock()
 
 	if player != nil {
-		player.LCK.Lock()
+		player.Lock()
 		if player.State&RAID == 0 { // when not being raid
 			event_id := atomic.AddInt32(&_event_id_gen, 1)
 			timer.Add(event_id, until, _raids_ch)
@@ -249,14 +257,14 @@ func Protect(id int32, until int64) bool {
 			player.State |= PROTECTED
 			player.ProtectTimeout = until
 			player.WaitEventId = event_id
-			player.LCK.Unlock()
+			player.Unlock()
 
 			_protectslock.Lock()
 			_protects[event_id] = player
 			_protectslock.Unlock()
 			return true
 		}
-		player.LCK.Unlock()
+		player.Unlock()
 	}
 
 	return false
@@ -270,13 +278,13 @@ func UnProtect(id int32) bool {
 	_lock_players.RUnlock()
 
 	if player != nil {
-		player.LCK.Lock()
+		player.Lock()
 		if player.State&PROTECTED != 0 {
 			player.State &= ^PROTECTED
-			player.LCK.Unlock()
+			player.Unlock()
 			return true
 		}
-		player.LCK.Unlock()
+		player.Unlock()
 	}
 
 	return false
@@ -290,9 +298,9 @@ func State(id int32) (ret int32) {
 	_lock_players.RUnlock()
 
 	if player != nil {
-		player.LCK.Lock()
+		player.Lock()
 		ret = player.State
-		player.LCK.Unlock()
+		player.Unlock()
 	}
 	return
 }
@@ -303,9 +311,9 @@ func ProtectTimeout(id int32) (ret int64) {
 	_lock_players.RUnlock()
 
 	if player != nil {
-		player.LCK.Lock()
+		player.Lock()
 		ret = player.ProtectTimeout
-		player.LCK.Unlock()
+		player.Unlock()
 	}
 
 	return
@@ -317,9 +325,9 @@ func Host(id int32) (ret int32) {
 	_lock_players.RUnlock()
 
 	if player != nil {
-		player.LCK.Lock()
+		player.Lock()
 		ret = player.Host
-		player.LCK.Unlock()
+		player.Unlock()
 	}
 
 	return
