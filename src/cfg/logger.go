@@ -24,7 +24,7 @@ func StartLogger(logfile string) {
 	}
 
 	var r Repeater
-	r.Out1 = os.Stdout
-	r.Out2 = f
+	r.out1 = os.Stdout
+	r.out2 = f
 	log.SetOutput(&r)
 }

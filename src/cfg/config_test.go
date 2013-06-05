@@ -6,5 +6,9 @@ import (
 )
 
 func TestReadConfig(t *testing.T) {
-	fmt.Println(Get())
+	config := Get()
+
+	for k, v := range config {
+		fmt.Println(k, "=", v)
+	}
 }
