@@ -3,6 +3,7 @@ GO=go
 
 PROGS = hub \
 	 event \
+	 stats \
 	 agent 
 
 SRCDIR = ./src
