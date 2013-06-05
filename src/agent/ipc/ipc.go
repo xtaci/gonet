@@ -33,20 +33,19 @@ func Send(src_id, dest_id int32, service int16, object interface{}) (ret bool) {
 		return false
 	}
 
-	req := IPCObject{Sender: src_id, Service: service, Object: val, Time: time.Now().Unix()}
+	req := &IPCObject{Sender: src_id, Service: service, Object: val, Time: time.Now().Unix()}
 
 	// first try local delivery, if dest_id is not in the same server, just forward to HUB server.
 	peer := QueryOnline(dest_id)
 	if peer != nil {
 		select {
-		case peer.MQ <- req:
+		case peer.MQ <- *req:
 		case <-time.After(time.Second):
 			panic("deadlock") // rare case, when both chan is full
 		}
 		return true
 	} else {
 		// convert req to json again, LEVEL-2 encapsulation
-		req_json, _ := json.Marshal(req)
-		return _forward(dest_id, req_json)
+		return _forward(dest_id, req.Json())
 	}
 }
