@@ -23,7 +23,7 @@ func Ping() bool {
 	return true
 }
 
-func Add(tblname string, oid uint32, user_id int32, timeout int64) uint32 {
+func Add(tblname string, oid uint32, user_id int32, timeout int64) int32 {
 	defer _event_err()
 	req := event.ADD_REQ{}
 	req.F_tblname = tblname
@@ -36,7 +36,7 @@ func Add(tblname string, oid uint32, user_id int32, timeout int64) uint32 {
 	return tbl.F_v
 }
 
-func Cancel(event_id uint32) {
+func Cancel(event_id int32) {
 	defer _event_err()
 	req := event.CANCEL_REQ{}
 	req.F_event_id = event_id

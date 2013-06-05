@@ -23,7 +23,6 @@ func P_rank_list_req(sess *Session, reader *packet.Packet) (ret []byte, err erro
 	for k, v := range ids {
 		info, _ := ipc.GetInfo(v)
 		out.F_items[k].F_id = v
-		out.F_items[k].F_name = info.Name
 		out.F_items[k].F_rank = scores[k]
 		out.F_items[k].F_state = info.State
 

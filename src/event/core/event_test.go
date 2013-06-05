@@ -15,6 +15,6 @@ func BenchmarkAdd(b *testing.B) {
 	fmt.Println("max event id :", _event_id_gen)
 
 	for i := 0; i < b.N; i++ {
-		Cancel(uint32(i))
+		Cancel(int32(i))
 	}
 }

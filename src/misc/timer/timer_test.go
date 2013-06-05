@@ -5,7 +5,7 @@ import "time"
 import "fmt"
 
 func TestTimer(t *testing.T) {
-	ch := make(chan uint32, 100)
+	ch := make(chan int32, 100)
 
 	now := time.Now().Unix()
 	Add(1, now+1, ch)
