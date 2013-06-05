@@ -30,7 +30,7 @@ const (
 
 const (
 	RAID_TIME = 300 // seconds
-	EVENT_MAX = 4096
+	EVENT_MAX = 50000
 )
 
 //--------------------------------------------------------- player info
