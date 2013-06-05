@@ -62,7 +62,7 @@ func P_add_req(reader *packet.Packet) []byte {
 
 func P_cancel_req(reader *packet.Packet) []byte {
 	tbl, _ := PKT_CANCEL_REQ(reader)
-	core.Cancel(uint32(tbl.F_event_id))
+	core.Cancel(tbl.F_event_id)
 	ret := INT{1}
 
 	return packet.Pack(Code["cancel_ack"], ret, nil)

@@ -1,4 +1,8 @@
-package protos
+package core
+
+import (
+	"encoding/json"
+)
 
 const (
 	TYPE_PVP                     = iota // 发生了一次PVP
@@ -13,7 +17,13 @@ const (
 )
 
 type StatsObject struct {
-	UserId int32
-	Type   int32
+	UserId    int32
+	Type      int32
+	Timestamp int64
 	// TODO: add fields
+}
+
+func (obj *StatsObject) Marshal() []byte {
+	json_val, _ := json.Marshal(obj)
+	return json_val
 }

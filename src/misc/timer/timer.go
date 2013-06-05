@@ -7,9 +7,9 @@ import (
 )
 
 type Event struct {
-	Id      uint32      // user specified Id
-	Timeout int64       // timeout
-	CH      chan uint32 // event trigger channel
+	Id      int32      // user specified Id
+	Timeout int64      // timeout
+	CH      chan int32 // event trigger channel
 }
 
 const (
@@ -124,7 +124,7 @@ func _trigger(level uint) {
 }
 
 //------------------------------------------------ add a timeout event, id will be send back
-func Add(id uint32, timeout int64, ch chan uint32) {
+func Add(id int32, timeout int64, ch chan int32) {
 	event := &Event{Id: id, CH: ch, Timeout: timeout}
 
 	timer_id := atomic.AddUint32(&_timer_id, 1)

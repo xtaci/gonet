@@ -26,7 +26,7 @@ func StartAgent(in chan []byte, conn net.Conn) {
 	sess.KickOut = false
 
 	// standard 1-sec timer
-	std_timer := make(chan uint32, 1)
+	std_timer := make(chan int32, 1)
 	timer.Add(1, time.Now().Unix()+1, std_timer)
 
 	// write buffer

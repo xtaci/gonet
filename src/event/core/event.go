@@ -14,10 +14,10 @@ type Event struct {
 }
 
 var (
-	_event_ch     chan uint32
-	_events       map[uint32]*Event // mapping from  event_id-> Event
+	_event_ch     chan int32
+	_events       map[int32]*Event // mapping from  event_id-> Event
 	_events_lock  sync.RWMutex
-	_event_id_gen uint32
+	_event_id_gen int32
 
 	_hashtbl map[uint32]string // mapping from hash(tblname)-> tblname
 )
@@ -27,8 +27,8 @@ const (
 )
 
 func init() {
-	_event_ch = make(chan uint32, EVENT_CHAN_MAX)
-	_events = make(map[uint32]*Event)
+	_event_ch = make(chan int32, EVENT_CHAN_MAX)
+	_events = make(map[int32]*Event)
 	_hashtbl = make(map[uint32]string)
 	go _expire()
 }
@@ -50,7 +50,7 @@ func _expire() {
 }
 
 //------------------------------------------------ Add a timeout event
-func Add(tblname string, oid uint32, user_id int32, timeout int64) uint32 {
+func Add(tblname string, oid uint32, user_id int32, timeout int64) int32 {
 	h_tblname := naming.FNV1a(tblname)
 	_hashtbl[h_tblname] = tblname
 
@@ -67,7 +67,7 @@ func Add(tblname string, oid uint32, user_id int32, timeout int64) uint32 {
 }
 
 //------------------------------------------------ Load a timeout event
-func Load(tblname string, oid uint32, user_id int32, timeout int64, event_id uint32) {
+func Load(tblname string, oid uint32, user_id int32, timeout int64, event_id int32) {
 	h_tblname := naming.FNV1a(tblname)
 	_hashtbl[h_tblname] = tblname
 
@@ -80,7 +80,7 @@ func Load(tblname string, oid uint32, user_id int32, timeout int64, event_id uin
 }
 
 //------------------------------------------------ cancel an oid's timeout
-func Cancel(event_id uint32) {
+func Cancel(event_id int32) {
 	_events_lock.Lock()
 	delete(_events, event_id)
 	_events_lock.Unlock()

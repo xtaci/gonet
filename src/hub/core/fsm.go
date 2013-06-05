@@ -40,7 +40,7 @@ type PlayerInfo struct {
 	ProtectTimeout int64      // unix time
 	RaidTimeout    int64      // unix time
 	Host           int32      // host
-	WaitEventId    uint32     // current waiting event id, a user will only wait on ONE timeout event,  PROTECTTIMEOUT of RAID TIMEOUT
+	WaitEventId    int32      // current waiting event id, a user will only wait on ONE timeout event,  PROTECTTIMEOUT of RAID TIMEOUT
 	LCK            sync.Mutex // Record lock
 }
 
@@ -63,23 +63,23 @@ var (
 	_lock_players sync.RWMutex          // lock players
 	_players      map[int32]*PlayerInfo // all players
 
-	_protects     map[uint32]*PlayerInfo
+	_protects     map[int32]*PlayerInfo
 	_protectslock sync.Mutex
-	_protects_ch  chan uint32
+	_protects_ch  chan int32
 
-	_raids     map[uint32]*PlayerInfo
+	_raids     map[int32]*PlayerInfo
 	_raidslock sync.Mutex
-	_raids_ch  chan uint32
+	_raids_ch  chan int32
 
-	_event_id_gen uint32
+	_event_id_gen int32
 )
 
 func init() {
 	_players = make(map[int32]*PlayerInfo)
-	_protects = make(map[uint32]*PlayerInfo)
-	_protects_ch = make(chan uint32, EVENT_MAX)
-	_raids = make(map[uint32]*PlayerInfo)
-	_raids_ch = make(chan uint32, EVENT_MAX)
+	_protects = make(map[int32]*PlayerInfo)
+	_protects_ch = make(chan int32, EVENT_MAX)
+	_raids = make(map[int32]*PlayerInfo)
+	_raids_ch = make(chan int32, EVENT_MAX)
 
 	go _expire()
 }
@@ -193,7 +193,7 @@ func Raid(id int32) bool {
 		if state&OFFLINE != 0 && state&(RAID|PROTECTED) == 0 { // when offline and free
 			timeout := time.Now().Unix() + RAID_TIME
 
-			event_id := atomic.AddUint32(&_event_id_gen, 1)
+			event_id := atomic.AddInt32(&_event_id_gen, 1)
 			timer.Add(event_id, timeout, _raids_ch) // generate timer
 
 			player.State = int32(OFFLINE | RAID)
@@ -243,7 +243,7 @@ func Protect(id int32, until int64) bool {
 	if player != nil {
 		player.LCK.Lock()
 		if player.State&RAID == 0 { // when not being raid
-			event_id := atomic.AddUint32(&_event_id_gen, 1)
+			event_id := atomic.AddInt32(&_event_id_gen, 1)
 			timer.Add(event_id, until, _raids_ch)
 
 			player.State |= PROTECTED

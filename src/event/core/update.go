@@ -17,13 +17,13 @@ import (
 )
 
 //------------------------------------------------ perform changes & save back, atomic
-func Execute(event *Event, event_id uint32) (ret bool) {
+func Execute(event *Event, event_id int32) (ret bool) {
 	defer PrintPanicStack()
 	_do(event, event_id)
 	return true
 }
 
-func _do(event *Event, event_id uint32) {
+func _do(event *Event, event_id int32) {
 	/*
 		switch event.tblname {
 		case naming.FNV1a(estates.COLLECTION):

@@ -7,9 +7,9 @@ timeout int64
 ===
 
 CANCEL_REQ=
-event_id uint32
+event_id int32
 ===
 
 INT=
-v uint32
+v int32
 ===
