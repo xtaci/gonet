@@ -8,6 +8,7 @@ import (
 
 import (
 	"cfg"
+	. "db"
 	"misc/timer"
 )
 
@@ -24,18 +25,25 @@ func (r *Record) Unlock() {
 	r._lock.Unlock()
 }
 
+//------------------------------------------------ variables
 var (
 	_stats      map[int32]*Record
 	_stats_lock sync.RWMutex
 	_stats_chan chan int32
 )
 
+const (
+	MAX_WRITE_REQ    = 1000000
+	STATS_COLLECTION = "STATS"
+)
+
 func init() {
 	_stats = make(map[int32]*Record)
-	_stats_chan = make(chan int32)
+	_stats_chan = make(chan int32, MAX_WRITE_REQ)
 	go _writer()
 }
 
+//------------------------------------------------ statistical data writer
 func _writer() {
 	for {
 		user_id := <-_stats_chan
@@ -68,8 +76,9 @@ func Collect(obj *StatsObject) {
 func _create_report(record *Record) {
 	record.Lock()
 	defer record.Unlock()
-	// create a summary report
-
+	// TODO: create a summary report
+	config := cfg.Get()
+	collection := Mongo.DB(config["mongo_db_stats"]).C(STATS_COLLECTION)
 	// empty the stats
 	record._stats = nil
 }
