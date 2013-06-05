@@ -56,7 +56,7 @@ func handleClient(conn net.Conn) {
 	defer conn.Close()
 
 	header := make([]byte, 2)
-	ch := make(chan []byte, 100)
+	ch := make(chan []byte, 10)
 
 	go StartAgent(ch, conn)
 
