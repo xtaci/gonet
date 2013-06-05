@@ -174,8 +174,8 @@ func (clan *ClanInfo) Ranklist() []int32 {
 	return m
 }
 
-//------------------------------------------------  send message to clan
-func (clan *ClanInfo) Send(obj *IPCObject) {
+//------------------------------------------------  push message to clan
+func (clan *ClanInfo) Push(obj *IPCObject) {
 	_lock.Lock()
 	defer _lock.Unlock()
 
@@ -193,25 +193,6 @@ func (clan *ClanInfo) Send(obj *IPCObject) {
 	clan.Messages = append(clan.Messages, obj)
 	clan.MaxMsgId += 1
 	_save(clan)
-}
-
-func (clan *ClanInfo) Recv(lastmsg_id uint32) []*IPCObject {
-	_lock.RLock()
-	defer _lock.RUnlock()
-
-	// QUEUE
-	if lastmsg_id >= clan.MaxMsgId {
-		return nil
-	}
-
-	count := int(clan.MaxMsgId - lastmsg_id)
-	if count > len(clan.Messages) {
-		return clan.Messages
-	} else {
-		return clan.Messages[len(clan.Messages)-count:]
-	}
-
-	return nil
 }
 
 //------------------------------------------------ Save to db

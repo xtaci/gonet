@@ -234,7 +234,7 @@ func P_forwardclan_req(hostid int32, pkt *packet.Packet) (r []byte) {
 		log.Println("forward ipc: no such clan")
 		return
 	}
-	clan.Send(obj)
+	clan.Push(obj)
 
 	// send to online users directly
 	members := clan.Members()
