@@ -5,20 +5,36 @@ import (
 )
 
 const (
-	TYPE_PVP                     = iota // 发生了一次PVP
-	TYPE_PVE                            // 发生了一次PVE
-	TYPE_TRAIN                          // 训练了一个小兵
-	TYPE_HERO_ATTACk                    // 英雄出战一次
-	TYPE_CONSUME_FOOD                   // 消耗一次食物
-	TYPE_CONSUME_GOLD                   // 消耗一次金币
-	TYPE_CONSUME_GOLD_AS_ENHANCE        // 消耗一次强化
-	TYPE_ROB_FOOD                       // 掠夺一次的食物量
-	TYPE_ROB_GOLD                       // 掠夺一次的金币量
+	UNKNOWN = iota
+	// 基本
+	TYPE_LOGIN  // 登陆
+	TYPE_LOGOUT // 登出
+	TYPE_CHAT   // 发送一次聊天
+	TYPE_EMAIL  // 发送一次邮件
+
+	TYPE_PVP // 发生了一次PVP
+	TYPE_PVE // 发生了一次PVE
+
+	// 军队
+	TYPE_TRAIN_SOLIDER // 训练完成一个小兵, Value为(兵种:数量）
+	TYPE_TRAIN_HERO    // 训练完成一个英雄, Value为(兵种:数量）
+	TYPE_HERO_FIGHT    //英雄出战一次
+
+	// 资源
+	TYPE_PRODUCT_NATURAL // 自然产出
+	TYPE_PRODUCE_PVE     // 一次PVE 资源产出
+	TYPE_PRODUCE_PVP     // 一次PVP资源产出
+	TYPE_CONSUME_UPGRADE // 一次升级消耗
+	TYPE_CONSUME_TRAIN   // 一次训练消耗
+
+	// 宝石
+	TYPE_CONSUME_GEM // 一次宝石消耗
 )
 
 type StatsObject struct {
 	UserId    int32
 	Type      int32
+	Value     []byte
 	Timestamp int64
 	// TODO: add fields
 }
