@@ -23,12 +23,12 @@ type StatsObject struct {
 	// TODO: add fields
 }
 
-func (obj *StatsObject) Marshal() []byte {
-	json_val, _ := json.Marshal(obj)
-	return json_val
-}
-
 type Summary struct {
 	UserId int32
 	// TODO: summary fields
+}
+
+func (sum *Summary) Marshal() []byte {
+	json_val, _ := json.Marshal(sum)
+	return json_val
 }
