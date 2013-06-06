@@ -10,7 +10,7 @@
 f(T) = Max(S + (T-T0) x RATE, Capacity) (S是T0时刻的储量, Capacity是容量)
 
 一旦T1时刻要使用产出资源，那么:
-S = f(T1)
+S = f(T1) - COST
 NP  = (T1-T0) x RATE , NP是这段时间的自然产出量
 
 GS 通知stats服务器NP值, GS累计这个值
