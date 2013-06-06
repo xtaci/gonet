@@ -21,7 +21,7 @@ const (
 	TYPE_HERO_FIGHT    //英雄出战一次
 
 	// 生产
-	TYPE_PRODUCT_NATURAL // 自然产出
+	TYPE_PRODUCT_NATURAL // 一次确认的自然产出
 	TYPE_PRODUCE_PVE     // 一次PVE 资源产出
 	TYPE_PRODUCE_PVP     // 一次PVP资源产出
 
@@ -37,7 +37,6 @@ const (
 )
 
 type StatsObject struct {
-	UserId    int32
 	Type      int32
 	Property  map[string]string
 	Timestamp int64
@@ -45,7 +44,8 @@ type StatsObject struct {
 }
 
 type Summary struct {
-	UserId int32
+	UserId    int32
+	Timestamp int64
 	// TODO: summary fields
 }
 

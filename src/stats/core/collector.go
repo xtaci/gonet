@@ -10,8 +10,9 @@ import (
 
 import (
 	"cfg"
-	. "db"
+	"db/data_tbl"
 	"misc/timer"
+	"types/estates"
 )
 
 //------------------------------------------------ 一个玩家对应一个
@@ -36,8 +37,7 @@ var (
 )
 
 const (
-	DAY_SEC          = int64(86400)
-	STATS_COLLECTION = "STATS"
+	DAY_SEC = int64(86400)
 )
 
 func init() {
@@ -65,7 +65,6 @@ func _writer() {
 		<-CH
 
 		config := cfg.Get()
-		c := Mongo.DB(config["mongo_db"]).C(STATS_COLLECTION)
 
 		// 复制map已进行费事操作,不阻塞collect
 		_all_lock.Lock()
@@ -75,10 +74,11 @@ func _writer() {
 		}
 		_all_lock.Unlock()
 
-		for _, record := range snapshot {
+		c := StatsCollection()
+		for userid, record := range snapshot {
 			if record != nil {
-				summary := _create_summary(record)
-				c.Upsert(bson.M{"userid": summary.UserId}, summary)
+				summary := _create_summary(userid, record)
+				c.Upsert(bson.M{"userid": userid}, summary)
 			}
 		}
 
@@ -95,17 +95,38 @@ func _writer() {
 }
 
 //------------------------------------------------ 按用户分组消息收集
-func Collect(obj *StatsObject) {
+func Collect(userid int32, obj *StatsObject) {
 	// 获得记录,为空则创建
 	_all_lock.Lock()
-	record := _all[obj.UserId]
+	record := _all[userid]
 	if record == nil {
 		record = &Record{}
-		_all[obj.UserId] = record
+		_all[userid] = record
 	}
 	_all_lock.Unlock()
+	_drop_expired(record)
 
-	// 丢弃过期消息
+	record.Lock()
+	record._stats = append(record._stats, obj)
+	record.Unlock()
+}
+
+//------------------------------------------------ create a summary and remove old data
+func _create_summary(userid int32, record *Record) *Summary {
+	record.Lock()
+	defer record.Unlock()
+
+	// TODO: create a summary report within last 24-hours
+	sum := &Summary{}
+	manager := &estates.Manager{}
+	data_tbl.Get(estates.COLLECTION, userid, manager)
+
+	_drop_expired(record)
+	return sum
+}
+
+//------------------------------------------------ 丢弃过期消息
+func _drop_expired(record *Record) {
 	now := time.Now().Unix()
 	record.Lock()
 	count := 0
@@ -125,18 +146,5 @@ func Collect(obj *StatsObject) {
 	if record._stats == nil {
 		record._stats = make([]*StatsObject, 0, 512)
 	}
-	record._stats = append(record._stats, obj)
 	record.Unlock()
-}
-
-//------------------------------------------------ create a summary and remove old data
-func _create_summary(record *Record) *Summary {
-	record.Lock()
-	defer record.Unlock()
-	// TODO: create a summary report
-	sum := &Summary{}
-	// empty the stats
-	record._stats = nil
-
-	return sum
 }
