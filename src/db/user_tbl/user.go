@@ -5,7 +5,6 @@ import (
 	"io"
 	"labix.org/v2/mgo/bson"
 	"log"
-	"time"
 )
 
 import (
@@ -59,8 +58,6 @@ func New(name, pass string) *User {
 		user.Id = NextVal(COUNTER_NAME)
 		user.Name = name
 		user.Pass = _md5(pass)
-		user.LoginCount = 1
-		user.LastLogin = time.Now().Unix()
 		err := c.Insert(user)
 		if err != nil {
 			log.Println(err)
@@ -103,7 +100,9 @@ func GetAll() []User {
 }
 
 func _md5(str string) []byte {
+	config := cfg.Get()
+	salted := str + config["salt"]
 	h := md5.New()
-	io.WriteString(h, str)
+	io.WriteString(h, salted)
 	return h.Sum(nil)
 }

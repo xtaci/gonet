@@ -25,8 +25,8 @@ func CreateGrid(manager *estates.Manager) *grid.Grid {
 
 		oid, _ := strconv.Atoi(k)
 		//	fmt.Println(w,h, wh, cell, v)
-		for x := v.X; x < v.X+byte(w); x++ {
-			for y := v.Y; y < v.Y+byte(h); y++ {
+		for x := int(v.X); x < int(v.X)+w; x++ {
+			for y := int(v.Y); y < int(v.Y)+h; y++ {
 				Grid.Set(x, y, uint16(oid))
 			}
 		}
