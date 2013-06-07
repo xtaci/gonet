@@ -26,13 +26,13 @@ const (
 
 //------------------------------------------------ send packet
 func (buf *Buffer) Send(data []byte) (err error) {
-	// len of Channel: the number of elements queued (unread) in the channel buffer;
+	// len of Channel: the number of elements queued (un-sent) in the channel buffer
 	if len(buf.pending) < buf.max {
 		buf.pending <- data
 		return nil
+	} else {
+		return errors.New(fmt.Sprintf("Send Buffer Overflow, possible DoS attack. Remote: %v", buf.conn.RemoteAddr()))
 	}
-
-	return errors.New(fmt.Sprintf("Send Buffer Overflow, possible DoS attack. Remote: %v", buf.conn.RemoteAddr()))
 }
 
 //------------------------------------------------ packet sender goroutine

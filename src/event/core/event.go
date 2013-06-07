@@ -1,9 +1,13 @@
 package core
 
 import (
+	"sync"
+)
+
+import (
+	"db"
 	"misc/naming"
 	"misc/timer"
-	"sync"
 )
 
 type Event struct {
@@ -24,6 +28,7 @@ var (
 
 const (
 	EVENT_CHAN_MAX = 200000
+	EVENTID_GEN    = "EVENTID_GEN"
 )
 
 func init() {
@@ -54,8 +59,7 @@ func Add(tblname string, oid uint32, user_id int32, timeout int64) int32 {
 	h_tblname := naming.FNV1a(tblname)
 	_hashtbl[h_tblname] = tblname
 
-	_event_id_gen++
-	event_id := _event_id_gen
+	event_id := db.NextVal(EVENTID_GEN)
 	timer.Add(event_id, timeout, _event_ch)
 
 	event := &Event{tblname: h_tblname, user_id: user_id, oid: oid, timeout: timeout}
@@ -66,7 +70,14 @@ func Add(tblname string, oid uint32, user_id int32, timeout int64) int32 {
 	return event_id
 }
 
-//------------------------------------------------ Load a timeout event
+//------------------------------------------------ cancel an oid's timeout
+func Cancel(event_id int32) {
+	_events_lock.Lock()
+	delete(_events, event_id)
+	_events_lock.Unlock()
+}
+
+//------------------------------------------------ Load a timeout event at startup
 func Load(tblname string, oid uint32, user_id int32, timeout int64, event_id int32) {
 	h_tblname := naming.FNV1a(tblname)
 	_hashtbl[h_tblname] = tblname
@@ -77,11 +88,4 @@ func Load(tblname string, oid uint32, user_id int32, timeout int64, event_id int
 	_events[event_id] = event
 
 	return
-}
-
-//------------------------------------------------ cancel an oid's timeout
-func Cancel(event_id int32) {
-	_events_lock.Lock()
-	delete(_events, event_id)
-	_events_lock.Unlock()
 }
