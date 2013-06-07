@@ -1,13 +1,19 @@
 digraph G {
-	size = "4,4";node [colorscheme=paired12];
+	size = "4,4";
+	node [colorscheme=paired12];
 
-	Agent1,Agent2,Agent3,Agent4 [label=Agent style=dashed color=1];
+	Agent1 [label=Agent style=dashed color=1];
+	Agent2 [label=Agent style=dashed color=1];
+	Agent3 [label=Agent style=dashed color=1];
+	Agent4 [label=Agent style=dashed color=1];
 	Agent1->GS1;
 	Agent2->GS1;
 	Agent3->GS2;
 	Agent4->GS2;
-	GS1,GS2 [label=GS style=filled color=2];
-	Event, Hub [style=filled color=3];
+	GS1 [label=GS style=filled color=2];
+	GS2 [label=GS style=filled color=2];
+	Event [style=filled color=3];
+	Hub [style=filled color=3];
 	GS1->Hub;
 	GS2->Hub;
 	GS1->Event;
