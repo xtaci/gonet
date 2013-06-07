@@ -1,31 +1,51 @@
 digraph G {
+	graph [label="The Architecture of gonet" fontname=arial fontsize=12];
 	node [colorscheme=paired12 fontname=arial];
-	Agent1 [label=Agent style=rounded shape=rect color=1];
-	Agent2 [label=Agent style=rounded shape=rect color=1];
-	Agent3 [label=Agent style=rounded shape=rect color=1];
-	Agent4 [label=Agent style=rounded shape=rect color=1];
-	Agent1->GS1;
-	Agent2->GS1;
-	Agent3->GS2;
-	Agent4->GS2;
-	GS1 [label=GS style=filled color=12];
-	GS2 [label=GS style=filled color=12];
-	GS1->GS2 [dir=both label=IPCObject style=dashed color="red:blue"];
+	subgraph Agents {
+		node [label=Agent style=rounded shape=rect color=1];
+		Agent1;
+		Agent2;
+		Agent3;
+		Agent4;
+		Agent5;
+	}
+
+	subgraph GS {
+		node [style=filled color=12];
+		GS1;
+		GS2;
+		GS1->GS2 [dir=both label=IPCObject style=dashed color="red:blue"];
+	}
+
+	subgraph {
+		node [style=filled shape=rect color=2];
+		GameDB;
+		StatsDB;
+	}
+
 	Event [style=filled shape=square color=3];
 	Hub [style=filled shape=square color=4];
 	Stats [style=filled shape=square color=5];
+
+	subgraph {
+		Agent1->GS1;
+		Agent2->GS1;
+		Agent3->GS2;
+		Agent4->GS2;
+		Agent5->GS2;
+	}
+
 	GS1->Hub;
 	GS2->Hub;
 	GS1->Event;
 	GS2->Event; 
 	GS1->Stats;
 	GS2->Stats; 
-	GameDB [style=filled shape=rect color=2];
-	StatsDB [style=filled shape=rect color=2];
-	Hub->GameDB;
-	Event->GameDB;
 	GS1->GameDB;
 	GS2->GameDB;
-	Stats->StatsDB;
+
+	Hub->GameDB;
+	Event->GameDB;
 	Stats->GameDB;
+	Stats->StatsDB;
 }
