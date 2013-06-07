@@ -26,15 +26,6 @@ func init() {
 	Servers = make(map[int32]chan []byte)
 }
 
-//--------------------------------------------------------- send
-func _send(seqid uint64, data []byte, output chan []byte) {
-	writer := packet.Writer()
-	writer.WriteU16(uint16(len(data)) + 8)
-	writer.WriteU64(seqid) // piggyback seq id
-	writer.WriteRawBytes(data)
-	output <- writer.Data()
-}
-
 func HandleRequest(hostid int32, reader *packet.Packet, output chan []byte) {
 	defer PrintPanicStack()
 
@@ -55,10 +46,9 @@ func HandleRequest(hostid int32, reader *packet.Packet, output chan []byte) {
 	if handle != nil {
 		ret := handle(hostid, reader)
 		if len(ret) != 0 {
-			_send(seqid, ret, output)
+			SendChan(seqid, ret, output)
 		}
 	}
-
 }
 
 func P_ping_req(hostid int32, reader *packet.Packet) []byte {

@@ -7,6 +7,7 @@ import (
 )
 
 import (
+	. "helper"
 	"hub/protos"
 	"misc/packet"
 )
@@ -20,15 +21,6 @@ var _host_genid int32
 
 func init() {
 	log.SetPrefix("[HUB]")
-}
-
-//---------------------------------------------------------- send
-func _send(seqid uint64, data []byte, output chan []byte) {
-	writer := packet.Writer()
-	writer.WriteU16(uint16(len(data)) + 8)
-	writer.WriteU64(seqid) // piggyback seq id
-	writer.WriteRawBytes(data)
-	output <- writer.Data()
 }
 
 //---------------------------------------------------------- Hub processing
@@ -70,7 +62,7 @@ func HubAgent(incoming chan []byte, conn net.Conn) {
 			reader := packet.Reader(msg)
 			go protos.HandleRequest(hostid, reader, output)
 		case msg := <-forward:
-			_send(0, msg, output)
+			SendChan(0, msg, output)
 		}
 	}
 
