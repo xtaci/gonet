@@ -18,15 +18,6 @@ func init() {
 	log.SetPrefix("[EVENT]")
 }
 
-//--------------------------------------------------------- send
-func _send(seqid uint64, data []byte, output chan []byte) {
-	writer := packet.Writer()
-	writer.WriteU16(uint16(len(data)) + 8)
-	writer.WriteU64(seqid) // piggyback seq id
-	writer.WriteRawBytes(data)
-	output <- writer.Data()
-}
-
 //------------------------------------------------ Event Server Agent
 func EventAgent(incoming chan []byte, conn net.Conn) {
 	// output buffer

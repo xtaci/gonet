@@ -12,15 +12,6 @@ import (
 	"misc/packet"
 )
 
-//--------------------------------------------------------- send
-func _send(seqid uint64, data []byte, output chan []byte) {
-	writer := packet.Writer()
-	writer.WriteU16(uint16(len(data)) + 8)
-	writer.WriteU64(seqid) // piggyback seq id
-	writer.WriteRawBytes(data)
-	output <- writer.Data()
-}
-
 func HandleRequest(reader *packet.Packet, output chan []byte) {
 	defer PrintPanicStack()
 
@@ -41,7 +32,7 @@ func HandleRequest(reader *packet.Packet, output chan []byte) {
 	if handle != nil {
 		ret := handle(reader)
 		if len(ret) != 0 {
-			_send(seqid, ret, output)
+			SendChan(seqid, ret, output)
 		}
 	}
 }
