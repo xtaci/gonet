@@ -194,12 +194,6 @@ func P_getinfo_req(hostid int32, pkt *packet.Packet) []byte {
 }
 
 func P_forward_req(hostid int32, pkt *packet.Packet) []byte {
-	defer func() {
-		if x := recover(); x != nil {
-			log.Println("forward packet error")
-		}
-	}()
-
 	tbl, _ := PKT_FORWARDIPC(pkt)
 
 	// if user is online, send to the server, or else send to database
@@ -228,10 +222,6 @@ func P_forwardclan_req(hostid int32, pkt *packet.Packet) (r []byte) {
 	ret := INT{F_v: 1}
 
 	defer func() {
-		if x := recover(); x != nil {
-			log.Println("forward clan packet error")
-		}
-
 		r = packet.Pack(Code["forwardclan_ack"], ret, nil)
 	}()
 
