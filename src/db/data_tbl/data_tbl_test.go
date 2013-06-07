@@ -9,7 +9,7 @@ import (
 
 func TestEstate(t *testing.T) {
 	data := &estates.Manager{}
-	e1 := &estates.Estate{TYPE: naming.FNV1a("工人小屋"), Status: estates.STATUS_CD}
+	e1 := &estates.Estate{TYPE: naming.FNV1a("工人小屋"), Ready: true}
 	data.Append(100, e1)
 	data.UserId = 1
 
