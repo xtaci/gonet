@@ -25,7 +25,7 @@ var (
 	_cancelqueue      []uint32 // cancel queue
 	_cancelqueue_lock sync.Mutex
 
-	_timer_id uint32
+	_timer_id uint32	// 内部事件编号
 )
 
 func init() {
@@ -105,7 +105,7 @@ func _trigger(level uint) {
 
 	for k, v := range list {
 		if v.Timeout-now < 1<<level {
-			// move to one closer timer or just removal
+			// move to one closer timer-list or trigger
 			if level == 0 {
 				func() {
 					defer func() {
@@ -123,7 +123,9 @@ func _trigger(level uint) {
 	}
 }
 
-//------------------------------------------------ add a timeout event, id will be send back
+//------------------------------------------------ 
+// 添加一个定时，timeout为到期的Unix时间
+// id 是调用者定义的编号, 事件发生时，会把id发送到ch
 func Add(id int32, timeout int64, ch chan int32) {
 	event := &Event{Id: id, CH: ch, Timeout: timeout}
 
