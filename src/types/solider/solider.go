@@ -1,12 +1,31 @@
 package solider
 
+import (
+	"fmt"
+)
+
+const (
+	COLLECTION = "SOLIDERS"
+)
+
 type Solider struct {
-	TYPE string // type in string
-	OID  uint32 // object id
-	HP   uint16
+	TYPE     string // type in string
+	OID      uint32 // object id
+	HP       int16
+	Ready    bool
+	Property map[string]string // unit's private data
 }
 
-type SoliderCD struct {
-	OID     uint32
-	EventId uint32
+type Manager struct {
+	UserId   int32
+	Version  uint32
+	Soliders map[string]*Solider // OID->Hero
+}
+
+func (m *Manager) Append(oid uint32, solider *Solider) {
+	if m.Soliders == nil {
+		m.Soliders = make(map[string]*Solider)
+	}
+
+	m.Soliders[fmt.Sprint(oid)] = solider
 }

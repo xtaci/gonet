@@ -6,9 +6,7 @@ import (
 )
 
 const (
-	COLLECTION    = "ESTATES"
-	STATUS_NORMAL = byte(0)
-	STATUS_CD     = 1
+	COLLECTION = "ESTATES"
 )
 
 //----------------------------------------------- Generic Move event records
@@ -19,11 +17,11 @@ type Move struct {
 }
 
 type Estate struct {
-	TYPE   uint32 // Object Type
-	X      uint8  // coordinate X
-	Y      uint8  // coordinate Y
-	Status byte
-	DB     map[string]string // unit's private data
+	TYPE     uint32 // Object Type
+	X        uint8  // coordinate X
+	Y        uint8  // coordinate Y
+	Ready    bool
+	Property map[string]string // unit's private data
 }
 
 type Manager struct {
