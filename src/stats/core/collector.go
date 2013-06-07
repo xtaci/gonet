@@ -117,15 +117,15 @@ func Collect(userid int32, obj *StatsObject) {
 
 //------------------------------------------------ 创建统计报表
 func _create_summary(userid int32, record *Record) *Summary {
+	_drop_expired(record)
+	// TODO: create a summary report within last 24-hours
 	record.Lock()
 	defer record.Unlock()
 
-	// TODO: create a summary report within last 24-hours
 	sum := &Summary{}
 	manager := &estates.Manager{}
 	data_tbl.Get(estates.COLLECTION, userid, manager)
 
-	_drop_expired(record)
 	return sum
 }
 
