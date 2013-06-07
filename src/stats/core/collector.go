@@ -107,6 +107,10 @@ func Collect(userid int32, obj *StatsObject) {
 	_drop_expired(record)
 
 	record.Lock()
+	// 放入新的消息
+	if record._stats == nil {
+		record._stats = make([]*StatsObject, 0, 512)
+	}
 	record._stats = append(record._stats, obj)
 	record.Unlock()
 }
@@ -142,9 +146,5 @@ func _drop_expired(record *Record) {
 		record._stats = record._stats[count:]
 	}
 
-	// 放入新的消息
-	if record._stats == nil {
-		record._stats = make([]*StatsObject, 0, 512)
-	}
 	record.Unlock()
 }
