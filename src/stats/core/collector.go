@@ -64,8 +64,6 @@ func _writer() {
 		// 时钟信号
 		<-CH
 
-		config := cfg.Get()
-
 		// 复制map已进行费事操作,不阻塞collect
 		_all_lock.Lock()
 		snapshot := make(map[int32]*Record)
@@ -88,6 +86,7 @@ func _writer() {
 		log.Printf("stats flush finished at %v\n", now)
 
 		// 明天同一时刻再见
+		config := cfg.Get()
 		trigger, _ := strconv.Atoi(config["collect_time"])
 		timer.Add(-1, now-passed+int64(trigger)+DAY_SEC, CH)
 		snapshot = nil
