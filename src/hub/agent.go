@@ -12,17 +12,17 @@ import (
 )
 
 const (
-	MAXCHAN = 65536
+	MAXCHAN = 100000
 )
 
-//----------------------------------------------- logical game server chans
+//---------------------------------------------------------- 连入主机的ID标示
 var _host_genid int32
 
 func init() {
 	log.SetPrefix("[HUB]")
 }
 
-//--------------------------------------------------------- send
+//---------------------------------------------------------- send
 func _send(seqid uint64, data []byte, output chan []byte) {
 	writer := packet.Writer()
 	writer.WriteU16(uint16(len(data)) + 8)
@@ -31,7 +31,7 @@ func _send(seqid uint64, data []byte, output chan []byte) {
 	output <- writer.Data()
 }
 
-//------------------------------------------------ Hub processing
+//---------------------------------------------------------- Hub processing
 func HubAgent(incoming chan []byte, conn net.Conn) {
 	hostid := atomic.AddInt32(&_host_genid, 1)
 	// forward buffer
@@ -40,7 +40,7 @@ func HubAgent(incoming chan []byte, conn net.Conn) {
 	output := make(chan []byte, MAXCHAN)
 
 	protos.ServerLock.Lock()
-	protos.Servers[hostid] = forward // message chan for forwarding to client
+	protos.Servers[hostid] = forward // 转发消息队列
 	protos.ServerLock.Unlock()
 
 	log.Printf("server id:%v connected\n", hostid)
@@ -76,7 +76,7 @@ func HubAgent(incoming chan []byte, conn net.Conn) {
 
 }
 
-//----------------------------------------------- to gs write buffer
+//---------------------------------------------------------- writer routine
 func _write_routine(output chan []byte, conn net.Conn) {
 	for {
 		msg, ok := <-output

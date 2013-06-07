@@ -17,12 +17,9 @@ import (
 )
 
 var (
+	// 各个服务器的Forward消息队列
 	Servers    map[int32]chan []byte
 	ServerLock sync.RWMutex
-)
-
-const (
-	COLLECTION = "MESSAGES"
 )
 
 func init() {
