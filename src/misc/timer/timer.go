@@ -43,6 +43,8 @@ func _timer() {
 	last := time.Now().Unix()
 
 	for {
+		time.Sleep(100 * time.Millisecond)
+
 		// 处理排队
 		// 最小的时间间隔，处理为1s
 		_eventqueue_lock.Lock()
@@ -86,8 +88,6 @@ func _timer() {
 
 			_trigger(0)
 		}
-
-		time.Sleep(100 * time.Millisecond)
 	}
 }
 
