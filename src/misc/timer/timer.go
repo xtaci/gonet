@@ -7,25 +7,22 @@ import (
 )
 
 type Event struct {
-	Id      int32      // user specified Id
-	Timeout int64      // timeout
-	CH      chan int32 // event trigger channel
+	Id      int32      // 用户定义的ID
+	Timeout int64      // 到期时间 Unix Time
+	CH      chan int32 // 发送通道
 }
 
 const (
-	TIMER_LEVEL = uint(16) // num of time intervals, 10 means max 2^10 seconds
+	TIMER_LEVEL = uint(16) // 时间段最大分级，最大时间段为 2^TIMERLEVEL
 )
 
 var (
-	_eventlist [TIMER_LEVEL]map[uint32]*Event // 2^n based time interval
+	_eventlist [TIMER_LEVEL]map[uint32]*Event // 事件列表
 
-	_eventqueue      map[uint32]*Event // add queue
+	_eventqueue      map[uint32]*Event // 事件添加队列
 	_eventqueue_lock sync.Mutex
 
-	_cancelqueue      []uint32 // cancel queue
-	_cancelqueue_lock sync.Mutex
-
-	_timer_id uint32	// 内部事件编号
+	_timer_id uint32 // 内部事件编号
 )
 
 func init() {
@@ -38,17 +35,20 @@ func init() {
 	go _timer()
 }
 
-//------------------------------------------------ Timer Routine
+//------------------------------------------------
+// 定时器 goroutine
+// 根据程序启动后经过的秒数计数
 func _timer() {
 	timer_count := uint32(0)
 	last := time.Now().Unix()
 
 	for {
-		// add pending events
+		// 处理排队
+		// 最小的时间间隔，处理为1s
 		_eventqueue_lock.Lock()
 		for k, v := range _eventqueue {
 			diff := v.Timeout - time.Now().Unix()
-			if diff <= 0 { // in case of very near event
+			if diff <= 0 {
 				diff = 1
 			}
 
@@ -62,24 +62,16 @@ func _timer() {
 		_eventqueue = make(map[uint32]*Event)
 		_eventqueue_lock.Unlock()
 
-		// cancelqueue
-		_cancelqueue_lock.Lock()
-		for _, v := range _cancelqueue {
-			for i := TIMER_LEVEL - 1; i >= 0; i-- {
-				list := _eventlist[i]
-				delete(list, v)
-			}
-		}
-		_cancelqueue = nil
-		_cancelqueue_lock.Unlock()
-
-		// triggers
+		// 检查事件触发
+		// 累计距离上一次触发的秒数,并逐秒触发
+		// 如果校正了系统时间，时间前移，nsec为负数的时候，last的值不应该变动，否则会出现秒数的重复计数
 		now := time.Now().Unix()
-		nsecs := now - last // num of seconds passed since last trigger
-		last = now
+		nsecs := now - last
 
-		if nsecs < 0 { // maybe someone changed system clock
+		if nsecs <= 0 {
 			continue
+		} else {
+			last = now
 		}
 
 		for c := int64(0); c < nsecs; c++ {
@@ -99,13 +91,14 @@ func _timer() {
 	}
 }
 
+//------------------------------------------------ 单级触发
 func _trigger(level uint) {
 	now := time.Now().Unix()
 	list := _eventlist[level]
 
 	for k, v := range list {
 		if v.Timeout-now < 1<<level {
-			// move to one closer timer-list or trigger
+			// 移动到前一个更短间距的LIST
 			if level == 0 {
 				func() {
 					defer func() {
@@ -123,7 +116,7 @@ func _trigger(level uint) {
 	}
 }
 
-//------------------------------------------------ 
+//------------------------------------------------
 // 添加一个定时，timeout为到期的Unix时间
 // id 是调用者定义的编号, 事件发生时，会把id发送到ch
 func Add(id int32, timeout int64, ch chan int32) {
