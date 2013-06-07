@@ -1,5 +1,5 @@
 ###A game server implemented with golang.
-
+![Architecture](/arch.png)
 ####条件
 0. 确保安装好bzr
 1. 确保安装好mongodb
