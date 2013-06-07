@@ -24,9 +24,8 @@ func HubStart() {
 	}
 
 	log.Println("Starting HUB")
-
-	// data init
 	startup_work()
+	go SignalProc()
 
 	// Listen
 	service := DEFAULT_SERVICE

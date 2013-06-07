@@ -24,6 +24,7 @@ func StatsStart() {
 	}
 
 	log.Println("Starting Stats Server")
+	go SignalProc()
 
 	// Listen
 	service := DEFAULT_SERVICE
