@@ -1,5 +1,5 @@
 ###A game server implemented with golang.
-![Architecture](/arch.png)
+![Architecture](arch.png)
 
 * Game Server:  
 玩家直接连接GS， 处理玩家逻辑，逻辑结果直接存入数据库，升级交给Event服务器处理，玩家交互由HUB完成。     
