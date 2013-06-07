@@ -58,7 +58,7 @@ func init() {
 	}
 }
 
-//------------------------------------------------ statistical data writer
+//------------------------------------------------ 统计数据定时汇总写入
 func _writer() {
 	for {
 		// 时钟信号
@@ -115,7 +115,7 @@ func Collect(userid int32, obj *StatsObject) {
 	record.Unlock()
 }
 
-//------------------------------------------------ create a summary and remove old data
+//------------------------------------------------ 创建统计报表
 func _create_summary(userid int32, record *Record) *Summary {
 	record.Lock()
 	defer record.Unlock()
@@ -129,13 +129,13 @@ func _create_summary(userid int32, record *Record) *Summary {
 	return sum
 }
 
-//------------------------------------------------ 丢弃过期消息
+//------------------------------------------------ 丢弃过期统计数据
 func _drop_expired(record *Record) {
-	now := time.Now().Unix()
+	expire_point := time.Now().Unix() - DAY_SEC
 	record.Lock()
 	count := 0
 	for _, v := range record._stats {
-		if v.Timestamp < now {
+		if v.Timestamp < expire_point {
 			count++
 		} else {
 			break
