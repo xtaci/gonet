@@ -72,6 +72,7 @@ func _writer() {
 		}
 		_all_lock.Unlock()
 
+		// 创建每个玩家的报表
 		c := StatsCollection()
 		for userid, record := range snapshot {
 			if record != nil {
@@ -81,11 +82,10 @@ func _writer() {
 		}
 
 		now := time.Now().Unix()
-		passed := now % DAY_SEC
-
 		log.Printf("stats flush finished at %v\n", now)
 
 		// 明天同一时刻再见
+		passed := now % DAY_SEC
 		config := cfg.Get()
 		trigger, _ := strconv.Atoi(config["collect_time"])
 		timer.Add(-1, now-passed+int64(trigger)+DAY_SEC, CH)
@@ -105,13 +105,13 @@ func Collect(userid int32, obj *StatsObject) {
 	_all_lock.Unlock()
 	_drop_expired(record)
 
-	record.Lock()
 	// 放入新的消息
+	record.Lock()
+	defer record.Unlock()
 	if record._stats == nil {
 		record._stats = make([]*StatsObject, 0, 512)
 	}
 	record._stats = append(record._stats, obj)
-	record.Unlock()
 }
 
 //------------------------------------------------ 创建统计报表
@@ -130,8 +130,10 @@ func _create_summary(userid int32, record *Record) *Summary {
 
 //------------------------------------------------ 丢弃过期统计数据
 func _drop_expired(record *Record) {
-	expire_point := time.Now().Unix() - DAY_SEC
 	record.Lock()
+	defer record.Unlock()
+
+	expire_point := time.Now().Unix() - DAY_SEC
 	count := 0
 	for _, v := range record._stats {
 		if v.Timestamp < expire_point {
@@ -144,6 +146,4 @@ func _drop_expired(record *Record) {
 	if count > 0 {
 		record._stats = record._stats[count:]
 	}
-
-	record.Unlock()
 }
