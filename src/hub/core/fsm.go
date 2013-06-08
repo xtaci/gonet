@@ -94,9 +94,9 @@ func _expire() {
 				if player.WaitEventId == event_id { // check if it is the waiting event, or just ignore
 					switch player.State {
 					case ON_PROT:
-						player.State = OFF_PROT
-					case ON_FREE:
-						player.State = ON_PROT
+						player.State = ON_FREE
+					case OFF_PROT:
+						player.State = OFF_FREE
 					}
 				}
 				player.Unlock()
