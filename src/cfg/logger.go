@@ -20,7 +20,7 @@ func StartLogger(logfile string) {
 
 	if err != nil {
 		log.Println("cannot open logfile %v\n", err)
-		os.Exit(1)
+		os.Exit(-1)
 	}
 
 	var r Repeater

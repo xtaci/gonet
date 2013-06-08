@@ -87,7 +87,7 @@ func handleClient(conn net.Conn) {
 func checkError(err error) {
 	if err != nil {
 		log.Println("Fatal error: %v", err)
-		os.Exit(1)
+		os.Exit(-1)
 	}
 }
 

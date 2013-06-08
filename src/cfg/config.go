@@ -45,7 +45,7 @@ func _load_config(path string) (ret map[string]string) {
 
 	if err != nil {
 		fmt.Println("error opening file %v\n", err)
-		os.Exit(1)
+		os.Exit(-1)
 	}
 
 	re := regexp.MustCompile(`[\t ]*([0-9A-Za-z_]+)[\t ]*=[\t ]*([^\t\n\f\r# ]+)[\t #]*`)
