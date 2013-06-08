@@ -2,6 +2,7 @@ package cfg
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -10,12 +11,16 @@ import (
 	"sync"
 )
 
-var _map map[string]string
-var _lock sync.RWMutex
+var _DEF_CONFIG = os.Getenv("GOPATH") + "/config.ini"
 
-const CONFIG_FILE = "config.ini"
+var (
+	_map        map[string]string
+	_lock       sync.RWMutex
+	config_file = flag.String("config", _DEF_CONFIG, "specify absolute path for config.ini")
+)
 
 func init() {
+	flag.Parse()
 	Reload()
 }
 
@@ -26,8 +31,8 @@ func Get() map[string]string {
 }
 
 func Reload() {
-	path := os.Getenv("GOPATH") + "/" + CONFIG_FILE
-	log.Println("Loading Config...")
+	path := *config_file
+	log.Println("Loading Config.")
 	defer log.Println("Config Loaded.")
 	_lock.Lock()
 	_map = _load_config(path)
