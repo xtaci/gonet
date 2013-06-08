@@ -1,7 +1,7 @@
 digraph G {
-	graph [label="The Architecture of gonet" fontname=arial fontsize=12];
-	node [colorscheme=paired12 fontname=arial fontsize=12];
-	edge [colorscheme=paired12]
+	graph [label="The Architecture of gonet" fontsize=12];
+	node [colorscheme=paired12 fontsize=12];
+	edge [colorscheme=paired12 fontsize=12];
 	subgraph Agents {
 		node [label=Agent style=rounded shape=rect color=1];
 		Agent1;
