@@ -12,3 +12,10 @@ HUB只处理来自GS的两类消息：
 
 1. 来自Game Server 的Call请求(request & ack)     
 2. Game Server 间的消息Forward      
+
+### 设计考虑
+1. 玩家动态排名,基于动态有序统计      
+2. 玩家状态机是行级锁实现       
+3. 联盟管理保留最大clan_msg_max这么多条消息。玩家登陆后，联盟表的消息会转发过来。
+
+![状态机](/doc/fsm.png)

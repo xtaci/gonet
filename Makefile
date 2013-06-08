@@ -8,16 +8,14 @@ PROGS = hub \
 	 agent 
 
 DOC_DIR = ./doc
-GRAPH = $(DOC_DIR)/arch.png
-
 SRCDIR = ./src
 
-all: $(PROGS) $(GRAPH)
+all: $(PROGS) $(DOC_DIR)/arch.png $(DOC_DIR)/fsm.png
 
 $(PROGS):
 	$(GO) install $@
 
-$(GRAPH): $(DOC_DIR)/arch.dot
+$(DOC_DIR)/%.png: $(DOC_DIR)/%.dot
 	$(DOT) -Tpng $< -o $@
 		
 clean:
