@@ -10,7 +10,9 @@ PROGS = hub \
 DOC_DIR = ./doc
 SRCDIR = ./src
 
-all: $(PROGS) $(DOC_DIR)/arch.png $(DOC_DIR)/fsm.png
+GRAPHS = $(DOC_DIR)/arch.png $(DOC_DIR)/fsm.png
+
+all: $(PROGS) $(GRAPHS)
 
 $(PROGS):
 	$(GO) install $@
@@ -19,7 +21,7 @@ $(DOC_DIR)/%.png: $(DOC_DIR)/%.dot
 	$(DOT) -Tpng $< -o $@
 		
 clean:
-	rm -rf bin pkg $(DOC_DIR)/arch.png
+	rm -rf bin pkg $(GRAPHS)
  
 fmt:
 	$(GO) fmt $(SRCDIR)/...
