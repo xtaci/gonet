@@ -209,6 +209,8 @@ func Free(id int32) bool {
 		switch player.State {
 		case ON_PROT:
 			player.State = ON_FREE
+		case OFF_RAID:
+			player.State = OFF_FREE
 		default:
 			return false
 		}
