@@ -11,8 +11,11 @@ type TMPObj struct {
 	C string
 }
 
-func TestPing(t *testing.T) {
+func init() {
 	DialHub()
+}
+
+func TestPing(t *testing.T) {
 	fmt.Println("testing PING")
 	if !Ping() {
 		t.Fatal()
@@ -30,9 +33,8 @@ func TestLogin(t *testing.T) {
 }
 
 func BenchmarkForward(b *testing.B) {
-	DialHub()
 	obj := &TMPObj{A: 10, B: 20, C: "test"}
 	for i := 0; i < b.N; i++ {
-		Send(0, 1, 1, obj)
+		Send(0, 2, 1, obj)
 	}
 }
