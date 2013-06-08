@@ -18,4 +18,4 @@ HUB只处理来自GS的两类消息：
 2. 玩家状态机是行级锁实现       
 3. 联盟管理保留最大clan_msg_max这么多条消息。玩家登陆后，联盟表的消息会转发过来。
 
-![状态机](/doc/fsm.png)
+![状态机](https://github.com/xtaci/gonet/raw/develop/doc/fsm.png)
