@@ -19,7 +19,7 @@
 统计服务器会访问到两个mongodb数据库，玩家数据库(只读)和统计数据库，最终会汇入统计数据库。
 
 ####条件
-0. 确保安装好bzr
+0. 确保安装好bzr, graphviz
 1. 确保安装好mongodb
 2. 确保config.ini中的mongo_xxxx配置正确
 3. export GOPATH='当前目录'
