@@ -11,25 +11,22 @@ type TMPObj struct {
 	C string
 }
 
-func TestHub(t *testing.T) {
+func TestPing(t *testing.T) {
 	DialHub()
 	fmt.Println("testing PING")
 	if !Ping() {
 		t.Fatal()
 	}
+}
 
-	obj := &TMPObj{A: 10, B: 20, C: "test"}
-	if !Send(0, 1, 1, obj) {
-		t.Error("send")
-	}
-
+func TestLogin(t *testing.T) {
 	if Login(0) {
 		t.Error("login")
 	}
 
-	info, success := GetInfo(0)
-	fmt.Println(info)
-	fmt.Println(success)
+	if !Login(1) {
+		t.Error("cannot login")
+	}
 }
 
 func BenchmarkForward(b *testing.B) {

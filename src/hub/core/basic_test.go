@@ -31,7 +31,6 @@ func BenchmarkFSM(b *testing.B) {
 		Raid(int32(i))
 		Free(int32(i))
 		Protect(int32(i), time.Now().Unix())
-		UnProtect(int32(i))
 	}
 }
 

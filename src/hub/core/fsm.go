@@ -112,6 +112,8 @@ func _add_fsm(user *User) {
 	if user.ProtectTimeout > time.Now().Unix() {
 		player.ProtectTimeout = user.ProtectTimeout
 		player.State = OFF_PROT
+	} else {
+		player.State = OFF_FREE
 	}
 
 	_lock_players.Lock()

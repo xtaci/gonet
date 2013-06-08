@@ -2,7 +2,6 @@ package protos
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"runtime"
 	"sync"
@@ -41,7 +40,6 @@ func HandleRequest(hostid int32, reader *packet.Packet, output chan []byte) {
 		return
 	}
 
-	fmt.Println("proto: ", b)
 	handle := ProtoHandler[b]
 	if handle != nil {
 		ret := handle(hostid, reader)
