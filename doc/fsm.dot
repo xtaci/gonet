@@ -1,6 +1,6 @@
 digraph G {
 	rankdir=LR;
-	node [shape = doublecircle]; OFF_FREE OFF_PROT;
+	node [shape = doublecircle]; OFF_FREE OFF_PROT OFF_RAID;
 	node [shape = circle];
 	OFF_FREE->ON_FREE [label="Login"];
 	OFF_FREE->OFF_RAID [label="Raid"];
