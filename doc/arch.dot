@@ -1,6 +1,7 @@
 digraph G {
 	graph [label="The Architecture of gonet" fontname=arial fontsize=12];
-	node [colorscheme=paired12 fontname=arial];
+	node [colorscheme=paired12 fontname=arial fontsize=12];
+	edge [colorscheme=paired12]
 	subgraph Agents {
 		node [label=Agent style=rounded shape=rect color=1];
 		Agent1;
@@ -11,10 +12,10 @@ digraph G {
 	}
 
 	subgraph GS {
-		node [style=filled color=12];
+		node [style=filled shape=circle color=12];
 		GS1;
 		GS2;
-		GS1->GS2 [dir=both label=IPCObject style=dashed color="red:blue"];
+		GS1->GS2 [dir=both label=IPCObject style=dashed color="9:10"];
 	}
 
 	subgraph {
