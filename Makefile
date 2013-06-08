@@ -7,7 +7,8 @@ PROGS = hub \
 	 stats \
 	 agent 
 
-GRAPH = arch.png
+DOC_DIR = ./doc
+GRAPH = $(DOC_DIR)/arch.png
 
 SRCDIR = ./src
 
@@ -16,11 +17,11 @@ all: $(PROGS) $(GRAPH)
 $(PROGS):
 	$(GO) install $@
 
-$(GRAPH): arch.dot
+$(GRAPH): $(DOC_DIR)/arch.dot
 	$(DOT) -Tpng $< -o $@
 		
 clean:
-	rm -rf bin pkg arch.png
+	rm -rf bin pkg $(DOC_DIR)/arch.png
  
 fmt:
 	$(GO) fmt $(SRCDIR)/...
