@@ -23,12 +23,21 @@ func TestPing(t *testing.T) {
 }
 
 func TestLogin(t *testing.T) {
-	if Login(0) {
-		t.Error("login")
+	if !Login(1) {
+		t.Error("cannot login")
+		fmt.Println("please run benchmark first")
+	}
+
+	if Login(1) {
+		t.Error("login twice")
+	}
+
+	if !Logout(1) {
+		t.Error("logout")
 	}
 
 	if !Login(1) {
-		t.Error("cannot login")
+		t.Error("login again")
 	}
 }
 
