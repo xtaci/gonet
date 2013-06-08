@@ -142,17 +142,6 @@ func P_protect_req(hostid int32, pkt *packet.Packet) []byte {
 	return packet.Pack(Code["protect_ack"], ret, nil)
 }
 
-func P_unprotect_req(hostid int32, pkt *packet.Packet) []byte {
-	tbl, _ := PKT_ID(pkt)
-	ret := INT{F_v: 0}
-
-	if core.UnProtect(tbl.F_id) {
-		ret.F_v = 1
-	}
-
-	return packet.Pack(Code["unprotect_ack"], ret, nil)
-}
-
 func P_free_req(hostid int32, pkt *packet.Packet) []byte {
 	tbl, _ := PKT_ID(pkt)
 	ret := INT{F_v: 0}
@@ -187,7 +176,8 @@ func P_forward_req(hostid int32, pkt *packet.Packet) []byte {
 	state := core.State(tbl.F_dest_id)
 
 	//fmt.Println(tbl.F_dest_id, tbl.F_IPC)
-	if state&core.ONLINE != 0 {
+	switch state {
+	case core.ON_PROT, core.ON_FREE:
 		host := core.Host(tbl.F_dest_id)
 
 		ServerLock.RLock()
@@ -195,7 +185,7 @@ func P_forward_req(hostid int32, pkt *packet.Packet) []byte {
 		ServerLock.RUnlock()
 
 		ch <- tbl.F_IPC
-	} else {
+	default:
 		// send to db
 		forward_tbl.Push(tbl.F_dest_id, tbl.F_IPC)
 	}
@@ -231,10 +221,9 @@ func P_forwardclan_req(hostid int32, pkt *packet.Packet) (r []byte) {
 	// send to online users directly
 	members := clan.Members()
 	for _, user_id := range members {
-		// if user is online, send to the server, or else send to database
 		state := core.State(user_id)
-		//fmt.Println(tbl.F_dest_id, tbl.F_IPC)
-		if state&core.ONLINE != 0 {
+		switch state {
+		case core.ON_PROT, core.ON_FREE:
 			host := core.Host(user_id)
 
 			ServerLock.RLock()

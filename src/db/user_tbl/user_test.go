@@ -22,3 +22,11 @@ func TestUser(t *testing.T) {
 		fmt.Println(v)
 	}
 }
+
+func BenchmarkCreateUser(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		user := fmt.Sprintf("test%v", i)
+		pass := fmt.Sprintf("pass%v", i)
+		New(user, pass)
+	}
+}

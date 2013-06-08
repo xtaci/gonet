@@ -12,7 +12,7 @@ import (
 
 type Info struct {
 	Id          int32
-	State       int32
+	State       byte
 	Score       int32
 	ProtectTime int64
 }

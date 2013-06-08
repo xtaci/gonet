@@ -11,21 +11,14 @@ import (
 	. "types"
 )
 
-// OFFLINE|RAID, OFFLINE|PROTECTED , OFFLINE
-// ONLINE|PROTECTED , ONLINE
+//------------------------------------------------ 状态机定义
 const (
-	HISHIFT = 16
-
-	//
-	OFFLINE = 1 << HISHIFT
-	ONLINE  = 1 << 1 << HISHIFT
-
-	// battle status
-	RAID      = 1
-	PROTECTED = 1 << 1
-
-	LOMASK = 0xFFFF
-	HIMASK = 0xFFFF0000
+	UNKNOWN = byte(iota)
+	OFF_FREE
+	OFF_RAID
+	ON_FREE
+	ON_PROT
+	OFF_PROT
 )
 
 const (
@@ -36,7 +29,7 @@ const (
 //--------------------------------------------------------- player info
 type PlayerInfo struct {
 	Id             int32
-	State          int32
+	State          byte
 	ProtectTimeout int64      // unix time
 	RaidTimeout    int64      // unix time
 	Host           int32      // host
@@ -71,23 +64,17 @@ var (
 	_lock_players sync.RWMutex          // lock players
 	_players      map[int32]*PlayerInfo // all players
 
-	_protects     map[int32]*PlayerInfo
-	_protectslock sync.Mutex
-	_protects_ch  chan int32
-
-	_raids     map[int32]*PlayerInfo
-	_raidslock sync.Mutex
-	_raids_ch  chan int32
+	_waits      map[int32]*PlayerInfo
+	_waits_lock sync.Mutex
+	_waits_ch   chan int32
 
 	_event_id_gen int32
 )
 
 func init() {
 	_players = make(map[int32]*PlayerInfo)
-	_protects = make(map[int32]*PlayerInfo)
-	_protects_ch = make(chan int32, EVENT_MAX)
-	_raids = make(map[int32]*PlayerInfo)
-	_raids_ch = make(chan int32, EVENT_MAX)
+	_waits = make(map[int32]*PlayerInfo)
+	_waits_ch = make(chan int32, EVENT_MAX)
 
 	go _expire()
 }
@@ -96,30 +83,21 @@ func init() {
 func _expire() {
 	for {
 		select {
-		case event_id := <-_protects_ch:
-			_protectslock.Lock()
-			player := _protects[event_id]
-			delete(_protects, event_id)
-			_protectslock.Unlock()
+		case event_id := <-_waits_ch:
+			_waits_lock.Lock()
+			player := _waits[event_id]
+			delete(_waits, event_id)
+			_waits_lock.Unlock()
 
 			if player != nil {
 				player.Lock()
 				if player.WaitEventId == event_id { // check if it is the waiting event, or just ignore
-					player.State = player.State & (^PROTECTED)
-				}
-				player.Unlock()
-			}
-
-		case event_id := <-_raids_ch:
-			_raidslock.Lock()
-			player := _raids[event_id]
-			delete(_raids, event_id)
-			_raidslock.Unlock()
-
-			if player != nil {
-				player.Lock()
-				if player.WaitEventId == event_id {
-					player.State = player.State & (^RAID)
+					switch player.State {
+					case ON_PROT:
+						player.State = OFF_PROT
+					case ON_FREE:
+						player.State = ON_PROT
+					}
 				}
 				player.Unlock()
 			}
@@ -129,11 +107,11 @@ func _expire() {
 
 //------------------------------------------------ add a user to finite state machine manager
 func _add_fsm(user *User) {
-	player := &PlayerInfo{Id: user.Id, State: OFFLINE}
+	player := &PlayerInfo{Id: user.Id}
 
 	if user.ProtectTimeout > time.Now().Unix() {
 		player.ProtectTimeout = user.ProtectTimeout
-		player.State |= PROTECTED
+		player.State = OFF_PROT
 	}
 
 	_lock_players.Lock()
@@ -141,9 +119,7 @@ func _add_fsm(user *User) {
 	_lock_players.Unlock()
 }
 
-// The State Machine Of Player
-//----------------------------------------------- OFFLINE->ONLINE
-// A->B
+//------------------------------------------------ The State Machine Of Player
 func Login(id, host int32) bool {
 	_lock_players.RLock()
 	player := _players[id]
@@ -152,20 +128,23 @@ func Login(id, host int32) bool {
 	if player != nil {
 		player.Lock()
 		defer player.Unlock()
-		state := player.State
 
-		if state&OFFLINE != 0 && state&RAID == 0 { // when offline & not being raid
-			player.State = int32(ONLINE | (state & LOMASK))
+		switch player.State {
+		case OFF_FREE:
+			player.State = ON_FREE
 			player.Host = host
 			return true
+		case OFF_PROT:
+			player.State = ON_PROT
+			player.Host = host
+			return true
+		default:
+			return false
 		}
 	}
-
 	return false
 }
 
-//----------------------------------------------- ONLINE->OFFLINE
-// A->B
 func Logout(id int32) bool {
 	_lock_players.RLock()
 	player := _players[id]
@@ -175,19 +154,19 @@ func Logout(id int32) bool {
 		player.Lock()
 		defer player.Unlock()
 
-		state := player.State
-
-		if state&ONLINE != 0 { // when online
-			player.State = int32(OFFLINE | (state & LOMASK))
-			return true
+		switch player.State {
+		case ON_FREE:
+			player.State = OFF_FREE
+		case ON_PROT:
+			player.State = OFF_PROT
+		default:
+			return false
 		}
+		return true
 	}
-
 	return false
 }
 
-//----------------------------------------------- (OFFLINE|FREE)->RAID
-// A->B->A
 func Raid(id int32) bool {
 	_lock_players.RLock()
 	player := _players[id]
@@ -195,34 +174,29 @@ func Raid(id int32) bool {
 
 	if player != nil {
 		player.Lock()
+		defer player.Unlock()
 
-		state := player.State
-
-		if state&OFFLINE != 0 && state&(RAID|PROTECTED) == 0 { // when offline and free
+		switch player.State {
+		case OFF_FREE:
 			timeout := time.Now().Unix() + RAID_TIME
-
 			event_id := atomic.AddInt32(&_event_id_gen, 1)
-			timer.Add(event_id, timeout, _raids_ch) // generate timer
+			timer.Add(event_id, timeout, _waits_ch) // generate timer
 
-			player.State = int32(OFFLINE | RAID)
+			player.State = OFF_RAID
 			player.RaidTimeout = timeout
 			player.WaitEventId = event_id
-			player.Unlock()
 
-			_raidslock.Lock()
-			_raids[event_id] = player
-			_raidslock.Unlock()
-			return true
+			_waits_lock.Lock()
+			_waits[event_id] = player
+			_waits_lock.Unlock()
+		default:
+			return false
 		}
-
-		player.Unlock()
+		return true
 	}
-
 	return false
 }
 
-//----------------------------------------------- RAID->FREE
-// A->B
 func Free(id int32) bool {
 	_lock_players.RLock()
 	player := _players[id]
@@ -232,17 +206,17 @@ func Free(id int32) bool {
 		player.Lock()
 		defer player.Unlock()
 
-		if player.State&RAID != 0 { // when being raid
-			player.State = int32(OFFLINE)
-			return true
+		switch player.State {
+		case ON_PROT:
+			player.State = ON_FREE
+		default:
+			return false
 		}
+		return true
 	}
-
 	return false
 }
 
-//----------------------------------------------- PROTECT
-// A->B->A
 func Protect(id int32, until int64) bool {
 	_lock_players.RLock()
 	player := _players[id]
@@ -250,41 +224,35 @@ func Protect(id int32, until int64) bool {
 
 	if player != nil {
 		player.Lock()
-		if player.State&RAID == 0 { // when not being raid
-			event_id := atomic.AddInt32(&_event_id_gen, 1)
-			timer.Add(event_id, until, _raids_ch)
+		defer player.Unlock()
 
-			player.State |= PROTECTED
+		switch player.State {
+		case ON_FREE:
+			event_id := atomic.AddInt32(&_event_id_gen, 1)
+			timer.Add(event_id, until, _waits_ch)
+
+			player.State = ON_PROT
 			player.ProtectTimeout = until
 			player.WaitEventId = event_id
-			player.Unlock()
 
-			_protectslock.Lock()
-			_protects[event_id] = player
-			_protectslock.Unlock()
-			return true
+			_waits_lock.Lock()
+			_waits[event_id] = player
+			_waits_lock.Unlock()
+		case OFF_RAID:
+			event_id := atomic.AddInt32(&_event_id_gen, 1)
+			timer.Add(event_id, until, _waits_ch)
+
+			player.State = OFF_PROT
+			player.ProtectTimeout = until
+			player.WaitEventId = event_id
+
+			_waits_lock.Lock()
+			_waits[event_id] = player
+			_waits_lock.Unlock()
+		default:
+			return false
 		}
-		player.Unlock()
-	}
-
-	return false
-}
-
-//----------------------------------------------- UNPROTECT
-// A->B->A
-func UnProtect(id int32) bool {
-	_lock_players.RLock()
-	player := _players[id]
-	_lock_players.RUnlock()
-
-	if player != nil {
-		player.Lock()
-		if player.State&PROTECTED != 0 {
-			player.State &= ^PROTECTED
-			player.Unlock()
-			return true
-		}
-		player.Unlock()
+		return true
 	}
 
 	return false
@@ -292,7 +260,7 @@ func UnProtect(id int32) bool {
 
 // State Readers
 // A->B
-func State(id int32) (ret int32) {
+func State(id int32) (ret byte) {
 	_lock_players.RLock()
 	player := _players[id]
 	_lock_players.RUnlock()

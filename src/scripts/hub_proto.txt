@@ -31,7 +31,7 @@ protecttime int64
 INFO=
 flag bool
 id int32
-state int32
+state byte
 score int32
 protecttime int64
 ===

@@ -76,15 +76,6 @@ payload:INT
 
 ####
 
-packet_type:7
-name:unprotect_req
-payload:id
-desc:撤销保护
-
-packet_type:1007
-name:unprotect_ack
-payload:INT
-
 ###
 packet_type:8
 name:free_req

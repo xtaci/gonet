@@ -17,8 +17,6 @@ var Code map[string]int16 = map[string]int16{
 	"raid_ack":        1005, //
 	"protect_req":     6,    // 加保护
 	"protect_ack":     1006, //
-	"unprotect_req":   7,    // 撤销保护
-	"unprotect_ack":   1007, //
 	"free_req":        8,    // 结束攻击
 	"free_ack":        1008, //
 	"getinfo_req":     9,    // 读取玩家信息
@@ -46,8 +44,6 @@ var RCode map[int16]string = map[int16]string{
 	1005: "raid_ack",        //
 	6:    "protect_req",     // 加保护
 	1006: "protect_ack",     //
-	7:    "unprotect_req",   // 撤销保护
-	1007: "unprotect_ack",   //
 	8:    "free_req",        // 结束攻击
 	1008: "free_ack",        //
 	9:    "getinfo_req",     // 读取玩家信息
@@ -68,7 +64,6 @@ var ProtoHandler map[uint16]func(int32, *packet.Packet) []byte = map[uint16]func
 	4:   P_getlist_req,
 	5:   P_raid_req,
 	6:   P_protect_req,
-	7:   P_unprotect_req,
 	8:   P_free_req,
 	9:   P_getinfo_req,
 	11:  P_adduser_req,
