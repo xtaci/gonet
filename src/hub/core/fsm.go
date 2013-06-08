@@ -249,6 +249,17 @@ func Protect(id int32, until int64) bool {
 			_waits_lock.Lock()
 			_waits[event_id] = player
 			_waits_lock.Unlock()
+		case ON_PROT:
+			event_id := atomic.AddInt32(&_event_id_gen, 1)
+			timer.Add(event_id, until, _waits_ch)
+
+			player.State = ON_PROT
+			player.ProtectTimeout = until
+			player.WaitEventId = event_id
+
+			_waits_lock.Lock()
+			_waits[event_id] = player
+			_waits_lock.Unlock()
 		default:
 			return false
 		}
