@@ -1,7 +1,9 @@
 package main
 
 import (
+	"agent/event_client"
 	"agent/ipc"
+	"agent/stats_client"
 	"cfg"
 )
 
@@ -24,6 +26,8 @@ func main() {
 
 	// dial HUB
 	ipc.DialHub()
+	event_client.DialEvent()
+	stats_client.DialStats()
 
 	// signal
 	go SignalProc()
