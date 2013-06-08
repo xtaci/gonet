@@ -5,13 +5,13 @@ digraph G {
 	OFF_FREE->ON_FREE [label="Login"];
 	OFF_FREE->OFF_RAID [label="Raid"];
 	OFF_FREE->OFF_PROT [label="Protect"];
-	OFF_PROT->ON_PROT [label="Login"]
-	OFF_RAID->OFF_PROT [label="Protect"]
+	OFF_PROT->ON_PROT [label="Login"];
+	OFF_RAID->OFF_PROT [label="Protect"];
+	OFF_PROT->OFF_FREE [label="Expire"];
 	ON_FREE->OFF_FREE [label="Logout"];
-	ON_FREE->ON_PROT [label="Protect"]
-	ON_PROT->OFF_PROT [label="Logout"]
-	ON_PROT->OFF_PROT [label="Expire"]
-	ON_PROT->ON_FREE [label="Free"]
-	ON_PROT->ON_FREE [label="Expire"]
-	ON_PROT->ON_PROT [label="Protect"]
+	ON_FREE->ON_PROT [label="Protect"];
+	ON_PROT->OFF_PROT [label="Logout"];
+	ON_PROT->ON_FREE [label="Free"];
+	ON_PROT->ON_FREE [label="Expire"];
+	ON_PROT->ON_PROT [label="Protect"];
 }
