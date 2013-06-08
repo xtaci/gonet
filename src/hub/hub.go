@@ -40,6 +40,7 @@ func HubStart() {
 	listener, err := net.ListenTCP("tcp", tcpAddr)
 	checkError(err)
 
+	log.Println("HUB Server OK.")
 	for {
 		conn, err := listener.Accept()
 

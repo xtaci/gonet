@@ -40,6 +40,7 @@ func EventStart() {
 	listener, err := net.ListenTCP("tcp", tcpAddr)
 	checkError(err)
 
+	log.Println("Event Server OK.")
 	for {
 		conn, err := listener.Accept()
 

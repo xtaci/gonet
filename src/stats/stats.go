@@ -39,6 +39,7 @@ func StatsStart() {
 	listener, err := net.ListenTCP("tcp", tcpAddr)
 	checkError(err)
 
+	log.Println("Stats Server OK.")
 	for {
 		conn, err := listener.Accept()
 

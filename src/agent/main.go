@@ -22,13 +22,12 @@ func main() {
 		cfg.StartLogger(config["gs_log"])
 	}
 
-	log.Println("Starting the server")
-
 	// dial HUB
 	ipc.DialHub()
 	event_client.DialEvent()
 	stats_client.DialStats()
 
+	log.Println("Starting the server.")
 	// signal
 	go SignalProc()
 
@@ -44,6 +43,8 @@ func main() {
 
 	listener, err := net.ListenTCP("tcp", tcpAddr)
 	checkError(err)
+
+	log.Println("Game Server OK.")
 
 	for {
 		conn, err := listener.Accept()

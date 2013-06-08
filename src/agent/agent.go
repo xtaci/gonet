@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net"
 	"strconv"
 	"time"
@@ -16,6 +17,10 @@ import (
 const (
 	DEFAULT_MQ_SIZE = 128
 )
+
+func init() {
+	log.SetPrefix("[GS]")
+}
 
 //----------------------------------------------- Start Agent when a client is connected
 func StartAgent(in chan []byte, conn net.Conn) {
