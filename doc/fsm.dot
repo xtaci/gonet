@@ -7,6 +7,7 @@ digraph G {
 	OFF_FREE->OFF_PROT [label="Protect"];
 	OFF_PROT->ON_PROT [label="Login"];
 	OFF_RAID->OFF_PROT [label="Protect"];
+	OFF_RAID->OFF_FREE [label="Free"];
 	OFF_PROT->OFF_FREE [label="Expire"];
 	ON_FREE->OFF_FREE [label="Logout"];
 	ON_FREE->ON_PROT [label="Protect"];
