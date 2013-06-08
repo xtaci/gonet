@@ -22,12 +22,19 @@ func DialEvent() {
 	log.Println("Connecting to Event server")
 	config := cfg.Get()
 
-	conn, err := net.Dial("tcp", config["event_service"])
+	addr, err := net.ResolveTCPAddr("tcp", config["event_service"])
 	if err != nil {
-		log.Println("Cannot connect to Event server")
-		os.Exit(1)
+		log.Println(err)
+		os.Exit(-1)
 	}
 
+	conn, err := net.DialTCP("tcp", nil, addr)
+	if err != nil {
+		log.Println(err)
+		os.Exit(-1)
+	}
+
+	conn.SetNoDelay(false)
 	_conn = conn
 
 	log.Println("Event Service Connected")

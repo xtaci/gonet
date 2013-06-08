@@ -42,11 +42,11 @@ func HubStart() {
 
 	log.Println("HUB Server OK.")
 	for {
-		conn, err := listener.Accept()
-
+		conn, err := listener.AcceptTCP()
 		if err != nil {
 			continue
 		}
+		conn.SetNoDelay(false)
 		go handleClient(conn)
 	}
 }

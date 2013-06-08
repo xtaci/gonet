@@ -41,11 +41,11 @@ func StatsStart() {
 
 	log.Println("Stats Server OK.")
 	for {
-		conn, err := listener.Accept()
-
+		conn, err := listener.AcceptTCP()
 		if err != nil {
 			continue
 		}
+		conn.SetNoDelay(false)
 		go handleClient(conn)
 	}
 }

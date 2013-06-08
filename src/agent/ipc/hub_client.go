@@ -24,12 +24,19 @@ func DialHub() {
 	log.Println("Connecting to HUB")
 	config := cfg.Get()
 
-	conn, err := net.Dial("tcp", config["hub_service"])
+	addr, err := net.ResolveTCPAddr("tcp", config["hub_service"])
 	if err != nil {
-		log.Println("Cannot connect to Hub")
-		os.Exit(1)
+		log.Println(err)
+		os.Exit(-1)
 	}
 
+	conn, err := net.DialTCP("tcp", nil, addr)
+	if err != nil {
+		log.Println(err)
+		os.Exit(-1)
+	}
+
+	conn.SetNoDelay(false)
 	_conn = conn
 
 	log.Println("HUB connected")

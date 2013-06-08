@@ -22,12 +22,19 @@ func DialStats() {
 	log.Println("Connecting to Stats server")
 	config := cfg.Get()
 
-	conn, err := net.Dial("tcp", config["stats_service"])
+	addr, err := net.ResolveTCPAddr("tcp", config["stats_service"])
 	if err != nil {
-		log.Println("Cannot connect to Stats server")
-		os.Exit(1)
+		log.Println(err)
+		os.Exit(-1)
 	}
 
+	conn, err := net.DialTCP("tcp", nil, addr)
+	if err != nil {
+		log.Println(err)
+		os.Exit(-1)
+	}
+
+	conn.SetNoDelay(false)
 	_conn = conn
 
 	log.Println("Stats Service Connected")
