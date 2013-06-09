@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net"
 	"strconv"
@@ -60,7 +59,6 @@ func StartAgent(in chan []byte, conn net.Conn) {
 			}
 
 			if result := UserRequestProxy(&sess, msg); result != nil {
-				fmt.Println(result)
 				err := buf.Send(result)
 				if err != nil {
 					return

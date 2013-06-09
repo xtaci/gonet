@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"time"
 )
@@ -39,12 +38,11 @@ func UserRequestProxy(sess *Session, p []byte) []byte {
 		log.Println("read protocol error")
 	}
 
-	fmt.Printf("code:%v,user:%v\n", b, sess.User.Id)
+	log.Printf("code:%v,user:%v\n", b, sess.User.Id)
 
 	handle := protos.ProtoHandler[b]
 	if handle != nil {
 		ret, err := handle(sess, reader)
-		fmt.Println(ret)
 		if err == nil {
 			return ret
 		}

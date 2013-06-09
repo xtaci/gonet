@@ -8,6 +8,16 @@ type Repeater struct {
 
 //----------------------------------------------- output replicator
 func (r *Repeater) Write(p []byte) (int, error) {
-	r.out1.Write(p)
-	return r.out2.Write(p)
+	var n int
+	var e error
+
+	if r.out1 != nil {
+		n, e = r.out1.Write(p)
+	}
+
+	if r.out2 != nil {
+		n, e = r.out2.Write(p)
+	}
+
+	return n, e
 }

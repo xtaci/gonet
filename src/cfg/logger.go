@@ -24,7 +24,14 @@ func StartLogger(logfile string) {
 	}
 
 	var r Repeater
-	r.out1 = os.Stdout
-	r.out2 = f
+
+	config := Get()
+	switch config["log_output"] {
+	case "both":
+		r.out1 = os.Stdout
+		r.out2 = f
+	case "file":
+		r.out2 = f
+	}
 	log.SetOutput(&r)
 }
