@@ -14,5 +14,15 @@
     c) 离线时，刷入数据库
 4. 事件服务器通过CAS(Compare-and-Set) 的方式变更升级数据, 保证玩家在线时逻辑处理的一致性.     
 
- 
- 
+#### 包结构
+<pre>
+|LENGTH|TIME_ELAPSED|PROTO|PAYLOAD|
+
+|16|32|16|...|
+</pre>
+
+#### 包测试：
+<pre>
+heart_beat:
+echo "000E 00000001 0000" | xxd -r -ps |nc 127.0.0.1 8890 -q 2|hexdump -C
+</pre>
