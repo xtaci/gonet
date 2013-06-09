@@ -5,11 +5,16 @@ import (
 	"io"
 	"labix.org/v2/mgo/bson"
 	"log"
+	"net"
+	"strconv"
+	"time"
 )
 
 import (
 	"cfg"
 	. "db"
+	"misc/alg/gaussian"
+	"misc/geoip"
 	. "types"
 )
 
@@ -48,7 +53,7 @@ func Login(name string, pass string) *User {
 }
 
 //----------------------------------------------- Create a new user
-func New(name, pass string) *User {
+func New(name, pass string, ip net.IP) *User {
 	config := cfg.Get()
 	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
 
@@ -58,6 +63,8 @@ func New(name, pass string) *User {
 		user.Id = NextVal(COUNTER_NAME)
 		user.Name = name
 		user.Pass = _md5(pass)
+		_inituser(user, ip)
+
 		err := c.Insert(user)
 		if err != nil {
 			log.Println(err, name, pass)
@@ -105,4 +112,14 @@ func _md5(str string) []byte {
 	h := md5.New()
 	io.WriteString(h, salted)
 	return h.Sum(nil)
+}
+
+//------------------------------------------------ 新注册用户的初始化
+func _inituser(user *User, ip net.IP) {
+	config := cfg.Get()
+	samples, _ := strconv.Atoi(config["samples"])
+
+	user.CountryCode = geoip.Query(ip)
+	user.LatencySamples = gaussian.NewDist(samples)
+	user.CreatedAt = time.Now().Unix()
 }

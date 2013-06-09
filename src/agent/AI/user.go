@@ -1,15 +1,12 @@
 package AI
 
 import (
-	"cfg"
 	"log"
-	"strconv"
 	"time"
 )
 
 import (
 	"db/data_tbl"
-	"misc/alg/gaussian"
 	. "types"
 	"types/estates"
 )
@@ -32,12 +29,4 @@ func LoginProc(sess *Session) bool {
 	LoadIPCObjects(sess.User.Id, sess.MQ)
 
 	return true
-}
-
-//------------------------------------------------ 新注册用户的初始化
-func InitUser(sess *Session) {
-	config := cfg.Get()
-	samples, _ := strconv.Atoi(config["samples"])
-	sess.User.LatencySamples = gaussian.NewDist(samples)
-	sess.User.CreatedAt = time.Now().Unix()
 }
