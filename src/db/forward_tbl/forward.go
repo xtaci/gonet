@@ -26,7 +26,7 @@ func Push(dest_id int32, value []byte) bool {
 	forward := &Forward{DestId: dest_id, Value: value}
 	err := c.Insert(forward)
 	if err != nil {
-		log.Println(err)
+		log.Println(err, dest_id)
 		return false
 	}
 
@@ -40,12 +40,12 @@ func PopAll(dest_id int32) [][]byte {
 	var forwards []Forward
 	err := c.Find(bson.M{"destid": dest_id}).All(&forwards)
 	if err != nil {
-		log.Println(err)
+		log.Println(err, dest_id)
 	}
 
 	info, err := c.RemoveAll(bson.M{"destid": dest_id})
 	if err != nil {
-		log.Println(info, err)
+		log.Println(info, err, dest_id)
 	}
 
 	objs := make([][]byte, len(forwards))

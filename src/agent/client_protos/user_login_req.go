@@ -1,8 +1,8 @@
 package protos
 
 import (
-	"time"
 	"fmt"
+	"time"
 )
 
 import (

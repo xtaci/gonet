@@ -48,7 +48,7 @@ func Get(collection string, user_id int32, data interface{}) bool {
 
 	err := c.Find(bson.M{"userid": user_id}).One(data)
 	if err != nil {
-		log.Println(err)
+		log.Println(err, collection, user_id)
 		return false
 	}
 
@@ -62,7 +62,7 @@ func GetAll(collection string, all interface{}) bool {
 
 	err := c.Find(nil).All(all)
 	if err != nil {
-		log.Println(err)
+		log.Println(err, collection)
 		return false
 	}
 

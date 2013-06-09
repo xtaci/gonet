@@ -40,7 +40,7 @@ func Login(name string, pass string) *User {
 	user := &User{}
 	err := c.Find(bson.M{"name": name, "pass": _md5(pass)}).One(user)
 	if err != nil {
-		log.Println(err)
+		log.Println(err, name, pass)
 		return nil
 	}
 
@@ -60,7 +60,7 @@ func New(name, pass string) *User {
 		user.Pass = _md5(pass)
 		err := c.Insert(user)
 		if err != nil {
-			log.Println(err)
+			log.Println(err, name, pass)
 			return nil
 		}
 		return user
@@ -77,7 +77,7 @@ func Get(id int32) *User {
 	user := &User{}
 	err := c.Find(bson.M{"id": id}).One(user)
 	if err != nil {
-		log.Println(err)
+		log.Println(err, id)
 		return nil
 	}
 

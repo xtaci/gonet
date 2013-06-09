@@ -1,12 +1,12 @@
 package protos
 
 import (
-	"testing"
-	"misc/packet"
 	"fmt"
-	"net"
 	"log"
+	"misc/packet"
+	"net"
 	"os"
+	"testing"
 )
 
 func TestAgent(t *testing.T) {
