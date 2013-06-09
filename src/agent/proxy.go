@@ -29,7 +29,7 @@ func UserRequestProxy(sess *Session, p []byte) []byte {
 
 	if sess.LoggedIn {
 		server_elapsed := now.Sub(sess.ConnectTime).Nanoseconds() / 1000
-		diff := int16(server_elapsed - int64(client_elapsed))
+		diff := int(server_elapsed - int64(client_elapsed))
 		sess.User.LatencySamples.Add(diff)
 	}
 

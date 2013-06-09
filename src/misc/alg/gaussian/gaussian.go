@@ -7,7 +7,7 @@ const (
 )
 
 type Dist struct {
-	Samples []int16
+	Samples []int
 	Ptr     int
 	N       int
 	Sigma   float64
@@ -16,7 +16,7 @@ type Dist struct {
 
 func NewDist(num_samples int) *Dist {
 	dist := &Dist{}
-	dist.Samples = make([]int16, num_samples)
+	dist.Samples = make([]int, num_samples)
 	return dist
 }
 
@@ -28,7 +28,7 @@ func (dist *Dist) IsSampleOk() bool {
 	}
 }
 
-func (dist *Dist) Add(x int16) {
+func (dist *Dist) Add(x int) {
 	dist.Samples[dist.Ptr] = x
 	if dist.Ptr++; dist.Ptr >= len(dist.Samples) {
 		dist.Ptr = 0
@@ -59,7 +59,7 @@ func (dist *Dist) Add(x int16) {
 	}
 }
 
-func (dist *Dist) P(x int16) float64 {
+func (dist *Dist) P(x int) float64 {
 	X := float64(x)
 	A := 1.0 / (dist.Sigma * SQRT2PI)
 	B := math.Exp(-((X - dist.Mean) * (X - dist.Mean)) / (2 * dist.Sigma * dist.Sigma))

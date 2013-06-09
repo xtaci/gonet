@@ -15,7 +15,7 @@ func TestGauss(t *testing.T) {
 	// gaussian
 	gaussian := NewDist(128)
 	for i := 0; i < 1000; i++ {
-		v := int16(gen.Int31n(200))
+		v := gen.Intn(200)
 		gaussian.Add(v)
 	}
 
@@ -26,13 +26,13 @@ func TestGauss(t *testing.T) {
 	sigma := gaussian.Sigma
 	mean := gaussian.Mean
 	for i := 0; i < 10; i++ {
-		v := int16(gen.Int31n(200))
+		v := gen.Intn(200)
 		fmt.Printf("X:%4d: P(v)=%0.4f, deriv:%.2fσ\n", v, gaussian.P(v), math.Abs(float64(v)-mean)/sigma)
 	}
 
 	fmt.Println("range [0,400]")
 	for i := 0; i < 10; i++ {
-		v := int16(gen.Int31n(400))
+		v := gen.Intn(400)
 		fmt.Printf("X:%4d: P(v)=%0.4f, deriv:%.2fσ\n", v, gaussian.P(v), math.Abs(float64(v)-mean)/sigma)
 	}
 }
