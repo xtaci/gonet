@@ -39,6 +39,10 @@ func TestLogin(t *testing.T) {
 	if !Login(1) {
 		t.Error("login again")
 	}
+
+	if !Logout(1) {
+		t.Error("logout")
+	}
 }
 
 func BenchmarkForward(b *testing.B) {
