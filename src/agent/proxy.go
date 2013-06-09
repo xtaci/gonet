@@ -39,7 +39,7 @@ func UserRequestProxy(sess *Session, p []byte) []byte {
 		log.Println("read protocol error")
 	}
 
-	//log.Printf("code:%v,user:%v\n", b, sess.User.Id)
+	fmt.Printf("code:%v,user:%v\n", b, sess.User.Id)
 
 	handle := protos.ProtoHandler[b]
 	if handle != nil {
