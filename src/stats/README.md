@@ -6,7 +6,7 @@
 
 持续性生产的计算方法,产量可表达为     
 
-f(T) = Max(S + (T-T0) x RATE, Capacity) (S是T0时刻的储量, Capacity是容量)      
+f(T) =Min(S + (T-T0) x RATE, Max) (S是T0时刻的储量, Max是容量)      
 
 一旦T1时刻要使用产出资源，那么:     
 S = f(T1) - COST      
