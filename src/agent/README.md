@@ -24,5 +24,5 @@
 #### 包测试：
 <pre>
 heart_beat:
-echo "000E 00000001 0000" | xxd -r -ps |nc 127.0.0.1 8888 -q 2|hexdump -C
+echo "0006 00000001 0000" | xxd -r -ps |nc 127.0.0.1 8888 -q 2|hexdump -C
 </pre>
