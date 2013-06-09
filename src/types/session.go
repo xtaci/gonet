@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/json"
+	"time"
 )
 
 import (
@@ -34,9 +35,9 @@ type Session struct {
 	KickOut  bool // flag for player is kicked out
 
 	// time related
-	ConnectTime    int64 // tcp connection establish time
-	LastPacketTime int64 // last packet arrive time
-	LastFlushTime  int64 // last flush to db time
-	Dirty          bool  // mark the data as dirty
-	OpCount        int   // num of operations since last sync
+	ConnectTime    time.Time // tcp connection establish time, in millsecond(ms)
+	LastPacketTime int64     // last packet arrive time, in seconds(s)
+	LastFlushTime  int64     // last flush to db time, in seconds(s)
+	Dirty          bool      // mark the data as dirty
+	OpCount        int       // num of operations since last sync
 }

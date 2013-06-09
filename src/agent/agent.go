@@ -26,7 +26,7 @@ func init() {
 func StartAgent(in chan []byte, conn net.Conn) {
 	var sess Session
 	sess.MQ = make(chan IPCObject, DEFAULT_MQ_SIZE)
-	sess.ConnectTime = time.Now().Unix()
+	sess.ConnectTime = time.Now()
 	sess.LastPacketTime = time.Now().Unix()
 	sess.KickOut = false
 
