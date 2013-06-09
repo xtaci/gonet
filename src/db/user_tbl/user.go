@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	COLLECTION   = "USER"
+	COLLECTION   = "USERS"
 	COUNTER_NAME = "USERID_GEN"
 )
 

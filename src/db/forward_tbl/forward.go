@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	COLLECTION = "FORWARD"
+	COLLECTION = "FORWARDS"
 )
 
 type Forward struct {
