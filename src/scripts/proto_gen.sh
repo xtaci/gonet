@@ -16,7 +16,7 @@ printf "\n" >> api.go
 awk -f api.awk api.txt >> api.go 
 awk -f api_rcode.awk api.txt >> api.go 
 
-printf "var ProtoHandler map[uint16]func(*Session, *packet.Packet) ([]byte, error) = map[uint16]func(*Session, *packet.Packet)([]byte, error){\n" >> api.go
+printf "var ProtoHandler map[uint16]func(*Session, *packet.Packet) []byte = map[uint16]func(*Session, *packet.Packet) []byte {\n" >> api.go
 awk -f api_bind_req.awk api.txt >> api.go 
 printf "}" >> api.go
 

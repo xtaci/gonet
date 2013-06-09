@@ -42,8 +42,8 @@ func UserRequestProxy(sess *Session, p []byte) []byte {
 
 	handle := protos.ProtoHandler[b]
 	if handle != nil {
-		ret, err := handle(sess, reader)
-		if err == nil {
+		ret := handle(sess, reader)
+		if len(ret) != 0 {
 			return ret
 		}
 	}
