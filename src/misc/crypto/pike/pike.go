@@ -20,8 +20,8 @@ const (
 	GENIUS_NUMBER = 0x05027919
 )
 
-//----------------------------------------------- Encode a given buffer
-func (ctx *Pike) Encode(data []byte) {
+//----------------------------------------------- Encode/Decode a given buffer
+func (ctx *Pike) Codec(data []byte) {
 	length := len(data)
 	if length == 0 {
 		return
