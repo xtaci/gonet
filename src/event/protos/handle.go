@@ -40,7 +40,7 @@ func HandleRequest(reader *packet.Packet, output chan []byte) {
 func P_ping_req(reader *packet.Packet) []byte {
 	tbl, _ := PKT_INT(reader)
 	ret := INT{tbl.F_v}
-	return packet.Pack(Code["ping_ack"], ret, nil)
+	return packet.Pack(-1, ret, nil)
 }
 
 func P_add_req(reader *packet.Packet) []byte {
@@ -48,7 +48,7 @@ func P_add_req(reader *packet.Packet) []byte {
 	event_id := core.Add(tbl.F_tblname, tbl.F_oid, tbl.F_user_id, tbl.F_timeout)
 	ret := INT{event_id}
 
-	return packet.Pack(Code["add_ack"], ret, nil)
+	return packet.Pack(-1, ret, nil)
 }
 
 func P_cancel_req(reader *packet.Packet) []byte {
@@ -56,7 +56,7 @@ func P_cancel_req(reader *packet.Packet) []byte {
 	core.Cancel(tbl.F_event_id)
 	ret := INT{1}
 
-	return packet.Pack(Code["cancel_ack"], ret, nil)
+	return packet.Pack(-1, ret, nil)
 }
 
 func checkErr(err error) {

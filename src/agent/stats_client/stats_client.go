@@ -128,7 +128,7 @@ func _call(data []byte) (ret []byte) {
 
 	select {
 	case msg := <-ACK:
-		return msg[2:] // the first 2-bytes are TYPE, just ignore it
+		return msg
 	case _ = <-time.After(10 * time.Second):
 	}
 

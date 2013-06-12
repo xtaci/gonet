@@ -39,7 +39,7 @@ func HandleRequest(reader *packet.Packet, output chan []byte) {
 func P_ping_req(reader *packet.Packet) []byte {
 	tbl, _ := PKT_INT(reader)
 	ret := INT{tbl.F_v}
-	return packet.Pack(Code["ping_ack"], ret, nil)
+	return packet.Pack(-1, ret, nil)
 }
 
 func P_add_req(reader *packet.Packet) []byte {
@@ -47,7 +47,7 @@ func P_add_req(reader *packet.Packet) []byte {
 	ret := INT{0}
 
 	fmt.Println(tbl)
-	return packet.Pack(Code["add_ack"], ret, nil)
+	return packet.Pack(-1, ret, nil)
 }
 
 func checkErr(err error) {

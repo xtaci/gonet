@@ -52,7 +52,7 @@ func HandleRequest(hostid int32, reader *packet.Packet, output chan []byte) {
 func P_ping_req(hostid int32, reader *packet.Packet) []byte {
 	tbl, _ := PKT_INT(reader)
 	ret := INT{tbl.F_v}
-	return packet.Pack(Code["ping_ack"], ret, nil)
+	return packet.Pack(-1, ret, nil)
 }
 
 func P_login_req(hostid int32, pkt *packet.Packet) []byte {
@@ -78,7 +78,7 @@ func P_login_req(hostid int32, pkt *packet.Packet) []byte {
 		}
 	}
 
-	return packet.Pack(Code["login_ack"], ret, nil)
+	return packet.Pack(-1, ret, nil)
 }
 
 func P_logout_req(hostid int32, pkt *packet.Packet) []byte {
@@ -89,7 +89,7 @@ func P_logout_req(hostid int32, pkt *packet.Packet) []byte {
 		ret.F_v = 1
 	}
 
-	return packet.Pack(Code["logout_ack"], ret, nil)
+	return packet.Pack(-1, ret, nil)
 }
 
 func P_changescore_req(hostid int32, pkt *packet.Packet) []byte {
@@ -100,7 +100,7 @@ func P_changescore_req(hostid int32, pkt *packet.Packet) []byte {
 		ret.F_v = 1
 	}
 
-	return packet.Pack(Code["changescore_ack"], ret, nil)
+	return packet.Pack(-1, ret, nil)
 }
 
 func P_getlist_req(hostid int32, pkt *packet.Packet) []byte {
@@ -115,7 +115,7 @@ func P_getlist_req(hostid int32, pkt *packet.Packet) []byte {
 		ret.F_items[k].F_score = scores[k]
 	}
 
-	return packet.Pack(Code["getlist_ack"], ret, nil)
+	return packet.Pack(-1, ret, nil)
 }
 
 func P_raid_req(hostid int32, pkt *packet.Packet) []byte {
@@ -126,7 +126,7 @@ func P_raid_req(hostid int32, pkt *packet.Packet) []byte {
 		ret.F_v = 1
 	}
 
-	return packet.Pack(Code["raid_ack"], ret, nil)
+	return packet.Pack(-1, ret, nil)
 }
 
 func P_protect_req(hostid int32, pkt *packet.Packet) []byte {
@@ -137,7 +137,7 @@ func P_protect_req(hostid int32, pkt *packet.Packet) []byte {
 		ret.F_v = 1
 	}
 
-	return packet.Pack(Code["protect_ack"], ret, nil)
+	return packet.Pack(-1, ret, nil)
 }
 
 func P_free_req(hostid int32, pkt *packet.Packet) []byte {
@@ -148,7 +148,7 @@ func P_free_req(hostid int32, pkt *packet.Packet) []byte {
 		ret.F_v = 1
 	}
 
-	return packet.Pack(Code["free_ack"], ret, nil)
+	return packet.Pack(-1, ret, nil)
 }
 
 func P_getinfo_req(hostid int32, pkt *packet.Packet) []byte {
@@ -164,7 +164,7 @@ func P_getinfo_req(hostid int32, pkt *packet.Packet) []byte {
 		ret.F_flag = true
 	}
 
-	return packet.Pack(Code["getinfo_ack"], ret, nil)
+	return packet.Pack(-1, ret, nil)
 }
 
 func P_forward_req(hostid int32, pkt *packet.Packet) []byte {
@@ -189,7 +189,7 @@ func P_forward_req(hostid int32, pkt *packet.Packet) []byte {
 	}
 
 	ret := INT{F_v: 1}
-	return packet.Pack(Code["forward_ack"], ret, nil)
+	return packet.Pack(-1, ret, nil)
 }
 
 func P_forwardclan_req(hostid int32, pkt *packet.Packet) (r []byte) {
@@ -197,7 +197,7 @@ func P_forwardclan_req(hostid int32, pkt *packet.Packet) (r []byte) {
 	ret := INT{F_v: 1}
 
 	defer func() {
-		r = packet.Pack(Code["forwardclan_ack"], ret, nil)
+		r = packet.Pack(-1, ret, nil)
 	}()
 
 	obj := &IPCObject{}
@@ -244,7 +244,7 @@ func P_adduser_req(hostid int32, pkt *packet.Packet) []byte {
 		ret.F_v = 1
 	}
 
-	return packet.Pack(Code["adduser_ack"], ret, nil)
+	return packet.Pack(-1, ret, nil)
 }
 
 func checkErr(err error) {

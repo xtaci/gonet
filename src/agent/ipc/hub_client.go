@@ -86,7 +86,7 @@ func HubReceiver(conn net.Conn) {
 		}
 
 		// two kinds of IPC:
-		// a). Hub Sends to GS, sequence number is not needed, just forwarding to session
+		// a). Hub Sends to GS, sequence number is not required (set to 0), just forwarding to session
 		// b). Call, sequence number is needed, send will wake up blocking-chan.
 		//
 		if seqval == 0 {
@@ -166,7 +166,7 @@ func _call(data []byte) (ret []byte) {
 
 	select {
 	case msg := <-ACK:
-		return msg[2:] // ignore protocol header
+		return msg
 	case _ = <-time.After(10 * time.Second):
 	}
 

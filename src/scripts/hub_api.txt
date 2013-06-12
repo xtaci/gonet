@@ -5,30 +5,16 @@ name:ping_req
 payload:INT
 desc:PING
 
-packet_type:1000
-name:ping_ack
-payload:INT
-desc:返回请求数值
-
 ##############
 packet_type:1
 name:login_req
 payload:id
 desc:登陆
 
-packet_type:1001
-name:login_ack
-payload:INT
-desc:
-
 packet_type:2
 name:logout_req
 payload:id
 desc:登出
-
-packet_type:1002
-name:logout_ack
-payload:INT
 
 ####
 
@@ -37,20 +23,12 @@ name:changescore_req
 payload:changescore
 desc:改变分数
 
-packet_type:1003
-name:changescore_ack
-payload:INT
-
 ####
 
 packet_type:4
 name:getlist_req
 payload:getlist
 desc:获取列表
-
-packet_type:1004
-name:getlist_ack
-payload:getlist_result
 
 ####
 
@@ -59,10 +37,6 @@ name:raid_req
 payload:id
 desc:攻击
 
-packet_type:1005
-name:raid_ack
-payload:INT
-
 ####
 
 packet_type:6
@@ -70,42 +44,24 @@ name:protect_req
 payload:PROTECT
 desc:加保护
 
-packet_type:1006
-name:protect_ack
-payload:INT
-
-####
-
 ###
-packet_type:8
+packet_type:7
 name:free_req
 payload:id
 desc:结束攻击
 
-packet_type:1008
-name:free_ack
-payload:INT
-
 ####
 
-packet_type:9
+packet_type:8
 name:getinfo_req
 payload:id
 desc:读取玩家信息
 
-packet_type:1009
-name:getinfo_ack
-payload:info
-
 #####
-packet_type:11
+packet_type:9
 name:adduser_req
 payload:id
 desc:注册一个新注册的玩家
-
-packet_type:1011
-name:adduser_ack
-payload:INT
 
 ########## IPC forward
 packet_type:100
@@ -113,15 +69,7 @@ name:forward_req
 payload:FORWARDIPC
 desc:转发IPC消息
 
-packet_type:1100
-name:forward_ack
-payload:INT
-
 packet_type:101
 name:forwardclan_req
 payload:FORWARDIPC
 desc:转发IPC消息到联盟
-
-packet_type:1101
-name:forwardclan_ack
-payload:INT
