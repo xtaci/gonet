@@ -36,8 +36,8 @@ digraph G {
 		Agent5->GS2;
 	}
 
-	GS1->Hub;
-	GS2->Hub;
+	GS1->Hub [dir=both];
+	GS2->Hub [dir=both];
 	GS1->Event;
 	GS2->Event; 
 	GS1->Stats;
