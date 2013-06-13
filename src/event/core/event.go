@@ -18,10 +18,9 @@ type Event struct {
 }
 
 var (
-	_event_ch     chan int32
-	_events       map[int32]*Event // mapping from  event_id-> Event
-	_events_lock  sync.RWMutex
-	_event_id_gen int32
+	_event_ch    chan int32
+	_events      map[int32]*Event // mapping from  event_id-> Event
+	_events_lock sync.RWMutex
 
 	_hashtbl map[uint32]string // mapping from hash(tblname)-> tblname
 )
