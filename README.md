@@ -19,7 +19,9 @@
 
 #### 通信原则:     
 1.  GS到Hub/Stats/Event的通信，都是Call同步调用，即GS必须等待ACK。         
-2.  Hub到GS的通信，只有Forward数据包。       
+2.  Hub到GS的通信，只有forward数据包。       
+3.  单播消息在玩家离线时会存入db, 登录后的启动过程 ___GS___ 直接读取db，并forward给玩家goroutine。
+4.  多播消息在只保留一个固定长度的FIFO, 登录后，多播消息的未读部分 ___HUB___ 会直接forward给玩家goroutine
 
 #### 安装先决条件:
 0. 确保安装好bzr, graphviz
