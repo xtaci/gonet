@@ -23,7 +23,14 @@ func init() {
 
 //----------------------------------------------- Start Agent when a client is connected
 func StartAgent(in chan []byte, conn net.Conn) {
+	defer func() {
+		if x := recover(); x != nil {
+			log.Println("unknown agent routine error")
+		}
+	}()
+
 	var sess Session
+	sess.IP = net.ParseIP(conn.RemoteAddr().String())
 	sess.MQ = make(chan IPCObject, DEFAULT_MQ_SIZE)
 	sess.ConnectTime = time.Now()
 	sess.LastPacketTime = time.Now().Unix()

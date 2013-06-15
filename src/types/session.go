@@ -2,12 +2,14 @@ package types
 
 import (
 	"encoding/json"
+	"net"
 	"time"
 )
 
 import (
 	"types/estates"
 	"types/grid"
+	"types/samples"
 )
 
 type IPCObject struct {
@@ -24,10 +26,11 @@ func (obj *IPCObject) Json() []byte {
 }
 
 type Session struct {
+	IP net.IP
 	MQ chan IPCObject // Player's Internal Message Queue
 	// user data
 	User    User
-	Estates estates.Manager
+	Estates *estates.Manager
 	Grid    *grid.Grid // Building's bitmap, online constructing...
 
 	// session related
@@ -35,9 +38,10 @@ type Session struct {
 	KickOut  bool // flag for player is kicked out
 
 	// time related
-	ConnectTime    time.Time // tcp connection establish time, in millsecond(ms)
-	LastPacketTime int64     // last packet arrive time, in seconds(s)
-	LastFlushTime  int64     // last flush to db time, in seconds(s)
-	Dirty          bool      // mark the data as dirty
-	OpCount        int       // num of operations since last sync
+	ConnectTime    time.Time        // tcp connection establish time, in millsecond(ms)
+	LastPacketTime int64            // last packet arrive time, in seconds(s)
+	LastFlushTime  int64            // last flush to db time, in seconds(s)
+	Dirty          bool             // mark the data as dirty
+	OpCount        int              // num of operations since last sync
+	LatencySamples *samples.Samples // 网络延迟样本
 }

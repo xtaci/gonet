@@ -30,7 +30,7 @@ func UserRequestProxy(sess *Session, p []byte) []byte {
 	if sess.LoggedIn {
 		server_elapsed := now.Sub(sess.ConnectTime).Nanoseconds() / 1000
 		diff := int(server_elapsed - int64(client_elapsed))
-		sess.User.LatencySamples.Add(diff)
+		sess.LatencySamples.G.Add(diff)
 	}
 
 	// read protocol id

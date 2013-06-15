@@ -10,9 +10,7 @@ import (
 
 import (
 	"cfg"
-	"db/data_tbl"
 	"misc/timer"
-	"types/estates"
 )
 
 //------------------------------------------------ 一个玩家对应一个
@@ -76,7 +74,7 @@ func _writer() {
 		c := StatsCollection()
 		for userid, record := range snapshot {
 			if record != nil {
-				summary := _create_summary(userid, record)
+				summary := _archive(userid, record)
 				c.Upsert(bson.M{"userid": userid}, summary)
 			}
 		}
@@ -112,20 +110,6 @@ func Collect(userid int32, obj *StatsObject) {
 		record._stats = make([]*StatsObject, 0, 512)
 	}
 	record._stats = append(record._stats, obj)
-}
-
-//------------------------------------------------ 创建统计报表
-func _create_summary(userid int32, record *Record) *Summary {
-	_drop_expired(record)
-	// TODO: create a summary report within last 24-hours
-	record.Lock()
-	defer record.Unlock()
-
-	sum := &Summary{}
-	manager := &estates.Manager{}
-	data_tbl.Get(estates.COLLECTION, userid, manager)
-
-	return sum
 }
 
 //------------------------------------------------ 丢弃过期统计数据

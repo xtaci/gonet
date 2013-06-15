@@ -50,14 +50,14 @@ func init() {
 	}
 }
 
-func _int64_ip(ip net.IP) int64 {
-	idx := 0
-	if len(ip) > 4 {
-		idx = 12
+func _int64_ip(_ip net.IP) int64 {
+	ip := _ip.To4()
+	if ip != nil {
+		ipv4 := uint32(ip[0])<<24 | uint32(ip[1])<<16 | uint32(ip[2])<<8 | uint32(ip[3])
+		return int64(ipv4)
 	}
 
-	ipv4 := uint32(ip[0+idx])<<24 | uint32(ip[1+idx])<<16 | uint32(ip[2+idx])<<8 | uint32(ip[3+idx])
-	return int64(ipv4)
+	return 0
 }
 
 //------------------------------------------------ Get Country Code

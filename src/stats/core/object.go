@@ -2,6 +2,8 @@ package core
 
 import (
 	"encoding/json"
+	. "types"
+	"types/estates"
 )
 
 const (
@@ -12,28 +14,22 @@ const (
 	TYPE_CHAT   // 发送一次聊天
 	TYPE_EMAIL  // 发送一次邮件
 
-	TYPE_PVP // 发生了一次PVP
-	TYPE_PVE // 发生了一次PVE
+	// 战斗
+	TYPE_PVP        // 发生了一次PVP
+	TYPE_PVE        // 发生了一次PVE
+	TYPE_HERO_FIGHT //英雄出战一次
 
 	// 军队
-	TYPE_TRAIN_SOLIDER // 训练完成一个小兵, Value为(兵种:数量）
-	TYPE_TRAIN_HERO    // 训练完成一个英雄, Value为(兵种:数量）
-	TYPE_HERO_FIGHT    //英雄出战一次
+	TYPE_TRAIN // 训练完成一个军队单位, Property 为(兵种:数量）
 
 	// 生产
-	TYPE_PRODUCT_NATURAL // 一次确认的自然产出
-	TYPE_PRODUCE_PVE     // 一次PVE 资源产出
-	TYPE_PRODUCE_PVP     // 一次PVP资源产出
+	TYPE_PRODUCT // 确认一次产出
 
-	// 消耗
-	TYPE_CONSUME_UPGRADE // 一次升级消耗
-	TYPE_CONSUME_TRAIN   // 一次训练消耗
-	TYPE_CONSUME_EQUIP   //  一次强化装备消耗
-	TYPE_CONSUME_SEARCH  //  一次搜寻对手消耗
-	TYPE_LOST_RESOURCE   // 一次资源损失
+	// 一次资源损失
+	TYPE_LOST_RESOURCE
 
-	// 宝石
-	TYPE_CONSUME_GEM // 一次宝石消耗
+	// GEM消耗
+	TYPE_CONSUME_GEM
 )
 
 type StatsObject struct {
@@ -43,13 +39,15 @@ type StatsObject struct {
 	// TODO: add fields
 }
 
-type Summary struct {
+type Archive struct {
 	UserId    int32
 	Timestamp int64
-	// TODO: summary fields
+	Fields    map[string]string
+	User      User
+	Estates   estates.Manager
 }
 
-func (sum *Summary) Marshal() []byte {
-	json_val, _ := json.Marshal(sum)
+func (archive *Archive) Marshal() []byte {
+	json_val, _ := json.Marshal(archive)
 	return json_val
 }
