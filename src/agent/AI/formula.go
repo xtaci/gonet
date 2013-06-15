@@ -1,6 +1,7 @@
 package AI
 
 import (
+	"math/rand"
 	"time"
 )
 
@@ -17,4 +18,9 @@ func SP(base, max int, t0 int64, rate float32) int {
 	}
 
 	return quantity
+}
+
+//------------------------------------------------ 随机概率丢骰子
+func Dice(probability float32) bool {
+	return rand.Float32() < probability
 }
