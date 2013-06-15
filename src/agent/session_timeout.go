@@ -19,6 +19,7 @@ func session_timeout(sess *Session) bool {
 		timeout, _ = strconv.Atoi(config["session_timeout"])
 	}
 
+	// compare current with last packet arrival time
 	if time.Now().Unix()-sess.LastPacketTime > int64(timeout) {
 		log.Printf("timeout: user %v, connected at: %v\n", sess.User.Id, sess.ConnectTime)
 		return true

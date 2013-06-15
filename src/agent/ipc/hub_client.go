@@ -167,7 +167,8 @@ func _call(data []byte) (ret []byte) {
 	select {
 	case msg := <-ACK:
 		return msg
-	case _ = <-time.After(10 * time.Second):
+	case <-time.After(10 * time.Second):
+		log.Println("HUB is not responding...")
 	}
 
 	return nil

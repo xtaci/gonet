@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strconv"
 	"time"
 )
@@ -25,7 +24,7 @@ func timer_work(sess *Session) {
 	config := cfg.Get()
 	ivl, _ := strconv.Atoi(config["flush_interval"])
 	if sess.Dirty && time.Now().Unix()-sess.LastFlushTime > int64(ivl) {
-		fmt.Println("TODO: flush all to db")
+		// 刷入数据到数据库
 		flag1 := user_tbl.Set(&sess.User)
 		flag2 := data_tbl.Set(estates.COLLECTION, &sess.Estates)
 

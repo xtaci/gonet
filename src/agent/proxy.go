@@ -26,6 +26,7 @@ func UserRequestProxy(sess *Session, p []byte) []byte {
 		return nil
 	}
 
+	// sampling latencies for cheat detection
 	if sess.LoggedIn {
 		server_elapsed := now.Sub(sess.ConnectTime).Nanoseconds() / 1000
 		diff := int(server_elapsed - int64(client_elapsed))
@@ -38,8 +39,7 @@ func UserRequestProxy(sess *Session, p []byte) []byte {
 		log.Println("read protocol error")
 	}
 
-	log.Printf("code:%v,user:%v\n", b, sess.User.Id)
-
+	//log.Printf("code:%v,user:%v\n", b, sess.User.Id)
 	handle := protos.ProtoHandler[b]
 	if handle != nil {
 		ret := handle(sess, reader)
