@@ -2,6 +2,7 @@ package main
 
 import (
 	"agent/ipc"
+	"encoding/json"
 	"testing"
 	. "types"
 )
@@ -24,4 +25,9 @@ func TestIPC(t *testing.T) {
 	IPCRequestProxy(&sess2, &obj)
 	obj = <-sess1.MQ
 	IPCRequestProxy(&sess1, &obj)
+	var str string
+	json.Unmarshal(obj.Object, &str)
+	if str != "ABC" {
+		t.Fatal(str)
+	}
 }
