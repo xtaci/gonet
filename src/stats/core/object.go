@@ -36,15 +36,14 @@ type StatsObject struct {
 	Type      int32
 	Property  map[string]string
 	Timestamp int64
-	// TODO: add fields
 }
 
 type Archive struct {
 	UserId    int32
 	Timestamp int64
 	Fields    map[string]string
-	User      User
-	Estates   estates.Manager
+	User      *User
+	Estates   *estates.Manager
 }
 
 func (archive *Archive) Marshal() []byte {
