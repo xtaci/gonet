@@ -31,37 +31,29 @@ func HubAgent(incoming chan []byte, conn net.Conn) {
 	// output buffer
 	output := make(chan []byte, MAXCHAN)
 
-	protos.ServerLock.Lock()
-	protos.Servers[hostid] = forward // 转发消息队列
-	protos.ServerLock.Unlock()
-
+	protos.AddServer(hostid, forward)
 	log.Printf("server id:%v connected\n", hostid)
 
 	go _write_routine(output, conn)
 
 	defer func() {
-		protos.ServerLock.Lock()
-		delete(protos.Servers, hostid)
-		protos.ServerLock.Unlock()
-
+		protos.RemoveServer(hostid)
 		close(forward)
 		close(output)
 
 		log.Printf("server id:%v disconnected\n", hostid)
 	}()
 
-	// HUB只处理两类消息，来自GS的，和转发来自其他GS的IPC消息
-	// 转发IPC消息时,seqid为0,GS检查如果seqid为0，则为forward消息
 	for {
 		select {
-		case msg, ok := <-incoming:
+		case msg, ok := <-incoming: // from hub
 			if !ok {
 				return
 			}
 
 			reader := packet.Reader(msg)
 			go protos.HandleRequest(hostid, reader, output)
-		case msg := <-forward:
+		case msg := <-forward: // send forward packet
 			SendChan(0, msg, output)
 		}
 	}

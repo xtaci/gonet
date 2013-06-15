@@ -17,12 +17,30 @@ import (
 
 var (
 	// 各个服务器的Forward消息队列
-	Servers    map[int32]chan []byte
-	ServerLock sync.RWMutex
+	_servers    map[int32]chan []byte
+	_serverlock sync.RWMutex
 )
 
+func AddServer(hostid int32, forward chan []byte) {
+	_serverlock.Lock()
+	defer _serverlock.Unlock()
+	_servers[hostid] = forward
+}
+
+func RemoveServer(hostid int32) {
+	_serverlock.Lock()
+	defer _serverlock.Unlock()
+	delete(_servers, hostid)
+}
+
+func ForwardChan(hostid int32) chan []byte {
+	_serverlock.RLock()
+	defer _serverlock.RUnlock()
+	return _servers[hostid]
+}
+
 func init() {
-	Servers = make(map[int32]chan []byte)
+	_servers = make(map[int32]chan []byte)
 }
 
 func HandleRequest(hostid int32, reader *packet.Packet, output chan []byte) {
@@ -65,10 +83,7 @@ func P_login_req(hostid int32, pkt *packet.Packet) []byte {
 		// 登陆后，将联盟消息push给玩家
 		clan := core.Clan(tbl.F_clan)
 		if clan != nil {
-			ServerLock.RLock()
-			ch := Servers[hostid]
-			ServerLock.RUnlock()
-
+			ch := ForwardChan(hostid)
 			objs := clan.Recv(tbl.F_clanmsgmax + 1)
 			for _, v := range objs {
 				ch <- v.Json()
@@ -178,13 +193,14 @@ func P_forward_req(hostid int32, pkt *packet.Packet) []byte {
 	case core.ON_PROT, core.ON_FREE:
 		host := core.Host(tbl.F_dest_id)
 
-		ServerLock.RLock()
-		ch := Servers[host]
-		ServerLock.RUnlock()
+		ch := ForwardChan(host)
 
-		ch <- tbl.F_IPC
+		if ch != nil {
+			ch <- tbl.F_IPC
+		} else {
+			forward_tbl.Push(tbl.F_dest_id, tbl.F_IPC)
+		}
 	default:
-		// send to db
 		forward_tbl.Push(tbl.F_dest_id, tbl.F_IPC)
 	}
 
@@ -224,11 +240,10 @@ func P_forwardclan_req(hostid int32, pkt *packet.Packet) (r []byte) {
 		case core.ON_PROT, core.ON_FREE:
 			host := core.Host(user_id)
 
-			ServerLock.RLock()
-			ch := Servers[host]
-			ServerLock.RUnlock()
-
-			ch <- tbl.F_IPC
+			ch := ForwardChan(host)
+			if ch != nil {
+				ch <- tbl.F_IPC
+			}
 		}
 	}
 
