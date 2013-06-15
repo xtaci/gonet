@@ -14,6 +14,7 @@ import (
 
 import (
 	"cfg"
+	"helper"
 	"misc/packet"
 	. "types"
 )
@@ -37,7 +38,7 @@ func DialHub() {
 		os.Exit(-1)
 	}
 
-	conn.SetNoDelay(false)
+	helper.SetConnParam(conn)
 	_conn = conn
 
 	log.Println("HUB connected")

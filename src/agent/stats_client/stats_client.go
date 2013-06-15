@@ -13,6 +13,7 @@ import (
 
 import (
 	"cfg"
+	"helper"
 	"misc/packet"
 )
 
@@ -35,7 +36,7 @@ func DialStats() {
 		os.Exit(-1)
 	}
 
-	conn.SetNoDelay(false)
+	helper.SetConnParam(conn)
 	_conn = conn
 
 	log.Println("Stats Service Connected")
