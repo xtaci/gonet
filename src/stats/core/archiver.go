@@ -16,7 +16,13 @@ func _archive(userid int32, collector *Collector) *Archive {
 	archive := &Archive{}
 	archive.Fields = make(map[string]float32)
 
-	//for
+	for _, stat := range collector._stats {
+		switch stat.Type {
+		case TYPE_SUMMABLE:
+			archive.Fields[stat.Key] += stat.Value
+		case TYPE_CONTINUOUS:
+		}
+	}
 
 	// snapshot of player data
 	data_tbl.Get(estates.COLLECTION, userid, &archive.Estates)
