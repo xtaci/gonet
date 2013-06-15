@@ -11,11 +11,12 @@ import (
 )
 
 const (
-	IPC_PING = int16(1)
+	UNKNOWN = int16(iota)
+	SERVICE_PING
 )
 
 var IPCHandler map[int16]func(*Session, *IPCObject) = map[int16]func(*Session, *IPCObject){
-	IPC_PING: IPC_ping,
+	SERVICE_PING: IPC_ping,
 }
 
 //------------------------------------------------ p2p send from src_id to dest_id

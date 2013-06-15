@@ -32,12 +32,10 @@ func TestAgent(t *testing.T) {
 	writer.WriteU32(0)
 	writer.WriteRawBytes(pkt)
 
-	fmt.Println(writer.Data())
 	conn.Write(writer.Data())
 
 	ret := make([]byte, 100)
 	conn.Read(ret)
-	fmt.Println(ret)
 }
 
 func BenchmarkAgent(b *testing.B) {
