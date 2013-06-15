@@ -8,6 +8,7 @@ import (
 )
 
 import (
+	"encoding/binary"
 	"io"
 	"log"
 	"net"
@@ -76,7 +77,7 @@ func handleClient(conn net.Conn) {
 		}
 
 		// data
-		size := int(header[0])<<8 | int(header[1])
+		size := binary.BigEndian.Uint16(header)
 		data := make([]byte, size)
 		n, err = io.ReadFull(conn, data)
 

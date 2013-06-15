@@ -1,6 +1,7 @@
 package stats_client
 
 import (
+	"encoding/binary"
 	"io"
 	"log"
 	"net"
@@ -67,13 +68,9 @@ func StatsReceiver(conn net.Conn) {
 			break
 		}
 
-		seqval := uint64(0)
-		for k, v := range seq_id {
-			seqval |= uint64(v) << uint((7-k)*8)
-		}
-
-		// data
-		size := int(header[0])<<8 | int(header[1]) - len(seq_id)
+		// read big-endian header
+		seqval := binary.BigEndian.Uint64(seq_id)
+		size := binary.BigEndian.Uint16(header) - 8
 		data := make([]byte, size)
 		n, err = io.ReadFull(conn, data)
 
