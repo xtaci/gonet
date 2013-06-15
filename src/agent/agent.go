@@ -45,8 +45,6 @@ func StartAgent(in chan []byte, conn net.Conn) {
 	// cleanup work
 	defer func() {
 		close_work(&sess)
-		close(std_timer)
-		close(sess.MQ)
 		bufctrl <- false
 	}()
 
@@ -72,7 +70,7 @@ func StartAgent(in chan []byte, conn net.Conn) {
 			}
 			IPCRequestProxy(&sess, &msg)
 
-		case _ = <-std_timer:
+		case <-std_timer:
 			timer_work(&sess)
 			if session_timeout(&sess) {
 				return
