@@ -15,7 +15,7 @@ const (
 	SERVICE_PING
 )
 
-var IPCHandler map[int16]func(*Session, *IPCObject) = map[int16]func(*Session, *IPCObject){
+var IPCHandler map[int16]func(*Session, *IPCObject) bool = map[int16]func(*Session, *IPCObject) bool{
 	SERVICE_PING: IPC_ping,
 }
 

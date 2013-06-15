@@ -55,7 +55,7 @@ func UserRequestProxy(sess *Session, p []byte) []byte {
 func IPCRequestProxy(sess *Session, p *IPCObject) {
 	defer PrintPanicStack()
 	handle := ipc.IPCHandler[p.Service]
-	log.Printf("ipc:%v,user:%v\n", p.Service, sess.User.Id)
+	//	log.Printf("ipc:%v,user:%v\n", p.Service, sess.User.Id)
 
 	if handle != nil {
 		handle(sess, p)

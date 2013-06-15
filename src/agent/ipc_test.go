@@ -2,10 +2,19 @@ package main
 
 import (
 	"agent/ipc"
-	"encoding/json"
+	"math/rand"
+	"sync"
 	"testing"
 	. "types"
 )
+
+func _simple_receiver(sess *Session, wg *sync.WaitGroup) {
+	for {
+		obj := <-sess.MQ
+		IPCRequestProxy(sess, &obj)
+		wg.Done()
+	}
+}
 
 func TestIPC(t *testing.T) {
 	// fake 2 user
@@ -16,18 +25,38 @@ func TestIPC(t *testing.T) {
 	sess2.User.Id = 2
 	sess2.MQ = make(chan IPCObject, 10)
 
+	wg := &sync.WaitGroup{}
+	wg.Add(2)
+	go _simple_receiver(&sess1, wg)
+	go _simple_receiver(&sess2, wg)
+
 	ipc.RegisterOnline(&sess1, sess1.User.Id)
 	ipc.RegisterOnline(&sess2, sess2.User.Id)
 
-	ipc.Send(1, 2, ipc.SERVICE_PING, "ABC")
-
-	obj := <-sess2.MQ
-	IPCRequestProxy(&sess2, &obj)
-	obj = <-sess1.MQ
-	IPCRequestProxy(&sess1, &obj)
-	var str string
-	json.Unmarshal(obj.Object, &str)
-	if str != "ABC" {
-		t.Fatal(str)
+	if !ipc.Send(1, 2, ipc.SERVICE_PING, "ABC") {
+		t.Fatal("ipc.Send failed")
 	}
+	wg.Wait()
+}
+
+func BenchmarkIPC(b *testing.B) {
+	wg := &sync.WaitGroup{}
+
+	for i := 1; i <= b.N; i++ {
+		var sess Session
+		sess.User.Id = int32(i)
+		sess.MQ = make(chan IPCObject, 10)
+		ipc.RegisterOnline(&sess, sess.User.Id)
+		go _simple_receiver(&sess, wg)
+	}
+
+	for i := 1; i <= b.N; i++ {
+		src := rand.Int31n(int32(b.N)) + 1
+		dest := rand.Int31n(int32(b.N)) + 1
+		if src != dest {
+			wg.Add(2)
+			ipc.Send(src, dest, ipc.SERVICE_PING, "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+		}
+	}
+	wg.Wait()
 }
