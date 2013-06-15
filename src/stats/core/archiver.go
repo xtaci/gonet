@@ -7,14 +7,16 @@ import (
 )
 
 //------------------------------------------------ 归档玩家数据
-func _archive(userid int32, record *Record) *Archive {
-	_drop_expired(record)
+func _archive(userid int32, collector *Collector) *Archive {
+	_drop_expired(collector)
 	// TODO: create a summary report within last 24-hours
-	record.Lock()
-	defer record.Unlock()
+	collector.Lock()
+	defer collector.Unlock()
 
 	archive := &Archive{}
-	archive.Fields = make(map[string]string)
+	archive.Fields = make(map[string]float32)
+
+	//for
 
 	// snapshot of player data
 	data_tbl.Get(estates.COLLECTION, userid, &archive.Estates)

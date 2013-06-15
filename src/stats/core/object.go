@@ -2,6 +2,10 @@ package core
 
 import (
 	"encoding/json"
+	"sync"
+)
+
+import (
 	. "types"
 	"types/estates"
 )
@@ -23,7 +27,8 @@ const (
 	TYPE_TRAIN // 训练完成一个军队单位, Property 为(兵种:数量）
 
 	// 生产
-	TYPE_PRODUCT // 确认一次产出
+	TYPE_PRODUCT     // 确认一次产出
+	TYPE_SYS_PRODUCT // 确认一次系统产出
 
 	// 一次资源损失
 	TYPE_LOST_RESOURCE
@@ -34,14 +39,28 @@ const (
 
 type StatsObject struct {
 	Type      int32
-	Property  map[string]string
+	Property  map[string]float32
 	Timestamp int64
+}
+
+//------------------------------------------------ 一个玩家对应一个
+type Collector struct {
+	_stats []*StatsObject
+	_lock  sync.Mutex
+}
+
+func (r *Collector) Lock() {
+	r._lock.Lock()
+}
+
+func (r *Collector) Unlock() {
+	r._lock.Unlock()
 }
 
 type Archive struct {
 	UserId    int32
 	Timestamp int64
-	Fields    map[string]string
+	Fields    map[string]float32
 	User      User
 	Estates   estates.Manager
 }

@@ -13,23 +13,9 @@ import (
 	"misc/timer"
 )
 
-//------------------------------------------------ 一个玩家对应一个
-type Record struct {
-	_stats []*StatsObject
-	_lock  sync.Mutex
-}
-
-func (r *Record) Lock() {
-	r._lock.Lock()
-}
-
-func (r *Record) Unlock() {
-	r._lock.Unlock()
-}
-
 //------------------------------------------------ variables
 var (
-	_all      map[int32]*Record
+	_all      map[int32]*Collector
 	_all_lock sync.RWMutex
 	CH        chan int32
 )
@@ -39,7 +25,7 @@ const (
 )
 
 func init() {
-	_all = make(map[int32]*Record)
+	_all = make(map[int32]*Collector)
 	CH = make(chan int32, 5)
 	go _writer()
 
@@ -64,7 +50,7 @@ func _writer() {
 
 		// 复制map已进行费事操作,不阻塞collect
 		_all_lock.Lock()
-		snapshot := make(map[int32]*Record)
+		snapshot := make(map[int32]*Collector)
 		for k, v := range _all {
 			snapshot[k] = v
 		}
@@ -72,9 +58,9 @@ func _writer() {
 
 		// 创建每个玩家的报表
 		c := StatsCollection()
-		for userid, record := range snapshot {
-			if record != nil {
-				summary := _archive(userid, record)
+		for userid, collector := range snapshot {
+			if collector != nil {
+				summary := _archive(userid, collector)
 				c.Upsert(bson.M{"userid": userid}, summary)
 			}
 		}
@@ -95,39 +81,19 @@ func _writer() {
 func Collect(userid int32, obj *StatsObject) {
 	// 获得记录,为空则创建
 	_all_lock.Lock()
-	record := _all[userid]
-	if record == nil {
-		record = &Record{}
-		_all[userid] = record
+	collector := _all[userid]
+	if collector == nil {
+		collector = &Collector{}
+		_all[userid] = collector
 	}
 	_all_lock.Unlock()
-	_drop_expired(record)
+	_drop_expired(collector)
 
 	// 放入新的消息
-	record.Lock()
-	defer record.Unlock()
-	if record._stats == nil {
-		record._stats = make([]*StatsObject, 0, 512)
+	collector.Lock()
+	defer collector.Unlock()
+	if collector._stats == nil {
+		collector._stats = make([]*StatsObject, 0, 512)
 	}
-	record._stats = append(record._stats, obj)
-}
-
-//------------------------------------------------ 丢弃过期统计数据
-func _drop_expired(record *Record) {
-	record.Lock()
-	defer record.Unlock()
-
-	expire_point := time.Now().Unix() - DAY_SEC
-	count := 0
-	for _, v := range record._stats {
-		if v.Timestamp < expire_point {
-			count++
-		} else {
-			break
-		}
-	}
-
-	if count > 0 {
-		record._stats = record._stats[count:]
-	}
+	collector._stats = append(collector._stats, obj)
 }
