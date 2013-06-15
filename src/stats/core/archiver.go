@@ -17,8 +17,8 @@ func _archive(userid int32, record *Record) *Archive {
 	archive.Fields = make(map[string]string)
 
 	// snapshot of player data
-	data_tbl.Get(estates.COLLECTION, userid, archive.Estates)
-	archive.User = user_tbl.Get(userid)
+	data_tbl.Get(estates.COLLECTION, userid, &archive.Estates)
+	archive.User = *user_tbl.Get(userid)
 
 	return archive
 }

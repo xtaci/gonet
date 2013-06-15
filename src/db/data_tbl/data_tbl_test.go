@@ -16,10 +16,9 @@ func TestEstate(t *testing.T) {
 	fmt.Println("Set")
 	Set(estates.COLLECTION, data)
 
-	fmt.Println("Get")
-	value := &estates.Manager{}
-	Get(estates.COLLECTION, 1, value)
-	fmt.Println("VALUE:", value)
+	var value *estates.Manager
+	Get(estates.COLLECTION, 1, &value)
+	fmt.Println("Get:", value)
 
 	var all []estates.Manager
 	GetAll(estates.COLLECTION, &all)

@@ -11,7 +11,7 @@ import (
 	. "db"
 )
 
-//------------------------------------------------ pass-in the POINTER!!!!
+//------------------------------------------------ pass-in *ptr
 func Set(collection string, data interface{}) bool {
 	config := cfg.Get()
 	c := Mongo.DB(config["mongo_db"]).C(collection)
@@ -41,7 +41,7 @@ func Set(collection string, data interface{}) bool {
 	return true
 }
 
-//------------------------------------------------ pass-in the POINTER!!!!!
+//------------------------------------------------ pass-in  *ptr or **ptr
 func Get(collection string, user_id int32, data interface{}) bool {
 	config := cfg.Get()
 	c := Mongo.DB(config["mongo_db"]).C(collection)
@@ -55,7 +55,7 @@ func Get(collection string, user_id int32, data interface{}) bool {
 	return true
 }
 
-//------------------------------------------------ pass-in the POINTER!!!!!
+//------------------------------------------------ pass-in *[]slice
 func GetAll(collection string, all interface{}) bool {
 	config := cfg.Get()
 	c := Mongo.DB(config["mongo_db"]).C(collection)
