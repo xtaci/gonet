@@ -11,12 +11,17 @@ import (
 	. "types"
 )
 
+const (
+	DEFAULT_TIMEOUT = 30
+)
+
 //----------------------------------------------- session timeout
 func session_timeout(sess *Session) bool {
 	config := cfg.Get()
-	timeout := 30 // sec
-	if config["session_timeout"] != "" {
-		timeout, _ = strconv.Atoi(config["session_timeout"])
+	timeout, err := strconv.Atoi(config["session_timeout"])
+	if err != nil {
+		log.Println("cannot parse session_timeout from config", err)
+		timeout = DEFAULT_TIMEOUT
 	}
 
 	// compare current with last packet arrival time

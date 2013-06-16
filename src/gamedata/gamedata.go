@@ -124,7 +124,10 @@ func GetInt(tblname string, rowname string, fieldname string) int32 {
 		return ^int32(0) // return MAX INT
 	}
 
-	v, _ := strconv.Atoi(val)
+	v, err := strconv.Atoi(val)
+	if err != nil {
+		log.Println("cannot parse integer from gamedata", err)
+	}
 
 	return int32(v)
 }
@@ -137,7 +140,7 @@ func GetFloat(tblname string, rowname string, fieldname string) float32 {
 
 	f, err := strconv.ParseFloat(val, 32)
 	if err != nil {
-		log.Println(GetFloat, err)
+		log.Println("cannot parse float from gamedata", err)
 	}
 
 	return float32(f)

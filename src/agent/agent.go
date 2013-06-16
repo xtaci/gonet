@@ -15,7 +15,8 @@ import (
 )
 
 const (
-	DEFAULT_MQ_SIZE = 128
+	DEFAULT_MQ_SIZE   = 128
+	DEFAULT_FLUSH_OPS = 10
 )
 
 func init() {
@@ -56,8 +57,12 @@ func StartAgent(in chan []byte, conn net.Conn) {
 	buf := NewBuffer(conn, bufctrl)
 	go buf.Start()
 
-	// max #operartion before flush
-	flush_ops, _ := strconv.Atoi(config["flush_ops"])
+	// max # of operartions allowed before flushing
+	flush_ops, err := strconv.Atoi(config["flush_ops"])
+	if err != nil {
+		log.Println("cannot parse flush_ops from config", err)
+		flush_ops = DEFAULT_FLUSH_OPS
+	}
 
 	// cleanup work
 	defer func() {

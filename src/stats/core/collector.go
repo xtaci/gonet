@@ -30,7 +30,10 @@ func init() {
 	go _writer()
 
 	config := cfg.Get()
-	trigger, _ := strconv.Atoi(config["collect_time"])
+	trigger, err := strconv.Atoi(config["collect_time"])
+	if err != nil {
+		log.Println("cannot parse collect_time from config", err)
+	}
 
 	// 寻找最近的触发点
 	now := time.Now().Unix()
@@ -71,7 +74,11 @@ func _writer() {
 		// 明天同一时刻再见
 		passed := now % DAY_SEC
 		config := cfg.Get()
-		trigger, _ := strconv.Atoi(config["collect_time"])
+		trigger, err := strconv.Atoi(config["collect_time"])
+		if err != nil {
+			log.Println("cannot parse collect_time from config", err)
+		}
+
 		timer.Add(-1, now-passed+int64(trigger)+DAY_SEC, CH)
 		snapshot = nil
 	}

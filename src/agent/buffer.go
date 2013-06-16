@@ -71,10 +71,11 @@ func (buf *Buffer) raw_send(data []byte) {
 
 //------------------------------------------------ create a new write buffer
 func NewBuffer(conn net.Conn, ctrl chan bool) *Buffer {
-	max := DEFAULT_QUEUE_SIZE
 	config := cfg.Get()
-	if config["packet_queue"] != "" {
-		max, _ = strconv.Atoi(config["packet_queue"])
+	max, err := strconv.Atoi(config["packet_queue"])
+	if err != nil {
+		max = DEFAULT_QUEUE_SIZE
+		log.Println("cannot parse packet_queue from config", err)
 	}
 
 	buf := Buffer{conn: conn}
