@@ -43,13 +43,8 @@ func (buf *Buffer) Start() {
 
 	for {
 		select {
-		case data, ok := <-buf.pending:
-			if !ok {
-				buf.conn.Close()
-				return
-			} else {
-				buf.raw_send(data)
-			}
+		case data := <-buf.pending:
+			buf.raw_send(data)
 		case _, ok := <-buf.ctrl:
 			if !ok {
 				return
