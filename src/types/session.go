@@ -41,7 +41,6 @@ type Session struct {
 	ConnectTime    time.Time        // tcp connection establish time, in millsecond(ms)
 	LastPacketTime int64            // last packet arrive time, in seconds(s)
 	LastFlushTime  int64            // last flush to db time, in seconds(s)
-	Dirty          bool             // mark the data as dirty
 	OpCount        int              // num of operations since last sync
 	LatencySamples *samples.Samples // 网络延迟样本
 }

@@ -30,7 +30,7 @@ func timer_work(sess *Session) {
 		ivl = DEFAULT_FLUSH_INTERVAL
 	}
 
-	if sess.Dirty && time.Now().Unix()-sess.LastFlushTime > int64(ivl) {
+	if sess.OpCount > 0 && time.Now().Unix()-sess.LastFlushTime > int64(ivl) {
 		// 刷入数据到数据库
 		_flush(sess)
 	}
