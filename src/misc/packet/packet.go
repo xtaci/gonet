@@ -1,7 +1,9 @@
 package packet
 
-import "errors"
-import "math"
+import (
+	"errors"
+	"math"
+)
 
 type Packet struct {
 	pos  uint
