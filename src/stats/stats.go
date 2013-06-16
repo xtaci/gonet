@@ -83,7 +83,7 @@ func handleClient(conn net.Conn) {
 		if n == 0 && err == io.EOF {
 			break
 		} else if err != nil {
-			log.Println("error receving header:", err)
+			log.Println("error receiving header:", err)
 			break
 		}
 
@@ -93,7 +93,7 @@ func handleClient(conn net.Conn) {
 		n, err = io.ReadFull(conn, data)
 
 		if err != nil {
-			log.Println("error receving msg:", err)
+			log.Println("error receiving msg:", err)
 			break
 		}
 		ch <- data

@@ -58,7 +58,7 @@ func HubReceiver(conn net.Conn) {
 		if n == 0 && err == io.EOF {
 			break
 		} else if err != nil {
-			log.Println("error receving header:", err)
+			log.Println("error receiving header:", err)
 			break
 		}
 
@@ -67,7 +67,7 @@ func HubReceiver(conn net.Conn) {
 		if n == 0 && err == io.EOF {
 			break
 		} else if err != nil {
-			log.Println("error receving seq_id:", err)
+			log.Println("error receiving seq_id:", err)
 			break
 		}
 
@@ -78,7 +78,7 @@ func HubReceiver(conn net.Conn) {
 		n, err = io.ReadFull(conn, data)
 
 		if err != nil {
-			log.Println("error receving msg:", err)
+			log.Println("error receiving msg:", err)
 			break
 		}
 
