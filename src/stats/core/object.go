@@ -11,9 +11,8 @@ import (
 )
 
 const (
-	UNKNOWN         = int32(iota)
-	TYPE_SUMMABLE   // summable
-	TYPE_CONTINUOUS // Continuous production type
+	UNKNOWN  = int32(iota)
+	TYPE_SUM // sum the result
 )
 
 type StatsObject struct {
@@ -41,7 +40,7 @@ type Archive struct {
 	UserId    int32
 	Timestamp int64
 	Fields    map[string]float32
-	User      User
+	User      *User
 	Estates   estates.Manager
 }
 

@@ -29,7 +29,7 @@ type Session struct {
 	IP net.IP
 	MQ chan IPCObject // Player's Internal Message Queue
 	// user data
-	User    User
+	User    *User
 	Estates *estates.Manager
 	Grid    *grid.Grid // Building's bitmap, online constructing...
 

@@ -25,7 +25,7 @@ func timer_work(sess *Session) {
 	ivl, _ := strconv.Atoi(config["flush_interval"])
 	if sess.Dirty && time.Now().Unix()-sess.LastFlushTime > int64(ivl) {
 		// 刷入数据到数据库
-		flag1 := user_tbl.Set(&sess.User)
+		flag1 := user_tbl.Set(sess.User)
 		flag2 := data_tbl.Set(estates.COLLECTION, &sess.Estates)
 
 		// 成功后才设置

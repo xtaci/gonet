@@ -19,10 +19,10 @@ func _simple_receiver(sess *Session, wg *sync.WaitGroup) {
 func TestIPC(t *testing.T) {
 	// fake 2 user
 	var sess1 Session
-	sess1.User.Id = 1
+	sess1.User = &User{Id: 1}
 	sess1.MQ = make(chan IPCObject, 10)
 	var sess2 Session
-	sess2.User.Id = 2
+	sess2.User = &User{Id: 2}
 	sess2.MQ = make(chan IPCObject, 10)
 
 	wg := &sync.WaitGroup{}
@@ -44,7 +44,7 @@ func BenchmarkIPC(b *testing.B) {
 
 	for i := 1; i <= b.N; i++ {
 		var sess Session
-		sess.User.Id = int32(i)
+		sess.User = &User{Id: int32(i)}
 		sess.MQ = make(chan IPCObject, 10)
 		ipc.RegisterOnline(&sess, sess.User.Id)
 		go _simple_receiver(&sess, wg)

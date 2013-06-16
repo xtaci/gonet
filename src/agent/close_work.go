@@ -17,7 +17,7 @@ func close_work(sess *Session) {
 		close(sess.MQ)
 
 		// 持久化逻辑#3: 离线时，刷入数据库
-		user_tbl.Set(&sess.User)
+		user_tbl.Set(sess.User)
 		data_tbl.Set(estates.COLLECTION, &sess.Estates)
 		data_tbl.Set(samples.COLLECTION, &sess.LatencySamples)
 	}
