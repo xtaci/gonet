@@ -7,6 +7,7 @@ import (
 )
 
 import (
+	"cfg"
 	. "helper"
 	"hub/protos"
 	"misc/packet"
@@ -25,6 +26,16 @@ func init() {
 
 //---------------------------------------------------------- Hub processing
 func HubAgent(incoming chan []byte, conn net.Conn) {
+	config := cfg.Get()
+	if config["profile"] == "true" {
+		SetMemProfileRate(1)
+		defer func() {
+			GC()
+			DumpHeap()
+			PrintGCSummary()
+		}()
+	}
+
 	hostid := atomic.AddInt32(&_host_genid, 1)
 	// forward buffer
 	forward := make(chan []byte, MAXCHAN)

@@ -9,6 +9,7 @@ import (
 
 import (
 	"cfg"
+	"helper"
 	"misc/timer"
 	. "types"
 )
@@ -29,6 +30,16 @@ func StartAgent(in chan []byte, conn net.Conn) {
 		}
 	}()
 
+	config := cfg.Get()
+	if config["profile"] == "true" {
+		helper.SetMemProfileRate(1)
+		defer func() {
+			helper.GC()
+			helper.DumpHeap()
+			helper.PrintGCSummary()
+		}()
+	}
+
 	var sess Session
 	sess.IP = net.ParseIP(conn.RemoteAddr().String())
 	sess.MQ = make(chan IPCObject, DEFAULT_MQ_SIZE)
@@ -46,7 +57,6 @@ func StartAgent(in chan []byte, conn net.Conn) {
 	go buf.Start()
 
 	// max #operartion before flush
-	config := cfg.Get()
 	flush_ops, _ := strconv.Atoi(config["flush_ops"])
 
 	// cleanup work

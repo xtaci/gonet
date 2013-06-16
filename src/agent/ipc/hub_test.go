@@ -45,6 +45,12 @@ func TestLogin(t *testing.T) {
 	}
 }
 
+func BenchmarkLogin(b *testing.B) {
+	for i := 1; i <= b.N; i++ {
+		Login(int32(i))
+	}
+}
+
 func BenchmarkForward(b *testing.B) {
 	obj := &TMPObj{A: 10, B: 20, C: "test"}
 	for i := 0; i < b.N; i++ {

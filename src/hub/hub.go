@@ -10,6 +10,7 @@ import (
 
 import (
 	"cfg"
+	"helper"
 )
 
 const (
@@ -47,7 +48,7 @@ func HubStart() {
 		if err != nil {
 			continue
 		}
-		conn.SetNoDelay(false)
+		helper.SetConnParam(conn)
 		go handleClient(conn)
 	}
 }

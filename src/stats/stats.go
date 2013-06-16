@@ -10,6 +10,7 @@ import (
 
 import (
 	"cfg"
+	"helper"
 )
 
 const (
@@ -18,8 +19,17 @@ const (
 
 //----------------------------------------------- Stats Server start
 func StatsStart() {
-	// start logger
 	config := cfg.Get()
+	if config["profile"] == "true" {
+		helper.SetMemProfileRate(1)
+		defer func() {
+			helper.GC()
+			helper.DumpHeap()
+			helper.PrintGCSummary()
+		}()
+	}
+
+	// start logger
 	if config["stats_log"] != "" {
 		cfg.StartLogger(config["stats_log"])
 	}
@@ -46,7 +56,7 @@ func StatsStart() {
 		if err != nil {
 			continue
 		}
-		conn.SetNoDelay(false)
+		helper.SetConnParam(conn)
 		go handleClient(conn)
 	}
 }
