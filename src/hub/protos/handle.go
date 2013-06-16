@@ -4,47 +4,18 @@ import (
 	"encoding/json"
 	"log"
 	"runtime"
-	"sync"
 )
 
 import (
 	"db/forward_tbl"
-	. "helper"
+	"helper"
 	"hub/core"
 	"misc/packet"
 	. "types"
 )
 
-var (
-	// 各个服务器的Forward消息队列
-	_servers    map[int32]chan []byte
-	_serverlock sync.RWMutex
-)
-
-func AddServer(hostid int32, forward chan []byte) {
-	_serverlock.Lock()
-	defer _serverlock.Unlock()
-	_servers[hostid] = forward
-}
-
-func RemoveServer(hostid int32) {
-	_serverlock.Lock()
-	defer _serverlock.Unlock()
-	delete(_servers, hostid)
-}
-
-func ForwardChan(hostid int32) chan []byte {
-	_serverlock.RLock()
-	defer _serverlock.RUnlock()
-	return _servers[hostid]
-}
-
-func init() {
-	_servers = make(map[int32]chan []byte)
-}
-
 func HandleRequest(hostid int32, reader *packet.Packet, output chan []byte) {
-	defer PrintPanicStack()
+	defer helper.PrintPanicStack()
 
 	seqid, err := reader.ReadU64() // read seqid
 	if err != nil {
@@ -62,7 +33,7 @@ func HandleRequest(hostid int32, reader *packet.Packet, output chan []byte) {
 	if handle != nil {
 		ret := handle(hostid, reader)
 		if len(ret) != 0 {
-			SendChan(seqid, ret, output)
+			helper.SendChan(seqid, ret, output)
 		}
 	}
 }

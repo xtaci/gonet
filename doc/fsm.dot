@@ -13,5 +13,6 @@ digraph G {
 	ON_PROT->OFF_PROT [label="Logout"];
 	ON_PROT->ON_FREE [label="Free"];
 	ON_PROT->ON_FREE [label="Expire"];
-	ON_PROT->ON_PROT [label="Protect"];
+	ON_PROT->ON_PROT [label="Login/Protect"];
+	ON_FREE->ON_FREE [label="Login"];
 }

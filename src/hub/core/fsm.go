@@ -132,11 +132,11 @@ func Login(id, host int32) bool {
 		defer player.Unlock()
 
 		switch player.State {
-		case OFF_FREE:
+		case OFF_FREE, ON_FREE:
 			player.State = ON_FREE
 			player.Host = host
 			return true
-		case OFF_PROT:
+		case OFF_PROT, ON_PROT:
 			player.State = ON_PROT
 			player.Host = host
 			return true

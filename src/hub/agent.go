@@ -8,7 +8,7 @@ import (
 
 import (
 	"cfg"
-	. "helper"
+	"helper"
 	"hub/protos"
 	"misc/packet"
 )
@@ -28,11 +28,11 @@ func init() {
 func HubAgent(incoming chan []byte, conn net.Conn) {
 	config := cfg.Get()
 	if config["profile"] == "true" {
-		SetMemProfileRate(1)
+		helper.SetMemProfileRate(1)
 		defer func() {
-			GC()
-			DumpHeap()
-			PrintGCSummary()
+			helper.GC()
+			helper.DumpHeap()
+			helper.PrintGCSummary()
 		}()
 	}
 
@@ -43,7 +43,7 @@ func HubAgent(incoming chan []byte, conn net.Conn) {
 	output := make(chan []byte, MAXCHAN)
 
 	protos.AddServer(hostid, forward)
-	log.Printf("server id:%v connected\n", hostid)
+	log.Printf("game server [id:%v] connected\n", hostid)
 
 	go _write_routine(output, conn)
 
@@ -52,7 +52,7 @@ func HubAgent(incoming chan []byte, conn net.Conn) {
 		close(forward)
 		close(output)
 
-		log.Printf("server id:%v disconnected\n", hostid)
+		log.Printf("game server [id:%v] disconnected\n", hostid)
 	}()
 
 	for {
@@ -63,9 +63,9 @@ func HubAgent(incoming chan []byte, conn net.Conn) {
 			}
 
 			reader := packet.Reader(msg)
-			go protos.HandleRequest(hostid, reader, output)
+			protos.HandleRequest(hostid, reader, output)
 		case msg := <-forward: // send forward packet
-			SendChan(0, msg, output)
+			helper.SendChan(0, msg, output)
 		}
 	}
 
