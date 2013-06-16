@@ -50,8 +50,10 @@ func (buf *Buffer) Start() {
 			} else {
 				buf.raw_send(data)
 			}
-		case _ = <-buf.ctrl:
-			close(buf.pending)
+		case _, ok := <-buf.ctrl:
+			if !ok {
+				return
+			}
 		}
 	}
 }

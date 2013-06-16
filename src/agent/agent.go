@@ -67,7 +67,7 @@ func StartAgent(in chan []byte, conn net.Conn) {
 	// cleanup work
 	defer func() {
 		close_work(&sess)
-		bufctrl <- false
+		close(bufctrl)
 	}()
 
 	// the main message loop
