@@ -15,6 +15,10 @@ import (
 
 //------------------------------------------------ 登陆后的数据加载
 func LoginProc(sess *Session) bool {
+	if sess.User == nil {
+		return false
+	}
+
 	// 载入建筑表
 	if !data_tbl.Get(estates.COLLECTION, sess.User.Id, &sess.Estates) {
 		// 创建默认的建筑表
