@@ -95,7 +95,7 @@ func StartAgent(in chan []byte, conn net.Conn) {
 			timer.Add(1, time.Now().Unix()+1, std_timer)
 		}
 
-		// TODO: 持久化逻辑#1： 超过一定的操作数量，刷入数据库
+		// 持久化逻辑#1： 超过一定的操作数量，刷入数据库
 		if sess.OpCount > flush_ops {
 			_flush(&sess)
 		}
