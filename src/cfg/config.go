@@ -20,9 +20,6 @@ var (
 )
 
 func init() {
-	if !flag.Parsed() {
-		flag.Parse()
-	}
 	Reload()
 }
 

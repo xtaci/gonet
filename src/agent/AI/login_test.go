@@ -21,7 +21,13 @@ func TestLoginProc(t *testing.T) {
 }
 
 func BenchmarkLoginProc(b *testing.B) {
-	sess := &Session{}
-	sess.MQ = make(chan IPCObject, 100)
-	sess.User = &User{Id: 1}
+	for i := 1; i <= b.N; i++ {
+		sess := &Session{}
+		sess.MQ = make(chan IPCObject, 1)
+		sess.User = &User{Id: int32(i)}
+		LoginProc(sess)
+		user_tbl.Set(sess.User)
+		data_tbl.Set(estates.COLLECTION, sess.Estates)
+		data_tbl.Set(samples.COLLECTION, sess.LatencySamples)
+	}
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/binary"
+	"flag"
 	"io"
 	"log"
 	"net"
@@ -16,6 +17,12 @@ import (
 const (
 	DEFAULT_SERVICE = ":8891"
 )
+
+func init() {
+	if !flag.Parsed() {
+		flag.Parse()
+	}
+}
 
 //----------------------------------------------- Stats Server start
 func StatsStart() {

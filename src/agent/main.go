@@ -1,19 +1,26 @@
 package main
 
 import (
+	"encoding/binary"
+	"flag"
+	"io"
+	"log"
+	"net"
+	"os"
+)
+
+import (
 	"agent/event_client"
 	"agent/ipc"
 	"agent/stats_client"
 	"cfg"
 )
 
-import (
-	"encoding/binary"
-	"io"
-	"log"
-	"net"
-	"os"
-)
+func init() {
+	if !flag.Parsed() {
+		flag.Parse()
+	}
+}
 
 //----------------------------------------------- Game Server Start
 func main() {
