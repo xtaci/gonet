@@ -23,5 +23,5 @@ func SP(base, max int, t0 int64, rate float32) int {
 
 //------------------------------------------------ 随机概率丢骰子
 func Dice(probability float32) bool {
-	return float32(helper.LCG())/float32(math.MaxUint32) < probability
+	return helper.LCG() < uint32(probability*math.MaxUint32)
 }
