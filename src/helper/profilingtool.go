@@ -84,12 +84,12 @@ func showSystemStat(interval time.Duration, count int) {
 
 		utime := usage1.Utime.Sec*1000000000 + usage1.Utime.Usec
 		stime := usage1.Stime.Sec*1000000000 + usage1.Stime.Usec
-		userCPUUtil := float64(utime-lastUtime) * 100 / float64(interval)
-		sysCPUUtil := float64(stime-lastStime) * 100 / float64(interval)
+		userCPUUtil := float64(int64(utime)-lastUtime) * 100 / float64(interval)
+		sysCPUUtil := float64(int64(stime)-lastStime) * 100 / float64(interval)
 		memUtil := usage1.Maxrss * 1024
 
-		lastUtime = utime
-		lastStime = stime
+		lastUtime = int64(utime)
+		lastStime = int64(stime)
 
 		if counter > 0 {
 			fmt.Printf("cpu: %3.2f%% us  %3.2f%% sy, mem:%s \n", userCPUUtil, sysCPUUtil, toH(uint64(memUtil)))
