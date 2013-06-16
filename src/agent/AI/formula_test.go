@@ -24,3 +24,11 @@ func BenchmarkDice(b *testing.B) {
 
 	fmt.Printf("dice prob:0.01, count: %v, total: %v\n", count, b.N)
 }
+
+/*
+func TestLCG(t *testing.T) {
+	for i:=0;i<100;i++ {
+		fmt.Println(LCG())
+	}
+}
+*/
