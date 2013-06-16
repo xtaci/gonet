@@ -28,6 +28,10 @@ func TestLogin(t *testing.T) {
 		fmt.Println("please run benchmark first")
 	}
 
+	if Login(1) {
+		t.Error("login twice")
+	}
+
 	if !Logout(1) {
 		t.Error("logout")
 	}

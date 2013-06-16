@@ -121,6 +121,29 @@ func _add_fsm(user *User) {
 	_lock_players.Unlock()
 }
 
+//------------------------------------------------ when game disconnect, perform a logout for all players on that gs
+func LogoutServer(host int32) {
+	_lock_players.RLock()
+	snapshot := make(map[int32]*PlayerInfo)
+	for k, v := range _players {
+		snapshot[k] = v
+	}
+	_lock_players.RUnlock()
+
+	for _, v := range snapshot {
+		v.Lock()
+		if v.Host == host {
+			switch v.State {
+			case ON_FREE:
+				v.State = OFF_FREE
+			case ON_PROT:
+				v.State = OFF_PROT
+			}
+		}
+		v.Unlock()
+	}
+}
+
 //------------------------------------------------ The State Machine Of Player
 func Login(id, host int32) bool {
 	_lock_players.RLock()
@@ -132,11 +155,11 @@ func Login(id, host int32) bool {
 		defer player.Unlock()
 
 		switch player.State {
-		case OFF_FREE, ON_FREE:
+		case OFF_FREE:
 			player.State = ON_FREE
 			player.Host = host
 			return true
-		case OFF_PROT, ON_PROT:
+		case OFF_PROT:
 			player.State = ON_PROT
 			player.Host = host
 			return true

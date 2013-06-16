@@ -9,6 +9,7 @@ import (
 import (
 	"cfg"
 	"helper"
+	"hub/core"
 	"hub/protos"
 	"misc/packet"
 )
@@ -49,6 +50,7 @@ func HubAgent(incoming chan []byte, conn net.Conn) {
 
 	defer func() {
 		protos.RemoveServer(hostid)
+		core.LogoutServer(hostid)
 		close(forward)
 		close(output)
 
