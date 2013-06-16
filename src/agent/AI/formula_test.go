@@ -6,10 +6,21 @@ import (
 	"time"
 )
 
-func TestSP(t *testing.T) {
+func BenchmarkSP(b *testing.B) {
 	t0 := time.Now().Unix()
 
-	for i := int64(0); i < 150; i++ {
-		fmt.Println(SP(0, 10000, t0-i, 100))
+	for i := int64(0); i < int64(b.N); i++ {
+		SP(0, 10000, t0-i, 100)
 	}
+}
+
+func BenchmarkDice(b *testing.B) {
+	count := 0
+	for i := 0; i < b.N; i++ {
+		if Dice(0.01) {
+			count++
+		}
+	}
+
+	fmt.Printf("dice prob:0.01, count: %v, total: %v\n", count, b.N)
 }
