@@ -7,14 +7,14 @@ IPC array byte
 #用户登陆发包
 LOGIN_REQ=
 id int32
-clan int32
-clanmsgmax uint32 
+group int32
+groupmsgmax uint32 
 ===
 
 #用户登录回包
 LOGIN_ACK=
 success bool
-clanmsgmax uint32
+groupmsgmax uint32
 ===
 
 #只携带ID的包

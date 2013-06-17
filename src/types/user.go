@@ -2,8 +2,8 @@ package types
 
 type User struct {
 	Id             int32  // 用户id
-	ClanId         int32  // 部落ID
-	ClanMsgId      uint32 // 收到的群消息最大编号
+	GroupId        int32  // 部落ID
+	GroupMsgId     uint32 // 收到的群消息最大编号
 	Name           string // 用户名
 	Pass           []byte // 密码(MD5 Hash)
 	Score          int32  // 分数

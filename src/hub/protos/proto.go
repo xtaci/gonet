@@ -8,14 +8,14 @@ type FORWARDIPC struct {
 }
 
 type LOGIN_REQ struct {
-	F_id         int32
-	F_clan       int32
-	F_clanmsgmax uint32
+	F_id          int32
+	F_group       int32
+	F_groupmsgmax uint32
 }
 
 type LOGIN_ACK struct {
-	F_success    bool
-	F_clanmsgmax uint32
+	F_success     bool
+	F_groupmsgmax uint32
 }
 
 type ID struct {
@@ -81,10 +81,10 @@ func PKT_LOGIN_REQ(reader *packet.Packet) (tbl LOGIN_REQ, err error) {
 	tbl.F_id, err = reader.ReadS32()
 	checkErr(err)
 
-	tbl.F_clan, err = reader.ReadS32()
+	tbl.F_group, err = reader.ReadS32()
 	checkErr(err)
 
-	tbl.F_clanmsgmax, err = reader.ReadU32()
+	tbl.F_groupmsgmax, err = reader.ReadU32()
 	checkErr(err)
 
 	return
@@ -94,7 +94,7 @@ func PKT_LOGIN_ACK(reader *packet.Packet) (tbl LOGIN_ACK, err error) {
 	tbl.F_success, err = reader.ReadBool()
 	checkErr(err)
 
-	tbl.F_clanmsgmax, err = reader.ReadU32()
+	tbl.F_groupmsgmax, err = reader.ReadU32()
 	checkErr(err)
 
 	return

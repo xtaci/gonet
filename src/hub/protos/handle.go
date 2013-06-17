@@ -52,15 +52,15 @@ func P_login_req(hostid int32, pkt *packet.Packet) []byte {
 		ret.F_success = true
 
 		// 登陆后，将联盟消息push给玩家
-		clan := core.Clan(tbl.F_clan)
-		if clan != nil {
+		group := core.Group(tbl.F_group)
+		if group != nil {
 			ch := ForwardChan(hostid)
-			objs := clan.Recv(tbl.F_clanmsgmax + 1)
+			objs := group.Recv(tbl.F_groupmsgmax + 1)
 			for _, v := range objs {
 				ch <- v.Json()
 			}
 
-			ret.F_clanmsgmax = clan.MaxMsgId
+			ret.F_groupmsgmax = group.MaxMsgId
 		}
 	}
 
@@ -179,7 +179,7 @@ func P_forward_req(hostid int32, pkt *packet.Packet) []byte {
 	return packet.Pack(-1, ret, nil)
 }
 
-func P_forwardclan_req(hostid int32, pkt *packet.Packet) (r []byte) {
+func P_forwardgroup_req(hostid int32, pkt *packet.Packet) (r []byte) {
 	tbl, _ := PKT_FORWARDIPC(pkt)
 	ret := INT{F_v: 1}
 
@@ -191,20 +191,20 @@ func P_forwardclan_req(hostid int32, pkt *packet.Packet) (r []byte) {
 	err := json.Unmarshal(tbl.F_IPC, obj)
 	if err != nil {
 		ret.F_v = 0
-		log.Println("decode clan IPCObject error")
+		log.Println("decode group IPCObject error")
 		return
 	}
 
-	clan := core.Clan(tbl.F_dest_id)
-	if clan == nil {
+	group := core.Group(tbl.F_dest_id)
+	if group == nil {
 		ret.F_v = 0
-		log.Println("forward ipc: no such clan")
+		log.Println("forward ipc: no such group")
 		return
 	}
-	clan.Push(obj)
+	group.Push(obj)
 
 	// send to online users directly
-	members := clan.Members()
+	members := group.Members()
 	for _, user_id := range members {
 		state := core.State(user_id)
 		switch state {

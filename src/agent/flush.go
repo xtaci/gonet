@@ -12,7 +12,7 @@ import (
 	"types/samples"
 )
 
-//------------------------------------------------ flush all user data 
+//------------------------------------------------ flush all user data
 func _flush(sess *Session) {
 	user_tbl.Set(sess.User)
 	data_tbl.Set(estates.COLLECTION, &sess.Estates)

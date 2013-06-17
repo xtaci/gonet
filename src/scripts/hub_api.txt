@@ -70,6 +70,6 @@ payload:FORWARDIPC
 desc:转发IPC消息
 
 packet_type:101
-name:forwardclan_req
+name:forwardgroup_req
 payload:FORWARDIPC
 desc:转发IPC消息到联盟
