@@ -35,11 +35,12 @@ func TestGroup(t *testing.T) {
 
 	fmt.Println("testing send & recv")
 
-	for i := 0; i < 200; i++ {
-		group.Push(nil)
+	for i := 0; i < 5; i++ {
+		obj := &IPCObject{}
+		group.Push(obj)
 	}
 
-	result := group.Recv(195)
+	result := group.Recv(0)
 
 	fmt.Println(len(result))
 
