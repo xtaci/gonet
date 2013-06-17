@@ -1,6 +1,10 @@
 package core
 
 import (
+	"log"
+)
+
+import (
 	"db/data_tbl"
 	"db/user_tbl"
 	"types/estates"
@@ -20,6 +24,8 @@ func _archive(userid int32, collector *Collector) *Archive {
 		switch stat.Type {
 		case TYPE_SUM:
 			archive.Fields[stat.Key] += stat.Value
+		default:
+			log.Println("cannot archive:", stat)
 		}
 	}
 
