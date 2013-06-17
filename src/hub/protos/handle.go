@@ -82,7 +82,7 @@ func P_changescore_req(hostid int32, pkt *packet.Packet) []byte {
 	tbl, _ := PKT_CHGSCORE(pkt)
 	ret := INT{F_v: 0}
 
-	if core.ChangeScore(tbl.F_id, tbl.F_oldscore, tbl.F_newscore) {
+	if core.UpdateScore(tbl.F_id, tbl.F_oldscore, tbl.F_newscore) {
 		ret.F_v = 1
 	}
 

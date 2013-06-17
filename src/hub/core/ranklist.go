@@ -28,7 +28,7 @@ func _add_rank(user *User) {
 }
 
 //------------------------------------------------ update score of a player
-func ChangeScore(id, oldscore, newscore int32) bool {
+func UpdateScore(id, oldscore, newscore int32) bool {
 	_lock_ranklist.Lock()
 	defer _lock_ranklist.Unlock()
 
