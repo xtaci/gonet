@@ -1,7 +1,16 @@
 package types
 
+const (
+	USER_TYPE_NORMAL = int32(iota)
+	USER_TYPE_I
+	USER_TYPE_II
+	USER_TYPE_III
+	USER_TYPE_IV
+)
+
 type User struct {
 	Id             int32  // 用户id
+	Type           int32  // 用户类型
 	GroupId        int32  // 部落ID
 	GroupMsgId     uint32 // 收到的群消息最大编号
 	Name           string // 用户名
