@@ -11,7 +11,7 @@ const (
 type User struct {
 	Id             int32  // 用户id
 	Type           int32  // 用户类型
-	GroupId        int32  // 部落ID
+	GroupId        int32  // 所属群ID
 	GroupMsgId     uint32 // 收到的群消息最大编号
 	Name           string // 用户名
 	Pass           []byte // 密码(MD5 Hash)

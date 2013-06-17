@@ -4,10 +4,6 @@ import (
 	"fmt"
 )
 
-const (
-	COLLECTION = "SOLIDERS"
-)
-
 type Solider struct {
 	TYPE     string // type in string
 	OID      uint32 // object id
@@ -19,7 +15,7 @@ type Solider struct {
 type Manager struct {
 	UserId   int32
 	Version  uint32
-	Soliders map[string]*Solider // OID->Hero
+	Soliders map[string]*Solider // OID->Solider
 }
 
 func (m *Manager) Append(oid uint32, solider *Solider) {
