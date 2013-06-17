@@ -15,7 +15,7 @@ GRAPHS = $(DOC_DIR)/arch.png $(DOC_DIR)/fsm.png
 all: $(PROGS) $(GRAPHS)
 
 $(PROGS):
-	$(GO) install -gcflags -m $@
+	$(GO) install $@
 
 $(DOC_DIR)/%.png: $(DOC_DIR)/%.dot
 	$(DOT) -Tpng $< -o $@
