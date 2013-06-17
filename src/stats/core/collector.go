@@ -63,8 +63,8 @@ func _writer() {
 		c := StatsCollection()
 		for userid, collector := range snapshot {
 			if collector != nil {
-				summary := _archive(userid, collector)
-				c.Upsert(bson.M{"userid": userid}, summary)
+				archive := _archive(userid, collector)
+				c.Upsert(bson.M{"userid": userid}, archive)
 			}
 		}
 
