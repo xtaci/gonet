@@ -21,11 +21,12 @@ const (
 	DEFAULT_GROUP_MESSAGES = 128
 )
 
+//---------------------------------------------------------- sortable members
 type MemberSlice struct {
 	M []int32
 }
 
-//------------------------------------------------ Add a member,make sure not twice added
+//---------------------------------------------------------- Add a member
 func (mem *MemberSlice) _add(user_id int32) {
 	for k := range mem.M {
 		if mem.M[k] == user_id {
@@ -55,7 +56,7 @@ func (mem *MemberSlice) Len() int {
 	return len(mem.M)
 }
 
-//------------------------------------------------ sort in descending order
+//---------------------------------------------------------- sort in descending order
 func (mem *MemberSlice) Less(i, j int) bool {
 	return Score(mem.M[i]) > Score(mem.M[j])
 }
@@ -64,24 +65,24 @@ func (mem *MemberSlice) Sort() {
 	sort.Sort(mem)
 }
 
-//------------------------------------------------ XOR swap
+//---------------------------------------------------------- XOR swap
 func (mem *MemberSlice) Swap(i, j int) {
 	mem.M[i] = mem.M[i] ^ mem.M[j]
 	mem.M[j] = mem.M[i] ^ mem.M[j]
 	mem.M[i] = mem.M[i] ^ mem.M[j]
 }
 
-//------------------------------------------------ Group
+//---------------------------------------------------------- Group Definition
 type GroupInfo struct {
-	GroupId  int32
-	Leader   int32
-	Name     string
-	Desc     string
-	Messages []*IPCObject
-	MaxMsgId uint32
+	GroupId  int32        // unique group id
+	Leader   int32        // group leader
+	Name     string       // group name
+	Desc     string       // group description
+	Messages []*IPCObject // group messages
+	MaxMsgId uint32       // max message id
 
 	// runtime
-	_members MemberSlice
+	_members MemberSlice // all memeber ids
 }
 
 var (
@@ -95,7 +96,7 @@ func init() {
 	_group_names = make(map[string]*GroupInfo)
 }
 
-//------------------------------------------------ create group
+//---------------------------------------------------------- create group
 func Create(creator_id int32, groupname string) (groupid int32, succ bool) {
 	_lock.Lock()
 	defer _lock.Unlock()
@@ -118,12 +119,14 @@ func Create(creator_id int32, groupname string) (groupid int32, succ bool) {
 	return 0, false
 }
 
+//---------------------------------------------------------- get group definition by groupid
 func Group(groupid int32) *GroupInfo {
 	_lock.Lock()
 	defer _lock.Unlock()
 	return _groups[groupid]
 }
 
+//---------------------------------------------------------- return group members
 func (group *GroupInfo) Members() []int32 {
 	_lock.RLock()
 	defer _lock.RUnlock()
@@ -134,7 +137,7 @@ func (group *GroupInfo) Members() []int32 {
 	return m
 }
 
-//------------------------------------------------ Join group
+//---------------------------------------------------------- Join group
 func (group *GroupInfo) Join(user_id int32) {
 	_lock.Lock()
 	defer _lock.Unlock()
@@ -143,7 +146,7 @@ func (group *GroupInfo) Join(user_id int32) {
 	_save(group)
 }
 
-//------------------------------------------------ leave group
+//---------------------------------------------------------- leave group
 func (group *GroupInfo) Leave(user_id int32) {
 	_lock.Lock()
 	defer _lock.Unlock()
@@ -163,7 +166,7 @@ func (group *GroupInfo) Leave(user_id int32) {
 	group._members._remove(user_id)
 }
 
-//------------------------------------------------ get group ranklist
+//---------------------------------------------------------- get group ranklist
 func (group *GroupInfo) Ranklist() []int32 {
 	_lock.RLock()
 	defer _lock.RUnlock()
@@ -175,7 +178,7 @@ func (group *GroupInfo) Ranklist() []int32 {
 	return m
 }
 
-//------------------------------------------------  push message to group
+//---------------------------------------------------------- push a message to group
 func (group *GroupInfo) Push(obj *IPCObject) {
 	_lock.Lock()
 	defer _lock.Unlock()
@@ -197,6 +200,7 @@ func (group *GroupInfo) Push(obj *IPCObject) {
 	_save(group)
 }
 
+//---------------------------------------------------------- recv all messages from lastmsg_id+1
 func (group *GroupInfo) Recv(lastmsg_id uint32) []*IPCObject {
 	_lock.RLock()
 	defer _lock.RUnlock()
@@ -215,7 +219,7 @@ func (group *GroupInfo) Recv(lastmsg_id uint32) []*IPCObject {
 	return nil
 }
 
-//------------------------------------------------ Save to db
+//---------------------------------------------------------- save to db
 func _save(group *GroupInfo) {
 	c := db.Collection(COLLECTION)
 	info, err := c.Upsert(bson.M{"groupid": group.GroupId}, group)
