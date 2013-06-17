@@ -10,6 +10,7 @@ import (
 	"types/estates"
 	"types/grid"
 	"types/samples"
+	"types/soldiers"
 )
 
 type IPCObject struct {
@@ -29,9 +30,10 @@ type Session struct {
 	IP net.IP
 	MQ chan IPCObject // Player's Internal Message Queue
 	// user data
-	User    *User
-	Estates *estates.Manager
-	Grid    *grid.Grid // Building's bitmap, online constructing...
+	User     *User
+	Estates  *estates.Manager
+	Soldiers *soldiers.Manager
+	Grid     *grid.Grid // Building's bitmap, online constructing...
 
 	// session related
 	LoggedIn bool // flag for weather the user is logged in
