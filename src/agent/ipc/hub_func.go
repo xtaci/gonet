@@ -197,6 +197,21 @@ func _forward(dest_id int32, IPC []byte) bool {
 	return true
 }
 
+//------------------------------------------------ Forward to Hub/Group
+func _group_forward(group_id int32, IPC []byte) bool {
+	defer _hub_err()
+	msg := hub.FORWARDIPC{F_dest_id: group_id, F_IPC: IPC}
+	ret := _call(packet.Pack(hub.Code["forwardgroup_req"], msg, nil))
+	reader := packet.Reader(ret)
+	tbl, err := hub.PKT_INT(reader)
+
+	if err != nil || tbl.F_v == 0 {
+		return false
+	}
+
+	return true
+}
+
 func _hub_err() {
 	if x := recover(); x != nil {
 		log.Println(x)

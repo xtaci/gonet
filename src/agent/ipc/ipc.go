@@ -19,7 +19,7 @@ var IPCHandler map[int16]func(*Session, *IPCObject) bool = map[int16]func(*Sessi
 	SERVICE_PING: IPC_ping,
 }
 
-//------------------------------------------------ p2p send from src_id to dest_id
+//---------------------------------------------------------- p2p send from src_id to dest_id
 func Send(src_id, dest_id int32, service int16, object interface{}) (ret bool) {
 	defer func() {
 		if x := recover(); x != nil {
@@ -49,4 +49,16 @@ func Send(src_id, dest_id int32, service int16, object interface{}) (ret bool) {
 		// convert req to json again, LEVEL-2 encapsulation
 		return _forward(dest_id, req.Json())
 	}
+}
+
+//---------------------------------------------------------- group send
+func GroupSend(src_id int32, group_id int32, service int16, object interface{}) (ret bool) {
+	val, err := json.Marshal(object)
+	if err != nil {
+		log.Println("IPC Send error:", err)
+		return false
+	}
+
+	req := &IPCObject{Multicast: true, Sender: src_id, Service: service, Object: val, Time: time.Now().Unix()}
+	return _group_forward(group_id, req.Json())
 }

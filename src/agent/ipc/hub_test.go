@@ -57,3 +57,10 @@ func BenchmarkForward(b *testing.B) {
 		Send(0, 2, 1, obj)
 	}
 }
+
+func BenchmarkGroupForward(b *testing.B) {
+	obj := &TMPObj{A: 10, B: 20, C: "test"}
+	for i := 0; i < b.N; i++ {
+		GroupSend(0, 2, 1, obj)
+	}
+}
