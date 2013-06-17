@@ -30,6 +30,10 @@ type Tree struct {
 	root *Node
 }
 
+func (t *Tree) Clear() {
+	t.root = nil
+}
+
 func (t *Tree) Root() *Node {
 	return t.root
 }

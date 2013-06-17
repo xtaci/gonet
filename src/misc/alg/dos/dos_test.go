@@ -62,6 +62,8 @@ func TestDos(t *testing.T) {
 		t.Error("dynamic order stat failed")
 	}
 
+	tree.Clear()
+	print_helper(tree.Root(), 0)
 }
 
 const INDENT_STEP = 4

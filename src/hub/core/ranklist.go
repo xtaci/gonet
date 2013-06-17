@@ -32,7 +32,8 @@ func UpdateScore(id, oldscore, newscore int32) bool {
 	_lock_ranklist.Lock()
 	defer _lock_ranklist.Unlock()
 
-	var tmplist []interface{}
+	tmplist := make([]interface{}, 0, 64)
+
 	defer func() {
 		for i := range tmplist {
 			_ranklist.Insert(int(oldscore), tmplist[i])

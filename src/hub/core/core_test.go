@@ -35,6 +35,7 @@ func BenchmarkFSM(b *testing.B) {
 }
 
 func TestRanklist(t *testing.T) {
+	_ranklist.Clear()
 	user := &User{Id: 1, Score: 100}
 	_add_rank(user)
 
@@ -51,6 +52,7 @@ func TestRanklist(t *testing.T) {
 }
 
 func BenchmarkGlobalRanklist(b *testing.B) {
+	_ranklist.Clear()
 	for i := 0; i < b.N; i++ {
 		user := &User{Id: int32(i), Score: int32(i)}
 		_add_rank(user)
@@ -59,4 +61,17 @@ func BenchmarkGlobalRanklist(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		GetList(1, i)
 	}
+}
+
+func BenchmarkUpdateScore(b *testing.B) {
+	_ranklist.Clear()
+	for i := 1; i <= b.N; i++ {
+		user := &User{Id: int32(i), Score: int32(i) % 100}
+		_add_rank(user)
+	}
+
+	for i := 1; i <= b.N; i++ {
+		UpdateScore(int32(i), int32(i)%100, (int32(i)%100)*2)
+	}
+	fmt.Println(GetList(1, 2))
 }
