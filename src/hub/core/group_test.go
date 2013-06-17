@@ -48,20 +48,16 @@ func TestGroup(t *testing.T) {
 	}
 }
 
-var groupid int32
-
 func init() {
-	groupid, _ = Create(1, "t4fbenchmark")
-}
-
-func BenchmarkGroup(b *testing.B) {
-	fmt.Println("group", groupid)
-	group := Group(groupid)
-
-	for i := 0; i < b.N; i++ {
+	for i := 0; i < 1000000; i++ {
 		user := &User{Id: int32(i), Score: int32(i)}
 		_add_rank(user)
 	}
+}
+
+func BenchmarkGroupRankList(b *testing.B) {
+	LoadGroups()
+	group := Group(1)
 
 	for i := 0; i < b.N; i++ {
 		group.Join(int32(i))
@@ -72,5 +68,4 @@ func BenchmarkGroup(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		group.Leave(int32(i))
 	}
-
 }

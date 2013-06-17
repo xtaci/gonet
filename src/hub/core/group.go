@@ -227,3 +227,18 @@ func _save(group *GroupInfo) {
 		log.Println(info, err)
 	}
 }
+
+//---------------------------------------------------------- startup load groups
+func LoadGroups() {
+	c := db.Collection(COLLECTION)
+	var groups []GroupInfo
+	err := c.Find(nil).All(&groups)
+	if err != nil {
+		log.Println(err)
+	}
+
+	for _, v := range groups {
+		_groups[v.GroupId] = &v
+		_group_names[v.Name] = &v
+	}
+}
