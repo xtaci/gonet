@@ -14,6 +14,7 @@ import (
 	"agent/ipc"
 	"agent/stats_client"
 	"cfg"
+	"inspect"
 )
 
 func init() {
@@ -29,6 +30,9 @@ func main() {
 	if config["gs_log"] != "" {
 		cfg.StartLogger(config["gs_log"])
 	}
+
+	// inspector
+	go inspect.StartInspect()
 
 	// dial HUB
 	ipc.DialHub()

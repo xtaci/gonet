@@ -1,12 +1,14 @@
 /* nex rp.nex && goyacc rp.y && 6g rp.nn.go y.go && 6l rp.nn.6 */
 %{
-package main
+package inspect
 import "fmt"
+import "net"
 %}
 
 %union { 
 	n int;
 	s string;
+	conn net.Conn
 } 
 
 %token INSPECT 
@@ -17,9 +19,9 @@ input:    /* empty */
 ;
 
 line:     '\n'
-       | exp '\n'      { fmt.Println(">"); }
+       | exp '\n'      { fmt.Fprintln(_conn, ">"); }
 ;
 
-exp:    INSPECT VARS { fmt.Println($2.s); }
+exp:    INSPECT VARS { fmt.Fprintln(_conn, $2.s); }
 ;
 %%

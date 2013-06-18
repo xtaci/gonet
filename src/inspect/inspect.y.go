@@ -1,15 +1,17 @@
 
 //line ./src/inspect/inspect.y:3
-package main
+package inspect
 import __yyfmt__ "fmt"
 //line ./src/inspect/inspect.y:3
 		import "fmt"
+import "net"
 
-//line ./src/inspect/inspect.y:7
+//line ./src/inspect/inspect.y:8
 type yySymType struct {
 	yys int 
 	n int;
 	s string;
+	conn net.Conn
 }
 
 const INSPECT = 57346
@@ -25,7 +27,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyMaxDepth = 200
 
-//line ./src/inspect/inspect.y:25
+//line ./src/inspect/inspect.y:27
 
 
 //line yacctab:1
@@ -310,11 +312,11 @@ yydefault:
 	switch yynt {
 
 	case 4:
-		//line ./src/inspect/inspect.y:20
-		{ fmt.Println(">"); }
+		//line ./src/inspect/inspect.y:22
+		{ fmt.Fprintln(_conn, ">"); }
 	case 5:
-		//line ./src/inspect/inspect.y:23
-		{ fmt.Println(yyS[yypt-0].s); }
+		//line ./src/inspect/inspect.y:25
+		{ fmt.Fprintln(_conn, yyS[yypt-0].s); }
 	}
 	goto yystack /* stack new state and value */
 }

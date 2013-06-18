@@ -2,10 +2,6 @@
 /inspect/ { return INSPECT }
 /(session)|(estates)/ { lval.s = yylex.Text() ;return VARS}
 //
-package main
-import "os"
+package inspect
 
-func main() {
-	lex := NewLexer(os.Stdin);
-	yyParse(lex)
-}
+
