@@ -31,8 +31,8 @@ $(DOC_DIR)/%.png: $(DOC_DIR)/%.dot
 	$(DOT) -Tpng $< -o $@
 
 $(INSPECT): $(INSPECTDIR)/inspect.nex $(INSPECTDIR)/inspect.y
-	$(GOYACC) -o $(INSPECTDIR)/inspect.y.go $(INSPECTDIR)/inspect.y 
 	$(NEXBIN) $(INSPECTDIR)/inspect.nex
+	$(GOYACC) -o $(INSPECTDIR)/inspect.y.go $(INSPECTDIR)/inspect.y 
 		
 clean:
 	rm -rf bin pkg $(NEXBIN)

@@ -33,7 +33,7 @@ func StartInspect() {
 		if err != nil {
 			continue
 		}
-		handleClient(conn)
+		go handleClient(conn)
 	}
 }
 

@@ -14,11 +14,15 @@ type yySymType struct {
 
 const INSPECT = 57346
 const ID = 57347
-const HELP = 57348
+const END = 57348
+const QUIT = 57349
+const HELP = 57350
 
 var yyToknames = []string{
 	"INSPECT",
 	"ID",
+	"END",
+	"QUIT",
 	"HELP",
 }
 var yyStatenames = []string{}
@@ -27,7 +31,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyMaxDepth = 200
 
-//line ./src/inspect/inspect.y:23
+//line ./src/inspect/inspect.y:31
 
 
 //line yacctab:1
@@ -37,41 +41,45 @@ var yyExca = []int{
 	-2, 0,
 }
 
-const yyNprod = 5
+const yyNprod = 9
 const yyPrivate = 57344
 
 var yyTokenNames []string
 var yyStates []string
 
-const yyLast = 5
+const yyLast = 11
 
 var yyAct = []int{
 
-	3, 2, 4, 5, 1,
+	5, 11, 4, 7, 6, 10, 9, 8, 3, 2,
+	1,
 }
 var yyPact = []int{
 
-	-1000, -4, -1000, -2, -1000, -1000,
+	-1000, -4, -1000, -1000, -1000, 2, 0, -1, -5, -1000,
+	-1000, -1000,
 }
 var yyPgo = []int{
 
-	0, 4, 1,
+	0, 10, 9, 8,
 }
 var yyR1 = []int{
 
-	0, 1, 1, 2, 2,
+	0, 1, 1, 2, 2, 2, 3, 3, 3,
 }
 var yyR2 = []int{
 
-	0, 0, 2, 2, 1,
+	0, 0, 2, 0, 1, 1, 3, 2, 2,
 }
 var yyChk = []int{
 
-	-1000, -1, -2, 4, 6, 5,
+	-1000, -1, -2, -3, 6, 4, 8, 7, 5, 6,
+	6, 6,
 }
 var yyDef = []int{
 
-	1, -2, 2, 0, 4, 3,
+	1, -2, 2, 4, 5, 0, 0, 0, 0, 7,
+	8, 6,
 }
 var yyTok1 = []int{
 
@@ -79,7 +87,7 @@ var yyTok1 = []int{
 }
 var yyTok2 = []int{
 
-	2, 3, 4, 5, 6,
+	2, 3, 4, 5, 6, 7, 8,
 }
 var yyTok3 = []int{
 	0,
@@ -310,12 +318,18 @@ yydefault:
 	// dummy call; replaced with literal code
 	switch yynt {
 
-	case 3:
-		//line ./src/inspect/inspect.y:20
-		{ Inspect(int32(yyS[yypt-0].n), conn); prompt(conn); }
-	case 4:
-		//line ./src/inspect/inspect.y:21
-		{fmt.Fprintln(conn, "\tinspect user_id"); prompt(conn);}
+	case 5:
+		//line ./src/inspect/inspect.y:24
+		{ prompt(conn) }
+	case 6:
+		//line ./src/inspect/inspect.y:27
+		{ Inspect(int32(yyS[yypt-1].n), conn); prompt(conn)}
+	case 7:
+		//line ./src/inspect/inspect.y:28
+		{fmt.Fprintln(conn, "\tinspect user_id"); prompt(conn)}
+	case 8:
+		//line ./src/inspect/inspect.y:29
+		{ conn.Close() }
 	}
 	goto yystack /* stack new state and value */
 }

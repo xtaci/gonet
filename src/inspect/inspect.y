@@ -11,13 +11,21 @@ import "fmt"
 
 %token INSPECT 
 %token ID 
+%token END
+%token QUIT
 %token HELP 
 %%
 input:    /* empty */
-       | input exp
+       | input line 
 ;
 
-exp:    INSPECT ID { Inspect(int32($2.n), conn); prompt(conn); }
-		| HELP {fmt.Fprintln(conn, "\tinspect user_id"); prompt(conn);}
+line: 
+		| exp
+		| END { prompt(conn) }
+;
+
+exp:    INSPECT ID END { Inspect(int32($2.n), conn); prompt(conn)}
+		| HELP END {fmt.Fprintln(conn, "\tinspect user_id"); prompt(conn)}
+	    | QUIT END { conn.Close() }
 ;
 %%
