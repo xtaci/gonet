@@ -35,7 +35,7 @@ $(INSPECT): $(INSPECTDIR)/inspect.nex $(INSPECTDIR)/inspect.y
 	$(NEXBIN) $(INSPECTDIR)/inspect.nex
 		
 clean:
-	rm -rf bin pkg $(GRAPHS) $(NEXBIN)
+	rm -rf bin pkg $(NEXBIN)
  
 fmt:
 	$(GO) fmt $(SRCDIR)/...
