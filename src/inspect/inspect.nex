@@ -1,0 +1,11 @@
+/[ \t]/  { /* Skip blanks and tabs. */ }
+/inspect/ { return INSPECT }
+/(session)|(estates)/ { lval.s = yylex.Text() ;return VARS}
+//
+package main
+import "os"
+
+func main() {
+	lex := NewLexer(os.Stdin);
+	yyParse(lex)
+}

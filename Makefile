@@ -1,6 +1,8 @@
 .PHONY: .FORCE
 GO=go
 DOT=dot
+GOYACC=$(GO) tool yacc
+NEXBIN=./nex
 
 PROGS = hub \
 	 event \
@@ -9,16 +11,28 @@ PROGS = hub \
 
 DOC_DIR = ./doc
 SRCDIR = ./src
+INSPECTDIR = $(SRCDIR)/inspect
+
+NEX=nex.go
 
 GRAPHS = $(DOC_DIR)/arch.png $(DOC_DIR)/fsm.png
 
-all: $(PROGS) $(GRAPHS)
+INSPECT = $(SRCDIR)/inspect/inspect.go
+
+all: $(NEXBIN) $(INSPECT) $(PROGS) $(GRAPHS)
+
+$(NEXBIN): $(NEX)
+	$(GO) build $<
 
 $(PROGS):
 	$(GO) install $@
 
 $(DOC_DIR)/%.png: $(DOC_DIR)/%.dot
 	$(DOT) -Tpng $< -o $@
+
+$(INSPECT): $(INSPECTDIR)/inspect.nex $(INSPECTDIR)/inspect.y
+	$(GOYACC) -o $(INSPECTDIR)/inspect.y.go $(INSPECTDIR)/inspect.y 
+	$(NEXBIN) $(INSPECTDIR)/inspect.nex
 		
 clean:
 	rm -rf bin pkg $(GRAPHS)
