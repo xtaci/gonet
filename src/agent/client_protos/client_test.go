@@ -54,19 +54,21 @@ func BenchmarkAgent(b *testing.B) {
 		os.Exit(-1)
 	}
 
-	U := user_login_info{}
-	pkt := packet.Pack(Code["user_login_req"], U, nil)
-
-	writer := packet.Writer()
-	writer.WriteU16(uint16(len(pkt) + 4))
-	writer.WriteU32(0)
-	writer.WriteRawBytes(pkt)
-	ret := make([]byte, 100)
-
 	fmt.Println("Benchmark", b.N)
+
 	for i := 0; i < b.N; i++ {
-		U.F_user_name = fmt.Sprint("test%v", i)
-		U.F_mac_addr = fmt.Sprint("mac%v", i)
+		U := user_login_info{}
+		U.F_user_name = fmt.Sprintf("test%v", i)
+		U.F_mac_addr = fmt.Sprintf("mac%v", i)
+
+		pkt := packet.Pack(Code["user_login_req"], U, nil)
+
+		writer := packet.Writer()
+		writer.WriteU16(uint16(len(pkt) + 4))
+		writer.WriteU32(0)
+		writer.WriteRawBytes(pkt)
+		ret := make([]byte, 100)
+
 		conn.Write(writer.Data())
 		conn.Read(ret)
 	}
