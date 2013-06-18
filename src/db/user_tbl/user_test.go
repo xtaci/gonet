@@ -10,10 +10,10 @@ import (
 func TestUser(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
 	user := fmt.Sprintf("test%v", rand.Int())
-	pass := fmt.Sprintf("pass%v", rand.Int())
+	mac := fmt.Sprintf("mac:%v", rand.Int())
 
-	New(user, pass)
-	if Login(user, pass) == nil {
+	New(user, mac)
+	if LoginMac(user, mac) == nil {
 		t.Error("login failed")
 	}
 
@@ -26,7 +26,7 @@ func TestUser(t *testing.T) {
 func BenchmarkCreateUser(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		user := fmt.Sprintf("test%v", i)
-		pass := fmt.Sprintf("pass%v", i)
-		New(user, pass)
+		mac := fmt.Sprintf("mac%v", i)
+		New(user, mac)
 	}
 }

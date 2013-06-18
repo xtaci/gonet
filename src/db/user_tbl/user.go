@@ -32,15 +32,14 @@ func Set(user *User) bool {
 	return true
 }
 
-//----------------------------------------------- login with (name, password) pair
-func Login(name string, pass string) *User {
+func LoginMac(name, mac string) *User {
 	config := cfg.Get()
 	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
 
 	user := &User{}
-	err := c.Find(bson.M{"name": name, "pass": _md5(pass)}).One(user)
+	err := c.Find(bson.M{"name": name, "mac": mac}).One(user)
 	if err != nil {
-		log.Println(err, name, pass)
+		log.Println(err, mac)
 		return nil
 	}
 
@@ -48,7 +47,7 @@ func Login(name string, pass string) *User {
 }
 
 //----------------------------------------------- Create a new user
-func New(name, pass string) *User {
+func New(name, mac string) *User {
 	config := cfg.Get()
 	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
 
@@ -57,10 +56,10 @@ func New(name, pass string) *User {
 	if err != nil {
 		user.Id = NextVal(COUNTER_NAME)
 		user.Name = name
-		user.Pass = _md5(pass)
+		user.Mac = mac
 		err := c.Insert(user)
 		if err != nil {
-			log.Println(err, name, pass)
+			log.Println(err, name, mac)
 			return nil
 		}
 		return user

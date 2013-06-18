@@ -24,6 +24,8 @@ func TestAgent(t *testing.T) {
 	}
 
 	U := user_login_info{}
+	U.F_user_name = "test1"
+	U.F_mac_addr = "mac1"
 	pkt := packet.Pack(Code["user_login_req"], U, nil)
 	fmt.Println(pkt)
 
@@ -63,6 +65,8 @@ func BenchmarkAgent(b *testing.B) {
 
 	fmt.Println("Benchmark", b.N)
 	for i := 0; i < b.N; i++ {
+		U.F_user_name = fmt.Sprint("test%v", i)
+		U.F_mac_addr = fmt.Sprint("mac%v", i)
 		conn.Write(writer.Data())
 		conn.Read(ret)
 	}

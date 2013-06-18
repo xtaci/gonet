@@ -1,6 +1,9 @@
 package ipc
 
-import "sync"
+import (
+	"sync"
+)
+
 import . "types"
 
 var _active map[int32]*Session
@@ -28,6 +31,21 @@ func QueryOnline(id int32) *Session {
 	_lock.RLock()
 
 	return _active[id]
+}
+
+//----------------------------------------------- list all online users
+func ListAll() []int32 {
+	defer _lock.RUnlock()
+	_lock.RLock()
+
+	list := make([]int32, len(_active))
+	idx := 0
+	for k := range _active {
+		list[idx] = k
+		idx++
+	}
+
+	return list
 }
 
 func init() {

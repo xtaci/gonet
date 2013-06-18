@@ -1,10 +1,10 @@
 package inspect
 
 import (
+	"fmt"
 	"log"
 	"net"
 	"os"
-	"fmt"
 )
 
 import (
@@ -39,14 +39,14 @@ func StartInspect() {
 
 func handleClient(conn net.Conn) {
 	defer func() {
-		if x :=recover();x!=nil {
+		if x := recover(); x != nil {
 			fmt.Fprintln(conn, x)
 		}
 		conn.Close()
 	}()
 
-	fmt.Fprintln(conn,"GameServer Console")
-	fmt.Fprintln(conn,`type 'help' for usage`)
+	fmt.Fprintln(conn, "GameServer Console")
+	fmt.Fprintln(conn, `type 'help' for usage`)
 	prompt(conn)
 	lex := NewLexer(conn)
 	yyParse(lex)
