@@ -34,8 +34,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyMaxDepth = 200
 
-//line ./src/inspect/inspect.y:35
-
+//line ./src/inspect/inspect.y:31
 //line yacctab:1
 var yyExca = []int{
 	-1, 1,
@@ -43,41 +42,41 @@ var yyExca = []int{
 	-2, 0,
 }
 
-const yyNprod = 9
+const yyNprod = 7
 const yyPrivate = 57344
 
 var yyTokenNames []string
 var yyStates []string
 
-const yyLast = 9
+const yyLast = 8
 
 var yyAct = []int{
 
-	4, 5, 8, 9, 7, 6, 3, 2, 1,
+	3, 4, 7, 8, 6, 5, 2, 1,
 }
 var yyPact = []int{
 
-	-1000, -4, -1000, -5, -3, -1000, -1000, -1000, -1000, -1000,
+	-1000, -4, -5, -3, -1000, -1000, -1000, -1000, -1000,
 }
 var yyPgo = []int{
 
-	0, 8, 7, 6,
+	0, 7, 6,
 }
 var yyR1 = []int{
 
-	0, 1, 1, 2, 2, 3, 3, 3, 3,
+	0, 1, 1, 2, 2, 2, 2,
 }
 var yyR2 = []int{
 
-	0, 0, 2, 0, 2, 2, 1, 1, 1,
+	0, 0, 3, 2, 1, 1, 1,
 }
 var yyChk = []int{
 
-	-1000, -1, -2, -3, 4, 5, 9, 8, 7, 6,
+	-1000, -1, -2, 4, 5, 9, 8, 7, 6,
 }
 var yyDef = []int{
 
-	1, -2, 2, 0, 0, 6, 7, 8, 4, 5,
+	1, -2, 0, 0, 4, 5, 6, 2, 3,
 }
 var yyTok1 = []int{
 
@@ -316,27 +315,27 @@ yydefault:
 	// dummy call; replaced with literal code
 	switch yynt {
 
-	case 5:
-		//line ./src/inspect/inspect.y:27
+	case 3:
+		//line ./src/inspect/inspect.y:23
 		{
 			Inspect(int32(yyS[yypt-0].n), conn)
 			prompt(conn)
 		}
-	case 6:
-		//line ./src/inspect/inspect.y:28
+	case 4:
+		//line ./src/inspect/inspect.y:24
 		{
 			ListAll(conn)
 			prompt(conn)
 		}
-	case 7:
-		//line ./src/inspect/inspect.y:29
+	case 5:
+		//line ./src/inspect/inspect.y:25
 		{
 			fmt.Fprintln(conn, "\tinspect user_id: inspect a user")
 			fmt.Fprintln(conn, "\tlist: list all online users")
 			prompt(conn)
 		}
-	case 8:
-		//line ./src/inspect/inspect.y:33
+	case 6:
+		//line ./src/inspect/inspect.y:29
 		{
 			conn.Close()
 		}

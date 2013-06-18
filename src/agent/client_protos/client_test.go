@@ -41,22 +41,20 @@ func TestAgent(t *testing.T) {
 }
 
 func BenchmarkAgent(b *testing.B) {
-	log.Println("Connecting to GS")
-	addr, err := net.ResolveTCPAddr("tcp", "0.0.0.0:8888")
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(-1)
-	}
-
-	conn, err := net.DialTCP("tcp", nil, addr)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(-1)
-	}
-
 	fmt.Println("Benchmark", b.N)
-
 	for i := 0; i < b.N; i++ {
+		addr, err := net.ResolveTCPAddr("tcp", "0.0.0.0:8888")
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(-1)
+		}
+
+		conn, err := net.DialTCP("tcp", nil, addr)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(-1)
+		}
+
 		U := user_login_info{}
 		U.F_user_name = fmt.Sprintf("test%v", i)
 		U.F_mac_addr = fmt.Sprintf("mac%v", i)

@@ -17,11 +17,7 @@ import "fmt"
 %token HELP 
 %%
 input:    /* empty */
-       | input line 
-;
-
-line: 
-		| exp END
+       | input exp END
 ;
 
 exp:    INSPECT ID { Inspect(int32($2.n), conn); prompt(conn)}
