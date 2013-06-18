@@ -1,29 +1,28 @@
-
 //line ./src/inspect/inspect.y:3
 package inspect
+
 import __yyfmt__ "fmt"
+
 //line ./src/inspect/inspect.y:3
-		import "fmt"
+import "fmt"
 
 //line ./src/inspect/inspect.y:7
 type yySymType struct {
-	yys int 
-	n int;
-	s string;
+	yys int
+	n   int
+	s   string
 }
 
 const INSPECT = 57346
 const LIST = 57347
 const ID = 57348
-const CRLF = 57349
-const QUIT = 57350
-const HELP = 57351
+const QUIT = 57349
+const HELP = 57350
 
 var yyToknames = []string{
 	"INSPECT",
 	"LIST",
 	"ID",
-	"CRLF",
 	"QUIT",
 	"HELP",
 }
@@ -33,8 +32,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyMaxDepth = 200
 
-//line ./src/inspect/inspect.y:30
-
+//line ./src/inspect/inspect.y:66
 
 //line yacctab:1
 var yyExca = []int{
@@ -43,49 +41,56 @@ var yyExca = []int{
 	-2, 0,
 }
 
-const yyNprod = 7
+const yyNprod = 13
 const yyPrivate = 57344
 
 var yyTokenNames []string
 var yyStates []string
 
-const yyLast = 8
+const yyLast = 16
 
 var yyAct = []int{
 
-	3, 4, 7, 8, 6, 5, 2, 1,
+	12, 9, 16, 11, 10, 3, 15, 13, 14, 8,
+	7, 6, 5, 4, 2, 1,
 }
 var yyPact = []int{
 
-	-1000, -4, -5, -3, -1000, -1000, -1000, -1000, -1000,
+	-1000, -4, -1000, -3, -1, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, 0, -1000, -8, -1000, -1000,
 }
 var yyPgo = []int{
 
-	0, 7, 6,
+	0, 15, 14, 13, 12, 11, 10, 9,
 }
 var yyR1 = []int{
 
-	0, 1, 1, 2, 2, 2, 2,
+	0, 1, 1, 2, 2, 3, 3, 3, 3, 4,
+	5, 6, 7,
 }
 var yyR2 = []int{
 
-	0, 3, 0, 2, 1, 1, 1,
+	0, 2, 0, 2, 3, 1, 1, 1, 1, 1,
+	1, 1, 2,
 }
 var yyChk = []int{
 
-	-1000, -1, -2, 4, 5, 9, 8, 7, 6,
+	-1000, -1, -2, 9, -3, -4, -5, -6, -7, 5,
+	8, 7, 4, 10, 9, 6, 10,
 }
 var yyDef = []int{
 
-	2, -2, 0, 0, 4, 5, 6, 1, 3,
+	2, -2, 1, 0, 0, 5, 6, 7, 8, 9,
+	10, 11, 0, 3, 0, 12, 4,
 }
 var yyTok1 = []int{
 
-	1,
+	1, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	10, 3, 3, 9,
 }
 var yyTok2 = []int{
 
-	2, 3, 4, 5, 6, 7, 8, 9,
+	2, 3, 4, 5, 6, 7, 8,
 }
 var yyTok3 = []int{
 	0,
@@ -317,19 +322,34 @@ yydefault:
 	switch yynt {
 
 	case 3:
-		//line ./src/inspect/inspect.y:23
-		{ Inspect(int32(yyS[yypt-0].n), conn); prompt(conn)}
-	case 4:
-		//line ./src/inspect/inspect.y:24
-		{ListAll(conn); prompt(conn)}
-	case 5:
 		//line ./src/inspect/inspect.y:25
-		{fmt.Fprintln(conn, "\tinspect user_id: inspect a user")
-					fmt.Fprintln(conn, "\tlist: list all online users")
-					prompt(conn) }
-	case 6:
-		//line ./src/inspect/inspect.y:28
-		{ conn.Close() }
+		{
+			prompt(conn)
+		}
+	case 9:
+		//line ./src/inspect/inspect.y:37
+		{
+			ListAll(conn)
+			prompt(conn)
+		}
+	case 10:
+		//line ./src/inspect/inspect.y:45
+		{
+			fmt.Fprintln(conn, "\tinspect user_id: inspect a user")
+			fmt.Fprintln(conn, "\tlist: list all online users")
+			prompt(conn)
+		}
+	case 11:
+		//line ./src/inspect/inspect.y:54
+		{
+			conn.Close()
+		}
+	case 12:
+		//line ./src/inspect/inspect.y:61
+		{
+			Inspect(int32(yyS[yypt-0].n), conn)
+			prompt(conn)
+		}
 	}
 	goto yystack /* stack new state and value */
 }
