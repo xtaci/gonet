@@ -12,20 +12,19 @@ import "fmt"
 %token INSPECT 
 %token LIST 
 %token ID 
-%token END
+%token CRLF
 %token QUIT
 %token HELP 
 %%
-input:    /* empty */
-       | input exp END
-;
+input:	input exp CRLF
+		|
+		;
 
-exp:    INSPECT ID { Inspect(int32($2.n), conn); prompt(conn)}
-	    | LIST {ListAll(conn); prompt(conn)}
+exp:	INSPECT ID { Inspect(int32($2.n), conn); prompt(conn)}
+		| LIST {ListAll(conn); prompt(conn)}
 		| HELP {fmt.Fprintln(conn, "\tinspect user_id: inspect a user")
-					fmt.Fprintln(conn, "\tlist: list all online users")
-					prompt(conn)
-					}
-	    | QUIT { conn.Close() }
-;
+				fmt.Fprintln(conn, "\tlist: list all online users")
+				prompt(conn) }
+		| QUIT { conn.Close() }
+		;
 %%

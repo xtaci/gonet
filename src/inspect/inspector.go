@@ -25,3 +25,7 @@ func Inspect(id int32, output io.Writer) {
 func ListAll(output io.Writer) {
 	fmt.Fprintln(output, ipc.ListAll())
 }
+
+func prompt(output io.Writer) {
+	fmt.Fprint(output, "gonet> ")
+}

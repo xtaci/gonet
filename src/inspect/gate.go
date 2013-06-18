@@ -52,10 +52,6 @@ func handleClient(conn net.Conn) {
 	yyParse(lex)
 }
 
-func prompt(conn net.Conn) {
-	fmt.Fprint(conn, "con> ")
-}
-
 func checkError(err error) {
 	if err != nil {
 		log.Println("Fatal error: %v", err)

@@ -1,5 +1,5 @@
 /[ \t]+/ {}
-/[\r\n]+/ {return END}
+/[\r\n]+/ {return CRLF}
 /[0-9]+/  { lval.n, _= strconv.Atoi(yylex.Text()); return ID }
 /inspect/ { return INSPECT }
 /help/ {return HELP}
