@@ -1,7 +1,9 @@
-/[ \t]/  { /* Skip blanks and tabs. */ }
+/[ \t\n]+/  {}
 /inspect/ { return INSPECT }
-/(session)|(estates)/ { lval.s = yylex.Text() ;return VARS}
+/help/ {return HELP}
+/[0-9]+/  { lval.n, _= strconv.Atoi(yylex.Text()); return ID }
 //
 package inspect
+import "strconv"
 
 

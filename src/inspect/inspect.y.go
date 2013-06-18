@@ -4,22 +4,22 @@ package inspect
 import __yyfmt__ "fmt"
 //line ./src/inspect/inspect.y:3
 		import "fmt"
-import "net"
 
-//line ./src/inspect/inspect.y:8
+//line ./src/inspect/inspect.y:7
 type yySymType struct {
 	yys int 
 	n int;
 	s string;
-	conn net.Conn
 }
 
 const INSPECT = 57346
-const VARS = 57347
+const ID = 57347
+const HELP = 57348
 
 var yyToknames = []string{
 	"INSPECT",
-	"VARS",
+	"ID",
+	"HELP",
 }
 var yyStatenames = []string{}
 
@@ -27,7 +27,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyMaxDepth = 200
 
-//line ./src/inspect/inspect.y:27
+//line ./src/inspect/inspect.y:23
 
 
 //line yacctab:1
@@ -37,50 +37,49 @@ var yyExca = []int{
 	-2, 0,
 }
 
-const yyNprod = 6
+const yyNprod = 5
 const yyPrivate = 57344
 
 var yyTokenNames []string
 var yyStates []string
 
-const yyLast = 7
+const yyLast = 5
 
 var yyAct = []int{
 
-	5, 6, 3, 7, 4, 2, 1,
+	3, 2, 4, 5, 1,
 }
 var yyPact = []int{
 
-	-1000, -4, -1000, -1000, -5, -2, -1000, -1000,
+	-1000, -4, -1000, -2, -1000, -1000,
 }
 var yyPgo = []int{
 
-	0, 6, 5, 4,
+	0, 4, 1,
 }
 var yyR1 = []int{
 
-	0, 1, 1, 2, 2, 3,
+	0, 1, 1, 2, 2,
 }
 var yyR2 = []int{
 
-	0, 0, 2, 1, 2, 2,
+	0, 0, 2, 2, 1,
 }
 var yyChk = []int{
 
-	-1000, -1, -2, 6, -3, 4, 6, 5,
+	-1000, -1, -2, 4, 6, 5,
 }
 var yyDef = []int{
 
-	1, -2, 2, 3, 0, 0, 4, 5,
+	1, -2, 2, 0, 4, 3,
 }
 var yyTok1 = []int{
 
-	1, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	6,
+	1,
 }
 var yyTok2 = []int{
 
-	2, 3, 4, 5,
+	2, 3, 4, 5, 6,
 }
 var yyTok3 = []int{
 	0,
@@ -311,12 +310,12 @@ yydefault:
 	// dummy call; replaced with literal code
 	switch yynt {
 
+	case 3:
+		//line ./src/inspect/inspect.y:20
+		{ Inspect(int32(yyS[yypt-0].n), conn); prompt(conn); }
 	case 4:
-		//line ./src/inspect/inspect.y:22
-		{ fmt.Fprintln(_conn, ">"); }
-	case 5:
-		//line ./src/inspect/inspect.y:25
-		{ fmt.Fprintln(_conn, yyS[yypt-0].s); }
+		//line ./src/inspect/inspect.y:21
+		{fmt.Fprintln(conn, "\tinspect user_id"); prompt(conn);}
 	}
 	goto yystack /* stack new state and value */
 }

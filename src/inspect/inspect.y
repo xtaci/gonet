@@ -2,26 +2,22 @@
 %{
 package inspect
 import "fmt"
-import "net"
 %}
 
 %union { 
 	n int;
 	s string;
-	conn net.Conn
 } 
 
 %token INSPECT 
-%token VARS
+%token ID 
+%token HELP 
 %%
 input:    /* empty */
-       | input line
+       | input exp
 ;
 
-line:     '\n'
-       | exp '\n'      { fmt.Fprintln(_conn, ">"); }
-;
-
-exp:    INSPECT VARS { fmt.Fprintln(_conn, $2.s); }
+exp:    INSPECT ID { Inspect(int32($2.n), conn); prompt(conn); }
+		| HELP {fmt.Fprintln(conn, "\tinspect user_id"); prompt(conn);}
 ;
 %%

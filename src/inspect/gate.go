@@ -4,11 +4,14 @@ import (
 	"log"
 	"net"
 	"os"
+	"fmt"
 )
 
 import (
 	"cfg"
 )
+
+var conn net.Conn
 
 func StartInspect() {
 	config := cfg.Get()
@@ -25,7 +28,7 @@ func StartInspect() {
 	checkError(err)
 
 	for {
-		conn, err := listener.Accept()
+		conn, err = listener.Accept()
 
 		if err != nil {
 			continue
@@ -34,17 +37,23 @@ func StartInspect() {
 	}
 }
 
-var _conn net.Conn
-
 func handleClient(conn net.Conn) {
 	defer func() {
+		if x :=recover();x!=nil {
+			fmt.Fprintln(conn, x)
+		}
 		conn.Close()
-		recover()
 	}()
 
-	_conn = conn
-	lex := NewLexer(_conn)
+	fmt.Fprintln(conn,"GameServer Console")
+	fmt.Fprintln(conn,`type 'help' for usage`)
+	prompt(conn)
+	lex := NewLexer(conn)
 	yyParse(lex)
+}
+
+func prompt(conn net.Conn) {
+	fmt.Fprint(conn, "con> ")
 }
 
 func checkError(err error) {
