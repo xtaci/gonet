@@ -1,10 +1,10 @@
-/[ \t\n]+/ {}
+/[ \t]+/ {}
+/[\r\n]+/ {return END}
+/[0-9]+/  { lval.n, _= strconv.Atoi(yylex.Text()); return ID }
 /inspect/ { return INSPECT }
 /help/ {return HELP}
 /quit/ {return QUIT}
 /list/ {return LIST}
-/[0-9]+/  { lval.n, _= strconv.Atoi(yylex.Text()); return ID }
-/\r/ {return END}
 /./ {}
 //
 package inspect
