@@ -54,5 +54,8 @@ func LoginProc(sess *Session) bool {
 
 	// 注册为在线
 	ipc.RegisterOnline(sess, sess.User.Id)
+
+	// TODO: 标记在线 
+	//sess.LoggedIn = true
 	return true
 }
