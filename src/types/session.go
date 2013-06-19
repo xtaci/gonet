@@ -9,6 +9,7 @@ import (
 import (
 	"types/estates"
 	"types/grid"
+	"types/heroes"
 	"types/samples"
 	"types/soldiers"
 )
@@ -33,6 +34,7 @@ type Session struct {
 	User     *User
 	Estates  *estates.Manager
 	Soldiers *soldiers.Manager
+	Heroes   *heroes.Manager
 	Grid     *grid.Grid // Building's bitmap, online constructing...
 
 	// session related
