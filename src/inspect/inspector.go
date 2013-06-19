@@ -1,6 +1,7 @@
 package inspect
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"reflect"
@@ -42,7 +43,7 @@ func InspectField(id int32, field string, output io.Writer) {
 		}
 	}
 
-	fmt.Fprintf(output, "%+v\n", node.Interface())
+	Print(output, node.Interface())
 }
 
 func ListAll(output io.Writer) {
@@ -51,4 +52,13 @@ func ListAll(output io.Writer) {
 
 func prompt(output io.Writer) {
 	fmt.Fprint(output, "gonet> ")
+}
+
+func Print(output io.Writer, value interface{}) {
+	txt, err := json.MarshalIndent(value, "", "\t")
+	if err != nil {
+		fmt.Fprintln(output, err)
+	} else {
+		fmt.Fprintln(output, string(txt))
+	}
 }

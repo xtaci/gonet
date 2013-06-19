@@ -1,17 +1,16 @@
+
 //line ./src/inspect/inspect.y:3
 package inspect
-
 import __yyfmt__ "fmt"
-
 //line ./src/inspect/inspect.y:3
-import "fmt"
+		import "fmt"
 
 //line ./src/inspect/inspect.y:7
 type yySymType struct {
-	yys   int
-	n     int
-	s     string
-	nodes string
+	yys int 
+	n int;
+	s string;
+	nodes string;
 }
 
 const INSPECT = 57346
@@ -36,6 +35,7 @@ const yyErrCode = 2
 const yyMaxDepth = 200
 
 //line ./src/inspect/inspect.y:75
+
 
 //line yacctab:1
 var yyExca = []int{
@@ -326,40 +326,40 @@ yydefault:
 
 	case 3:
 		//line ./src/inspect/inspect.y:27
-		{
-			prompt(conn)
-		}
+		{ 
+				prompt(conn)
+			}
 	case 9:
 		//line ./src/inspect/inspect.y:39
 		{
-			ListAll(conn)
-			prompt(conn)
-		}
+				ListAll(conn)
+				prompt(conn)
+			}
 	case 10:
 		//line ./src/inspect/inspect.y:47
 		{
-			fmt.Fprintln(conn, "\tinspect user_id: inspect a user struct")
-			fmt.Fprintln(conn, "\tinspect user_id.Field1.Field2...: dotted fields")
-			fmt.Fprintln(conn, "\tlist: list all online users")
-			prompt(conn)
-		}
+				fmt.Fprintln(conn, "\tinspect user_id: inspect a user struct")
+				fmt.Fprintln(conn, "\tinspect user_id.Field1.Field2...: dotted fields")
+				fmt.Fprintln(conn, "\tlist: list all online users")
+				prompt(conn) 
+			}
 	case 11:
 		//line ./src/inspect/inspect.y:57
-		{
-			conn.Close()
-		}
+		{ 
+				conn.Close() 
+			}
 	case 12:
 		//line ./src/inspect/inspect.y:64
-		{
-			Inspect(int32(yyS[yypt-0].n), conn)
-			prompt(conn)
-		}
+		{ 
+				Inspect(int32(yyS[yypt-0].n), conn)
+				prompt(conn)
+			}
 	case 13:
 		//line ./src/inspect/inspect.y:70
 		{
-			InspectField(int32(yyS[yypt-1].n), yyS[yypt-0].nodes, conn)
-			prompt(conn)
-		}
+				InspectField(int32(yyS[yypt-1].n), yyS[yypt-0].nodes, conn) 
+				prompt(conn)
+			}
 	}
 	goto yystack /* stack new state and value */
 }
