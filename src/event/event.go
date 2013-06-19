@@ -24,7 +24,7 @@ func init() {
 	}
 }
 
-//----------------------------------------------- Event Server start
+//---------------------------------------------------------- Event Server start
 func EventStart() {
 	config := cfg.Get()
 	if config["profile"] == "true" {
@@ -69,7 +69,7 @@ func EventStart() {
 	}
 }
 
-//----------------------------------------------- handle cooldown request
+//---------------------------------------------------------- handle cooldown request
 func handleClient(conn net.Conn) {
 	defer conn.Close()
 
