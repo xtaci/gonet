@@ -18,7 +18,7 @@ func init() {
 	log.SetPrefix("[EVENT]")
 }
 
-//------------------------------------------------ Event Server Agent
+//----------------------------------------------------------- Event Server Agent
 func EventAgent(incoming chan []byte, conn net.Conn) {
 	// output buffer
 	output := make(chan []byte, MAXCHAN)
@@ -41,7 +41,7 @@ func EventAgent(incoming chan []byte, conn net.Conn) {
 	}
 }
 
-//----------------------------------------------- write buffer
+//---------------------------------------------------------- write buffer
 func _write_routine(output chan []byte, conn net.Conn) {
 	for {
 		msg, ok := <-output

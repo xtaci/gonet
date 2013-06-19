@@ -16,7 +16,7 @@ import (
 //	"types/estates"
 )
 
-//------------------------------------------------ perform changes & save back, atomic
+//---------------------------------------------------------- perform changes & save back, atomic
 func Execute(event *Event, event_id int32) (ret bool) {
 	defer PrintPanicStack()
 	_do(event, event_id)
@@ -34,7 +34,7 @@ func _do(event *Event, event_id int32) {
 
 /*
 
-//------------------------------------------------ do the real work until complete or panic!!!
+//---------------------------------------------------------- do the real work until complete or panic!!!
 func _do_estates(event *Event, event_id uint32) {
 	config := cfg.Get()
 	c := Mongo.DB(config["mongo_db"]).C(estates.COLLECTION)

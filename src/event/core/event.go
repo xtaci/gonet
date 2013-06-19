@@ -53,7 +53,7 @@ func _expire() {
 	}
 }
 
-//------------------------------------------------ Add a timeout event
+//---------------------------------------------------------- Add a timeout event
 func Add(tblname string, oid uint32, user_id int32, timeout int64) int32 {
 	h_tblname := naming.FNV1a(tblname)
 	_hashtbl[h_tblname] = tblname
@@ -69,14 +69,14 @@ func Add(tblname string, oid uint32, user_id int32, timeout int64) int32 {
 	return event_id
 }
 
-//------------------------------------------------ cancel an oid's timeout
+//---------------------------------------------------------- cancel an oid's timeout
 func Cancel(event_id int32) {
 	_events_lock.Lock()
 	delete(_events, event_id)
 	_events_lock.Unlock()
 }
 
-//------------------------------------------------ Load a timeout event at startup
+//---------------------------------------------------------- Load a timeout event at startup
 func Load(tblname string, oid uint32, user_id int32, timeout int64, event_id int32) {
 	h_tblname := naming.FNV1a(tblname)
 	_hashtbl[h_tblname] = tblname

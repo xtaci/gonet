@@ -11,7 +11,7 @@ import (
 	"cfg"
 )
 
-//----------------------------------------------- handle unix signals
+//---------------------------------------------------------- handle unix signals
 func SignalProc() {
 	ch := make(chan os.Signal)
 	signal.Notify(ch, syscall.SIGHUP)

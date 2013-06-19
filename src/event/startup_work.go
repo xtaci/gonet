@@ -14,7 +14,7 @@ func startup_work() {
 	load_estates()
 }
 
-//----------------------------------------------- load user table into memory
+//---------------------------------------------------------- load user table into memory
 func load_estates() {
 	/*
 		var managers []estates.Manager
