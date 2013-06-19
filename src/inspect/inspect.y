@@ -80,11 +80,9 @@ inspect:
 gc:
 		GC
 		{
-			fmt.Fprintln(conn,"before:")
-			helper.FprintGCSummary(conn)
 			helper.GC()
-			fmt.Fprintln(conn,"after:")
 			helper.FprintGCSummary(conn)
+			prompt(conn)
 		}
 		;
 %%

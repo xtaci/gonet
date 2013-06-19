@@ -40,7 +40,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyMaxDepth = 200
 
-//line ./src/inspect/inspect.y:90
+//line ./src/inspect/inspect.y:88
 
 //line yacctab:1
 var yyExca = []int{
@@ -369,11 +369,9 @@ yydefault:
 	case 15:
 		//line ./src/inspect/inspect.y:82
 		{
-			fmt.Fprintln(conn, "before:")
-			helper.FprintGCSummary(conn)
 			helper.GC()
-			fmt.Fprintln(conn, "after:")
 			helper.FprintGCSummary(conn)
+			prompt(conn)
 		}
 	}
 	goto yystack /* stack new state and value */
