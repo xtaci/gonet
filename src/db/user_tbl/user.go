@@ -18,7 +18,7 @@ const (
 	COUNTER_NAME = "USERID_GEN"
 )
 
-//----------------------------------------------- Change
+//---------------------------------------------------------- update a user
 func Set(user *User) bool {
 	config := cfg.Get()
 	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
@@ -32,6 +32,7 @@ func Set(user *User) bool {
 	return true
 }
 
+//---------------------------------------------------------- login with name & mac address
 func LoginMac(name, mac string) *User {
 	config := cfg.Get()
 	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
@@ -46,7 +47,7 @@ func LoginMac(name, mac string) *User {
 	return user
 }
 
-//----------------------------------------------- Create a new user
+//---------------------------------------------------------- create a new user
 func New(name, mac string) *User {
 	config := cfg.Get()
 	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
@@ -68,7 +69,7 @@ func New(name, mac string) *User {
 	return nil
 }
 
-//----------------------------------------------- Load a user's user info
+//---------------------------------------------------------- load a user
 func Get(id int32) *User {
 	config := cfg.Get()
 	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
@@ -83,7 +84,7 @@ func Get(id int32) *User {
 	return user
 }
 
-//----------------------------------------------- Load all users's user info
+//---------------------------------------------------------- load all userss
 func GetAll() []User {
 	config := cfg.Get()
 	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
