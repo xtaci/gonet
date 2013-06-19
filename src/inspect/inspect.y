@@ -45,9 +45,9 @@ list:
 help:
 		HELP 
 		{
-			fmt.Fprintln(conn, "\tinspect user_id: inspect a user struct")
-			fmt.Fprintln(conn, "\tinspect user_id.Field1.Field2...: dotted fields")
-			fmt.Fprintln(conn, "\tlist: list all online users")
+			fmt.Fprintln(conn, "\t(p)rint user_id: inspect a user struct")
+			fmt.Fprintln(conn, "\t(p)rint user_id.Field1.Field2...: dotted fields")
+			fmt.Fprintln(conn, "\t(l)ist: list all online users")
 			prompt(conn) 
 		}
 		;

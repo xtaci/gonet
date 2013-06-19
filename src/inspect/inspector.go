@@ -47,7 +47,7 @@ func InspectField(id int32, field string, output io.Writer) {
 }
 
 func ListAll(output io.Writer) {
-	fmt.Fprintln(output, ipc.ListAll())
+	Print(output, ipc.ListAll())
 }
 
 func prompt(output io.Writer) {
