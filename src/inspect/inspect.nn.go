@@ -17,7 +17,7 @@ type family struct {
 	endcase int
 }
 
-var a0 [8]dfa
+var a0 [9]dfa
 var a []family
 
 func init() {
@@ -573,6 +573,56 @@ func init() {
 		a0[6].id = 6
 	}
 	{
+		var acc [3]bool
+		var fun [3]func(rune) int
+		fun[0] = func(r rune) int {
+			switch r {
+			case 103:
+				return 1
+			case 99:
+				return -1
+			default:
+				switch {
+				default:
+					return -1
+				}
+			}
+			panic("unreachable")
+		}
+		fun[1] = func(r rune) int {
+			switch r {
+			case 103:
+				return -1
+			case 99:
+				return 2
+			default:
+				switch {
+				default:
+					return -1
+				}
+			}
+			panic("unreachable")
+		}
+		acc[2] = true
+		fun[2] = func(r rune) int {
+			switch r {
+			case 103:
+				return -1
+			case 99:
+				return -1
+			default:
+				switch {
+				default:
+					return -1
+				}
+			}
+			panic("unreachable")
+		}
+		a0[7].acc = acc[:]
+		a0[7].f = fun[:]
+		a0[7].id = 7
+	}
+	{
 		var acc [2]bool
 		var fun [2]func(rune) int
 		fun[0] = func(r rune) int {
@@ -596,11 +646,11 @@ func init() {
 			}
 			panic("unreachable")
 		}
-		a0[7].acc = acc[:]
-		a0[7].f = fun[:]
-		a0[7].id = 7
+		a0[8].acc = acc[:]
+		a0[8].f = fun[:]
+		a0[8].id = 8
 	}
-	a[0].endcase = 8
+	a[0].endcase = 9
 	a[0].a = a0[:]
 }
 func getAction(c *frame) int {
@@ -748,11 +798,15 @@ func (yylex Lexer) Lex(lval *yySymType) int {
 			{
 				return LIST
 			}
-		case 7: //./
+		case 7: //(gc)/
+			{
+				return GC
+			}
+		case 8: //./
 			{
 				return int(yylex.Text()[0])
 			}
-		case 8: ///
+		case 9: ///
 			// [END]
 		}
 	}

@@ -5,6 +5,7 @@
 /(h|help)/ {return HELP}
 /(q|uit)/ {return QUIT}
 /(l|list)/ {return LIST}
+/(gc)/ {return GC}
 /./ {return int(yylex.Text()[0])}
 //
 package inspect

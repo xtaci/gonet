@@ -2,6 +2,7 @@ package helper
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"runtime"
@@ -128,7 +129,7 @@ func ShowGCStat() {
 			if gcstats.NumGC > numGC {
 				runtime.ReadMemStats(memStats)
 
-				printGC(memStats, gcstats)
+				printGC(memStats, gcstats, os.Stdout)
 				numGC = gcstats.NumGC
 			}
 			time.Sleep(interval)
@@ -137,15 +138,19 @@ func ShowGCStat() {
 }
 
 func PrintGCSummary() {
+	FprintGCSummary(os.Stdout)
+}
+
+func FprintGCSummary(output io.Writer) {
 	memStats := &runtime.MemStats{}
 	runtime.ReadMemStats(memStats)
 	gcstats := &debug.GCStats{PauseQuantiles: make([]time.Duration, 100)}
 	debug.ReadGCStats(gcstats)
 
-	printGC(memStats, gcstats)
+	printGC(memStats, gcstats, output)
 }
 
-func printGC(memStats *runtime.MemStats, gcstats *debug.GCStats) {
+func printGC(memStats *runtime.MemStats, gcstats *debug.GCStats, output io.Writer) {
 
 	if gcstats.NumGC > 0 {
 		lastPause := gcstats.Pause[0]
@@ -153,7 +158,7 @@ func printGC(memStats *runtime.MemStats, gcstats *debug.GCStats) {
 		overhead := float64(gcstats.PauseTotal) / float64(elapsed) * 100
 		allocatedRate := float64(memStats.TotalAlloc) / elapsed.Seconds()
 
-		fmt.Printf("NumGC:%d Pause:%s Pause(Avg):%s Overhead:%3.2f%% Alloc:%s Sys:%s Alloc(Rate):%s/s Histogram:%s %s %s \n",
+		fmt.Fprintf(output, "NumGC:%d Pause:%s Pause(Avg):%s Overhead:%3.2f%% Alloc:%s Sys:%s Alloc(Rate):%s/s Histogram:%s %s %s \n",
 			gcstats.NumGC,
 			toS(lastPause),
 			toS(avg(gcstats.Pause)),
@@ -169,7 +174,7 @@ func printGC(memStats *runtime.MemStats, gcstats *debug.GCStats) {
 		elapsed := time.Now().Sub(startTime)
 		allocatedRate := float64(memStats.TotalAlloc) / elapsed.Seconds()
 
-		fmt.Printf("Alloc:%s Sys:%s Alloc(Rate):%s/s\n",
+		fmt.Fprintf(output, "Alloc:%s Sys:%s Alloc(Rate):%s/s\n",
 			toH(memStats.Alloc),
 			toH(memStats.Sys),
 			toH(uint64(allocatedRate)))
