@@ -34,7 +34,12 @@ func InspectField(id int32, field string, output io.Writer) {
 
 		switch node.Kind() {
 		case reflect.Ptr, reflect.Interface:
-			node = node.Elem()
+			if !node.IsNil() {
+				node = node.Elem()
+			} else {
+				fmt.Fprintln(output, "<nil>")
+				return
+			}
 		}
 
 		if !node.IsValid() {
