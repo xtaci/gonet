@@ -1,5 +1,6 @@
 /[ \t]/ {}
-/[0-9]*/  { lval.n, _= strconv.Atoi(yylex.Text()); return ID }
+/[0-9]+/  { lval.n, _= strconv.Atoi(yylex.Text()); return ID }
+/(\.[A-Za-z]+)+/ { lval.nodes = yylex.Text(); return FIELD }
 /inspect/ { return INSPECT }
 /help/ {return HELP}
 /quit/ {return QUIT}

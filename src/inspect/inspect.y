@@ -7,9 +7,11 @@ import "fmt"
 %union { 
 	n int;
 	s string;
+	nodes string;
 } 
 
 %token INSPECT 
+%token FIELD
 %token LIST 
 %token ID 
 %token QUIT
@@ -43,7 +45,8 @@ list:
 help:
 		HELP 
 		{
-			fmt.Fprintln(conn, "\tinspect user_id: inspect a user")
+			fmt.Fprintln(conn, "\tinspect user_id: inspect a user struct")
+			fmt.Fprintln(conn, "\tinspect user_id.Field1.Field2...: dotted fields")
 			fmt.Fprintln(conn, "\tlist: list all online users")
 			prompt(conn) 
 		}
@@ -60,6 +63,12 @@ inspect:
 		INSPECT ID 
 		{ 
 			Inspect(int32($2.n), conn)
+			prompt(conn)
+		}
+		|
+		INSPECT ID FIELD 
+		{
+			InspectField(int32($2.n), $3.nodes, conn) 
 			prompt(conn)
 		}
 		;

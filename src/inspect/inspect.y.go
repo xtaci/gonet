@@ -8,19 +8,22 @@ import "fmt"
 
 //line ./src/inspect/inspect.y:7
 type yySymType struct {
-	yys int
-	n   int
-	s   string
+	yys   int
+	n     int
+	s     string
+	nodes string
 }
 
 const INSPECT = 57346
-const LIST = 57347
-const ID = 57348
-const QUIT = 57349
-const HELP = 57350
+const FIELD = 57347
+const LIST = 57348
+const ID = 57349
+const QUIT = 57350
+const HELP = 57351
 
 var yyToknames = []string{
 	"INSPECT",
+	"FIELD",
 	"LIST",
 	"ID",
 	"QUIT",
@@ -32,7 +35,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyMaxDepth = 200
 
-//line ./src/inspect/inspect.y:66
+//line ./src/inspect/inspect.y:75
 
 //line yacctab:1
 var yyExca = []int{
@@ -41,56 +44,56 @@ var yyExca = []int{
 	-2, 0,
 }
 
-const yyNprod = 13
+const yyNprod = 14
 const yyPrivate = 57344
 
 var yyTokenNames []string
 var yyStates []string
 
-const yyLast = 16
+const yyLast = 17
 
 var yyAct = []int{
 
-	12, 9, 16, 11, 10, 3, 15, 13, 14, 8,
-	7, 6, 5, 4, 2, 1,
+	12, 16, 9, 13, 11, 10, 3, 14, 15, 17,
+	8, 7, 6, 5, 4, 2, 1,
 }
 var yyPact = []int{
 
-	-1000, -4, -1000, -3, -1, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, 0, -1000, -8, -1000, -1000,
+	-1000, -4, -1000, -8, -3, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, 1, -1000, -10, 4, -1000, -1000,
 }
 var yyPgo = []int{
 
-	0, 15, 14, 13, 12, 11, 10, 9,
+	0, 16, 15, 14, 13, 12, 11, 10,
 }
 var yyR1 = []int{
 
 	0, 1, 1, 2, 2, 3, 3, 3, 3, 4,
-	5, 6, 7,
+	5, 6, 7, 7,
 }
 var yyR2 = []int{
 
 	0, 2, 0, 2, 3, 1, 1, 1, 1, 1,
-	1, 1, 2,
+	1, 1, 2, 3,
 }
 var yyChk = []int{
 
-	-1000, -1, -2, 9, -3, -4, -5, -6, -7, 5,
-	8, 7, 4, 10, 9, 6, 10,
+	-1000, -1, -2, 10, -3, -4, -5, -6, -7, 6,
+	9, 8, 4, 11, 10, 7, 11, 5,
 }
 var yyDef = []int{
 
 	2, -2, 1, 0, 0, 5, 6, 7, 8, 9,
-	10, 11, 0, 3, 0, 12, 4,
+	10, 11, 0, 3, 0, 12, 4, 13,
 }
 var yyTok1 = []int{
 
 	1, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	10, 3, 3, 9,
+	11, 3, 3, 10,
 }
 var yyTok2 = []int{
 
-	2, 3, 4, 5, 6, 7, 8,
+	2, 3, 4, 5, 6, 7, 8, 9,
 }
 var yyTok3 = []int{
 	0,
@@ -322,32 +325,39 @@ yydefault:
 	switch yynt {
 
 	case 3:
-		//line ./src/inspect/inspect.y:25
+		//line ./src/inspect/inspect.y:27
 		{
 			prompt(conn)
 		}
 	case 9:
-		//line ./src/inspect/inspect.y:37
+		//line ./src/inspect/inspect.y:39
 		{
 			ListAll(conn)
 			prompt(conn)
 		}
 	case 10:
-		//line ./src/inspect/inspect.y:45
+		//line ./src/inspect/inspect.y:47
 		{
-			fmt.Fprintln(conn, "\tinspect user_id: inspect a user")
+			fmt.Fprintln(conn, "\tinspect user_id: inspect a user struct")
+			fmt.Fprintln(conn, "\tinspect user_id.Field1.Field2...: dotted fields")
 			fmt.Fprintln(conn, "\tlist: list all online users")
 			prompt(conn)
 		}
 	case 11:
-		//line ./src/inspect/inspect.y:54
+		//line ./src/inspect/inspect.y:57
 		{
 			conn.Close()
 		}
 	case 12:
-		//line ./src/inspect/inspect.y:61
+		//line ./src/inspect/inspect.y:64
 		{
 			Inspect(int32(yyS[yypt-0].n), conn)
+			prompt(conn)
+		}
+	case 13:
+		//line ./src/inspect/inspect.y:70
+		{
+			InspectField(int32(yyS[yypt-1].n), yyS[yypt-0].nodes, conn)
 			prompt(conn)
 		}
 	}
