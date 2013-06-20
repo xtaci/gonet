@@ -17,12 +17,12 @@ var _lock sync.RWMutex
 var _tables map[uint32]*Table
 var _hashtbl map[uint32]string // hash->string
 
-//----------------------------------------------- info for a level
+//---------------------------------------------------------- info for a level
 type Record struct {
 	Fields map[uint32]string
 }
 
-//----------------------------------------------- Numerical Table for a object
+//---------------------------------------------------------- Numerical Table for a object
 type Table struct {
 	Records map[uint32]*Record
 }
@@ -31,7 +31,7 @@ func init() {
 	Reload()
 }
 
-//------------------------------------------------ Reload *.csv
+//----------------------------------------------------------- Reload *.csv
 func Reload() {
 	_lock.Lock()
 	defer _lock.Unlock()
@@ -62,12 +62,12 @@ func Reload() {
 	}
 }
 
-//------------------------------------------------ Query a name by hash
+//----------------------------------------------------------- Query a name by hash
 func Query(hash uint32) string {
 	return _hashtbl[hash]
 }
 
-//----------------------------------------------- et Field value
+//---------------------------------------------------------- Set Field value
 func _set(tblname string, rowname string, fieldname string, value string) {
 	// store hashing
 	h_rowname := naming.FNV1a(rowname)
@@ -96,7 +96,7 @@ func _set(tblname string, rowname string, fieldname string, value string) {
 	rec.Fields[h_fieldname] = value
 }
 
-//----------------------------------------------- Get Field value
+//---------------------------------------------------------- Get Field value
 func _gethash(h_tblname uint32, h_rowname uint32, h_fieldname uint32) string {
 	_lock.RLock()
 	defer _lock.RUnlock()
@@ -119,6 +119,7 @@ func _get(tblname string, rowname string, fieldname string) string {
 	return _gethash(naming.FNV1a(tblname), naming.FNV1a(rowname), naming.FNV1a(fieldname))
 }
 
+//---------------------------------------------------------- Get Field value as Integer
 func GetInt(tblname string, rowname string, fieldname string) int32 {
 	val := _get(tblname, rowname, fieldname)
 	v, err := strconv.Atoi(val)
@@ -130,6 +131,7 @@ func GetInt(tblname string, rowname string, fieldname string) int32 {
 	return int32(v)
 }
 
+//---------------------------------------------------------- Get Field value as Float
 func GetFloat(tblname string, rowname string, fieldname string) float32 {
 	val := _get(tblname, rowname, fieldname)
 	f, err := strconv.ParseFloat(val, 32)
@@ -141,7 +143,7 @@ func GetFloat(tblname string, rowname string, fieldname string) float32 {
 	return float32(f)
 }
 
-//----------------------------------------------- Get Field value as string
+//---------------------------------------------------------- Get Field value as string
 func GetString(tblname string, rowname string, fieldname string) string {
 	return _get(tblname, rowname, fieldname)
 }
