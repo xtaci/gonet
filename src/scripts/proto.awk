@@ -1,10 +1,13 @@
 ###########################################################
 ## generate proto payload struct 
 ##
-BEGIN { RS = "===\n\n+"; FS ="\n" 
+BEGIN { RS = "==="; FS ="\n" 
 print ""
 print "import \"misc/packet\"\n"
 TYPES["byte"]="byte"
+TYPES["short"]="int16"
+TYPES["int16"]="int16"
+TYPES["uint16"]="uint16"
 TYPES["string"]="string"
 TYPES["integer"]="int32"
 TYPES["int32"]="int32"

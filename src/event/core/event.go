@@ -6,14 +6,12 @@ import (
 
 import (
 	"db"
-	"misc/naming"
 	"misc/timer"
 )
 
 type Event struct {
-	tblname uint32
+	_type   int16
 	user_id int32
-	oid     uint32
 	timeout int64
 }
 
@@ -21,8 +19,6 @@ var (
 	_event_ch    chan int32
 	_events      map[int32]*Event // mapping from  event_id-> Event
 	_events_lock sync.RWMutex
-
-	_hashtbl map[uint32]string // mapping from hash(tblname)-> tblname
 )
 
 const (
@@ -33,7 +29,6 @@ const (
 func init() {
 	_event_ch = make(chan int32, EVENT_CHAN_MAX)
 	_events = make(map[int32]*Event)
-	_hashtbl = make(map[uint32]string)
 	go _expire()
 }
 
@@ -54,14 +49,11 @@ func _expire() {
 }
 
 //---------------------------------------------------------- Add a timeout event
-func Add(tblname string, oid uint32, user_id int32, timeout int64) int32 {
-	h_tblname := naming.FNV1a(tblname)
-	_hashtbl[h_tblname] = tblname
-
+func Add(Type int16, user_id int32, timeout int64) int32 {
 	event_id := db.NextVal(EVENTID_GEN)
 	timer.Add(event_id, timeout, _event_ch)
 
-	event := &Event{tblname: h_tblname, user_id: user_id, oid: oid, timeout: timeout}
+	event := &Event{_type: Type, user_id: user_id, timeout: timeout}
 	_events_lock.Lock()
 	_events[event_id] = event
 	_events_lock.Unlock()
@@ -77,13 +69,9 @@ func Cancel(event_id int32) {
 }
 
 //---------------------------------------------------------- Load a timeout event at startup
-func Load(tblname string, oid uint32, user_id int32, timeout int64, event_id int32) {
-	h_tblname := naming.FNV1a(tblname)
-	_hashtbl[h_tblname] = tblname
-
+func Load(Type int16, user_id int32, timeout int64, event_id int32) {
 	timer.Add(event_id, timeout, _event_ch)
-
-	event := &Event{tblname: h_tblname, user_id: user_id, oid: oid, timeout: timeout}
+	event := &Event{_type: Type, user_id: user_id, timeout: timeout}
 	_events[event_id] = event
 
 	return

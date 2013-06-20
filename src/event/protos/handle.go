@@ -44,15 +44,15 @@ func P_ping_req(reader *packet.Packet) []byte {
 }
 
 func P_add_req(reader *packet.Packet) []byte {
-	tbl, _ := PKT_ADD_REQ(reader)
-	event_id := core.Add(tbl.F_tblname, tbl.F_oid, tbl.F_user_id, tbl.F_timeout)
+	tbl, _ := PKT_ADD_EVENT(reader)
+	event_id := core.Add(tbl.F_type, tbl.F_user_id, tbl.F_timeout)
 	ret := INT{event_id}
 
 	return packet.Pack(-1, &ret, nil)
 }
 
 func P_cancel_req(reader *packet.Packet) []byte {
-	tbl, _ := PKT_CANCEL_REQ(reader)
+	tbl, _ := PKT_CANCEL_EVENT(reader)
 	core.Cancel(tbl.F_event_id)
 	ret := INT{1}
 

@@ -1,12 +1,14 @@
-# 增加一个冷却REQ
-ADD_REQ=
-tblname string
-oid	uint32
+ADD_EVENT=
+type int16
 user_id int32
 timeout int64
 ===
 
-CANCEL_REQ=
+CANCEL_EVENT=
+event_id int32
+===
+
+EVENT_ID=
 event_id int32
 ===
 

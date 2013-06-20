@@ -3,6 +3,9 @@
 ##
 BEGIN { RS = ""; FS ="\n" 
 TYPES["byte"]="ReadByte"
+TYPES["short"]="ReadS16"
+TYPES["int16"]="ReadS16"
+TYPES["uint16"]="ReadU16"
 TYPES["string"]="ReadString"
 TYPES["integer"]="ReadS32"
 TYPES["int32"]="ReadS32"

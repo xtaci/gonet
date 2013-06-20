@@ -23,11 +23,10 @@ func Ping() bool {
 	return true
 }
 
-func Add(tblname string, oid uint32, user_id int32, timeout int64) int32 {
+func Add(Type int16, user_id int32, timeout int64) int32 {
 	defer _event_err()
-	req := event.ADD_REQ{}
-	req.F_tblname = tblname
-	req.F_oid = oid
+	req := event.ADD_EVENT{}
+	req.F_type = Type
 	req.F_user_id = user_id
 	req.F_timeout = timeout
 	ret := _call(packet.Pack(event.Code["add_req"], &req, nil))
@@ -38,7 +37,7 @@ func Add(tblname string, oid uint32, user_id int32, timeout int64) int32 {
 
 func Cancel(event_id int32) {
 	defer _event_err()
-	req := event.CANCEL_REQ{}
+	req := event.CANCEL_EVENT{}
 	req.F_event_id = event_id
 	_call(packet.Pack(event.Code["cancel_req"], &req, nil))
 }

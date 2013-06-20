@@ -12,18 +12,18 @@ desc:返回请求数值
 
 packet_type:1
 name:add_req
-payload:ADD_REQ
-desc:添加一个cooldown请求
+payload:ADD_EVENT
+desc:添加一个离线事件
 
 packet_type:1001
 name:add_ack
-payload:INT
-desc:返回0
+payload:EVENT_ID
+desc:返回事件编号
 
 packet_type:2
 name:cancel_req
-payload:CANCEL_REQ
-desc:取消一个cooldown请求
+payload:CANCEL_EVENT
+desc:取消一个事件
 
 packet_type:1002
 name:cancel_ack
