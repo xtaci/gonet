@@ -13,7 +13,7 @@ func Ping() bool {
 	defer _stats_err()
 	req := stats.INT{}
 	req.F_v = 1
-	ret := _call(packet.Pack(stats.Code["ping_req"], req, nil))
+	ret := _call(packet.Pack(stats.Code["ping_req"], &req, nil))
 	reader := packet.Reader(ret)
 	tbl, _ := stats.PKT_INT(reader)
 	if tbl.F_v != req.F_v {

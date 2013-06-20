@@ -26,7 +26,7 @@ func TestAgent(t *testing.T) {
 	U := user_login_info{}
 	U.F_user_name = "test1"
 	U.F_mac_addr = "mac1"
-	pkt := packet.Pack(Code["user_login_req"], U, nil)
+	pkt := packet.Pack(Code["user_login_req"], &U, nil)
 	fmt.Println(pkt)
 
 	writer := packet.Writer()
@@ -59,7 +59,7 @@ func BenchmarkAgent(b *testing.B) {
 		U.F_user_name = fmt.Sprintf("test%v", i)
 		U.F_mac_addr = fmt.Sprintf("mac%v", i)
 
-		pkt := packet.Pack(Code["user_login_req"], U, nil)
+		pkt := packet.Pack(Code["user_login_req"], &U, nil)
 
 		writer := packet.Writer()
 		writer.WriteU16(uint16(len(pkt) + 4))

@@ -21,7 +21,7 @@ func Ping() bool {
 	defer _hub_err()
 	req := hub.INT{}
 	req.F_v = 1
-	ret := _call(packet.Pack(hub.Code["ping_req"], req, nil))
+	ret := _call(packet.Pack(hub.Code["ping_req"], &req, nil))
 	reader := packet.Reader(ret)
 	tbl, _ := hub.PKT_INT(reader)
 	if tbl.F_v != req.F_v {
@@ -35,7 +35,7 @@ func Login(id int32) bool {
 	defer _hub_err()
 	req := hub.LOGIN_REQ{}
 	req.F_id = id
-	ret := _call(packet.Pack(hub.Code["login_req"], req, nil))
+	ret := _call(packet.Pack(hub.Code["login_req"], &req, nil))
 	reader := packet.Reader(ret)
 	tbl, err := hub.PKT_LOGIN_ACK(reader)
 
@@ -50,7 +50,7 @@ func Logout(id int32) bool {
 	defer _hub_err()
 	req := hub.ID{}
 	req.F_id = id
-	ret := _call(packet.Pack(hub.Code["logout_req"], req, nil))
+	ret := _call(packet.Pack(hub.Code["logout_req"], &req, nil))
 	reader := packet.Reader(ret)
 	tbl, err := hub.PKT_INT(reader)
 
@@ -66,7 +66,7 @@ func Raid(id int32) bool {
 
 	req := hub.ID{}
 	req.F_id = id
-	ret := _call(packet.Pack(hub.Code["raid_req"], req, nil))
+	ret := _call(packet.Pack(hub.Code["raid_req"], &req, nil))
 	reader := packet.Reader(ret)
 	tbl, err := hub.PKT_INT(reader)
 
@@ -82,7 +82,7 @@ func Protect(id int32, until time.Time) bool {
 
 	req := hub.ID{}
 	req.F_id = id
-	ret := _call(packet.Pack(hub.Code["protect_req"], req, nil))
+	ret := _call(packet.Pack(hub.Code["protect_req"], &req, nil))
 	reader := packet.Reader(ret)
 	tbl, err := hub.PKT_INT(reader)
 
@@ -98,7 +98,7 @@ func Free(id int32) bool {
 
 	req := hub.ID{}
 	req.F_id = id
-	ret := _call(packet.Pack(hub.Code["free_req"], req, nil))
+	ret := _call(packet.Pack(hub.Code["free_req"], &req, nil))
 	reader := packet.Reader(ret)
 	tbl, err := hub.PKT_INT(reader)
 
@@ -114,7 +114,7 @@ func Unprotect(id int32) bool {
 
 	req := hub.ID{}
 	req.F_id = id
-	ret := _call(packet.Pack(hub.Code["unprotect_req"], req, nil))
+	ret := _call(packet.Pack(hub.Code["unprotect_req"], &req, nil))
 	reader := packet.Reader(ret)
 	tbl, err := hub.PKT_INT(reader)
 
@@ -130,7 +130,7 @@ func GetInfo(id int32) (info Info, flag bool) {
 
 	req := hub.ID{}
 	req.F_id = id
-	ret := _call(packet.Pack(hub.Code["getinfo_req"], req, nil))
+	ret := _call(packet.Pack(hub.Code["getinfo_req"], &req, nil))
 	reader := packet.Reader(ret)
 	tbl, _err := hub.PKT_INFO(reader)
 	if _err == nil && tbl.F_flag {
@@ -152,7 +152,7 @@ func GetList(A, B int32) (ids, scores []int32, err error) {
 	req := hub.GETLIST{}
 	req.F_A = A
 	req.F_B = B
-	ret := _call(packet.Pack(hub.Code["getlist_req"], req, nil))
+	ret := _call(packet.Pack(hub.Code["getlist_req"], &req, nil))
 	reader := packet.Reader(ret)
 	tbl, _err := hub.PKT_LIST(reader)
 	ids = make([]int32, len(ids))
@@ -170,7 +170,7 @@ func AddUser(id int32) bool {
 	defer _hub_err()
 	req := hub.ID{}
 	req.F_id = id
-	ret := _call(packet.Pack(hub.Code["adduser_req"], req, nil))
+	ret := _call(packet.Pack(hub.Code["adduser_req"], &req, nil))
 	reader := packet.Reader(ret)
 	tbl, err := hub.PKT_INT(reader)
 
@@ -186,7 +186,7 @@ func _forward(dest_id int32, IPC []byte) bool {
 	defer _hub_err()
 	// HUB protocol forwarding
 	msg := hub.FORWARDIPC{F_dest_id: dest_id, F_IPC: IPC}
-	ret := _call(packet.Pack(hub.Code["forward_req"], msg, nil))
+	ret := _call(packet.Pack(hub.Code["forward_req"], &msg, nil))
 	reader := packet.Reader(ret)
 	tbl, err := hub.PKT_INT(reader)
 
@@ -201,7 +201,7 @@ func _forward(dest_id int32, IPC []byte) bool {
 func _group_forward(group_id int32, IPC []byte) bool {
 	defer _hub_err()
 	msg := hub.FORWARDIPC{F_dest_id: group_id, F_IPC: IPC}
-	ret := _call(packet.Pack(hub.Code["forwardgroup_req"], msg, nil))
+	ret := _call(packet.Pack(hub.Code["forwardgroup_req"], &msg, nil))
 	reader := packet.Reader(ret)
 	tbl, err := hub.PKT_INT(reader)
 

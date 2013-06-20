@@ -21,5 +21,5 @@ func P_user_login_req(sess *Session, reader *packet.Packet) []byte {
 		AI.LoginProc(sess)
 	}
 
-	return packet.Pack(Code["user_login_succeed_ack"], ret, nil)
+	return packet.Pack(Code["user_login_succeed_ack"], &ret, nil)
 }

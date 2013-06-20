@@ -13,7 +13,7 @@ func Ping() bool {
 	defer _event_err()
 	req := event.INT{}
 	req.F_v = 1
-	ret := _call(packet.Pack(event.Code["ping_req"], req, nil))
+	ret := _call(packet.Pack(event.Code["ping_req"], &req, nil))
 	reader := packet.Reader(ret)
 	tbl, _ := event.PKT_INT(reader)
 	if tbl.F_v != req.F_v {
@@ -30,7 +30,7 @@ func Add(tblname string, oid uint32, user_id int32, timeout int64) int32 {
 	req.F_oid = oid
 	req.F_user_id = user_id
 	req.F_timeout = timeout
-	ret := _call(packet.Pack(event.Code["add_req"], req, nil))
+	ret := _call(packet.Pack(event.Code["add_req"], &req, nil))
 	reader := packet.Reader(ret)
 	tbl, _ := event.PKT_INT(reader)
 	return tbl.F_v
@@ -40,7 +40,7 @@ func Cancel(event_id int32) {
 	defer _event_err()
 	req := event.CANCEL_REQ{}
 	req.F_event_id = event_id
-	_call(packet.Pack(event.Code["cancel_req"], req, nil))
+	_call(packet.Pack(event.Code["cancel_req"], &req, nil))
 }
 
 func _event_err() {
