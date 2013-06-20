@@ -19,14 +19,14 @@ digraph G {
 	}
 
 	subgraph {
-		node [style=filled shape="diamond" color=8];
+		node [style=filled shape="doublecircle" color=8];
 		Event;
 		Hub;
 		Stats;
 	}
 
 	subgraph {
-		node [style=filled shape=rect color=10];
+		node [shape=box3d style=filled fillcolor=7 color=10 fontcolor=10];
 		GameDB;
 		StatsDB;
 	}
