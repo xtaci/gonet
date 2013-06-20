@@ -1,6 +1,5 @@
 # 转发IPC消息
 FORWARDIPC=
-dest_id int32
 IPC array byte
 ===
 

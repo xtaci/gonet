@@ -15,11 +15,13 @@ import (
 )
 
 type IPCObject struct {
-	Sender    int32  // sender id
-	Multicast bool   // indicate wheather this message should be deliver to a group.
-	Service   int16  // service type
-	Object    []byte // json formatted object
-	Time      int64  // sent time
+	SrcID      int32  // sender id
+	DestID     int32  // destination id	
+	Multicast  bool   // indicate wheather this message should be deliver to a group.
+	Service    int16  // service type
+	Object     []byte // json formatted object
+	Time       int64  // sent time
+	MarkDelete bool   // for db mark as delete
 }
 
 func (obj *IPCObject) Json() []byte {

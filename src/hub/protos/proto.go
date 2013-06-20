@@ -3,8 +3,7 @@ package protos
 import "misc/packet"
 
 type FORWARDIPC struct {
-	F_dest_id int32
-	F_IPC     []byte
+	F_IPC []byte
 }
 
 type LOGIN_REQ struct {
@@ -68,9 +67,6 @@ type INT struct {
 }
 
 func PKT_FORWARDIPC(reader *packet.Packet) (tbl FORWARDIPC, err error) {
-	tbl.F_dest_id, err = reader.ReadS32()
-	checkErr(err)
-
 	tbl.F_IPC, err = reader.ReadBytes()
 	checkErr(err)
 

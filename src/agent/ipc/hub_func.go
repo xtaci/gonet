@@ -8,6 +8,7 @@ import (
 import (
 	hub "hub/protos"
 	"misc/packet"
+	. "types"
 )
 
 type Info struct {
@@ -182,10 +183,10 @@ func AddUser(id int32) bool {
 }
 
 //------------------------------------------------ Forward to Hub
-func _forward(dest_id int32, IPC []byte) bool {
+func _forward(req *IPCObject) bool {
 	defer _hub_err()
 	// HUB protocol forwarding
-	msg := hub.FORWARDIPC{F_dest_id: dest_id, F_IPC: IPC}
+	msg := hub.FORWARDIPC{F_IPC: req.Json()}
 	ret := _call(packet.Pack(hub.Code["forward_req"], &msg, nil))
 	reader := packet.Reader(ret)
 	tbl, err := hub.PKT_INT(reader)
@@ -198,9 +199,9 @@ func _forward(dest_id int32, IPC []byte) bool {
 }
 
 //------------------------------------------------ Forward to Hub/Group
-func _group_forward(group_id int32, IPC []byte) bool {
+func _group_forward(req *IPCObject) bool {
 	defer _hub_err()
-	msg := hub.FORWARDIPC{F_dest_id: group_id, F_IPC: IPC}
+	msg := hub.FORWARDIPC{F_IPC: req.Json()}
 	ret := _call(packet.Pack(hub.Code["forwardgroup_req"], &msg, nil))
 	reader := packet.Reader(ret)
 	tbl, err := hub.PKT_INT(reader)

@@ -156,23 +156,31 @@ func P_getinfo_req(hostid int32, pkt *packet.Packet) []byte {
 func P_forward_req(hostid int32, pkt *packet.Packet) []byte {
 	tbl, _ := PKT_FORWARDIPC(pkt)
 
+	object := &IPCObject{}
+	err := json.Unmarshal(tbl.F_IPC, object)
+
+	if err != nil {
+		log.Println("decode forward IPCObject error")
+		return nil
+	}
+
 	// if user is online, send to the server, or else send to database
-	state := core.State(tbl.F_dest_id)
+	state := core.State(object.DestID)
 
 	//fmt.Println(tbl.F_dest_id, tbl.F_IPC)
 	switch state {
 	case core.ON_PROT, core.ON_FREE:
-		host := core.Host(tbl.F_dest_id)
+		host := core.Host(object.DestID)
 
 		ch := ForwardChan(host)
 
 		if ch != nil {
 			ch <- tbl.F_IPC
 		} else {
-			forward_tbl.Push(tbl.F_dest_id, tbl.F_IPC)
+			forward_tbl.Push(object)
 		}
 	default:
-		forward_tbl.Push(tbl.F_dest_id, tbl.F_IPC)
+		forward_tbl.Push(object)
 	}
 
 	ret := INT{F_v: 1}
@@ -187,21 +195,21 @@ func P_forwardgroup_req(hostid int32, pkt *packet.Packet) (r []byte) {
 		r = packet.Pack(-1, &ret, nil)
 	}()
 
-	obj := &IPCObject{}
-	err := json.Unmarshal(tbl.F_IPC, obj)
+	object := &IPCObject{}
+	err := json.Unmarshal(tbl.F_IPC, object)
 	if err != nil {
 		ret.F_v = 0
 		log.Println("decode group IPCObject error")
 		return
 	}
 
-	group := core.Group(tbl.F_dest_id)
+	group := core.Group(object.DestID)
 	if group == nil {
 		ret.F_v = 0
 		log.Println("forward ipc: no such group")
 		return
 	}
-	group.Push(obj)
+	group.Push(object)
 
 	// send to online users directly
 	members := group.Members()

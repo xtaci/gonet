@@ -7,11 +7,11 @@ import (
 )
 
 func TestForward(t *testing.T) {
-	obj := &IPCObject{Sender: 1}
-	Push(1, obj.Json())
-	objs := PopAll(1)
+	obj := &IPCObject{SrcID: 1, DestID: 2}
+	fmt.Println(Push(obj))
+	objs := PopAll(2)
 
 	for k := range objs {
-		fmt.Println(k, string(objs[k]))
+		fmt.Println("retrieved:", objs[k])
 	}
 }

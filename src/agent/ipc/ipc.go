@@ -34,7 +34,7 @@ func Send(src_id, dest_id int32, service int16, object interface{}) (ret bool) {
 		return false
 	}
 
-	req := &IPCObject{Sender: src_id, Service: service, Object: val, Time: time.Now().Unix()}
+	req := &IPCObject{SrcID: src_id, DestID: dest_id, Service: service, Object: val, Time: time.Now().Unix()}
 
 	// first try local delivery, if dest_id is not in the same server, just forward to HUB server.
 	peer := QueryOnline(dest_id)
@@ -47,7 +47,7 @@ func Send(src_id, dest_id int32, service int16, object interface{}) (ret bool) {
 		return true
 	} else {
 		// convert req to json again, LEVEL-2 encapsulation
-		return _forward(dest_id, req.Json())
+		return _forward(req)
 	}
 }
 
@@ -59,6 +59,6 @@ func GroupSend(src_id int32, group_id int32, service int16, object interface{}) 
 		return false
 	}
 
-	req := &IPCObject{Multicast: true, Sender: src_id, Service: service, Object: val, Time: time.Now().Unix()}
-	return _group_forward(group_id, req.Json())
+	req := &IPCObject{Multicast: true, SrcID: src_id, DestID: group_id, Service: service, Object: val, Time: time.Now().Unix()}
+	return _group_forward(req)
 }

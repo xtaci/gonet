@@ -1,6 +1,7 @@
 package forward_tbl
 
 import (
+	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"log"
 )
@@ -8,50 +9,52 @@ import (
 import (
 	"cfg"
 	. "db"
+	. "types"
 )
 
 const (
 	COLLECTION = "FORWARDS"
 )
 
-type Forward struct {
-	DestId int32
-	Value  []byte
-}
-
-func Push(dest_id int32, value []byte) bool {
+func Push(req *IPCObject) bool {
 	config := cfg.Get()
 	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
 
-	forward := &Forward{DestId: dest_id, Value: value}
-	err := c.Insert(forward)
+	err := c.Insert(req)
 	if err != nil {
-		log.Println(err, dest_id)
+		log.Println(err, req)
 		return false
 	}
 
 	return true
 }
 
-func PopAll(dest_id int32) [][]byte {
+func PopAll(dest_id int32) []IPCObject {
 	config := cfg.Get()
 	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
 
-	var forwards []Forward
-	err := c.Find(bson.M{"destid": dest_id}).All(&forwards)
+	var objects []IPCObject
+	change := mgo.Change{
+		Update: bson.M{"$set": bson.M{"markdelete": true}},
+	}
+
+	// mark delete
+	info, err := c.Find(bson.M{"destid": dest_id}).Apply(change, &objects)
 	if err != nil {
-		log.Println(err, dest_id)
+		log.Println(err, info)
 	}
 
-	info, err := c.RemoveAll(bson.M{"destid": dest_id})
+	// select
+	err = c.Find(bson.M{"destid": dest_id, "markdelete": true}).Sort("time").All(&objects)
 	if err != nil {
-		log.Println(info, err, dest_id)
+		log.Println(err)
 	}
 
-	objs := make([][]byte, len(forwards))
-	for k := range forwards {
-		objs[k] = forwards[k].Value
+	// real delete
+	info, err = c.RemoveAll(bson.M{"destid": dest_id, "markdelete": true})
+	if err != nil {
+		log.Println(err, info)
 	}
 
-	return objs
+	return objects
 }
