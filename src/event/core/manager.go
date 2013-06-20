@@ -6,6 +6,7 @@ import (
 
 import (
 	"db"
+	"db/event_tbl"
 	"misc/timer"
 	. "types"
 )
@@ -48,10 +49,13 @@ func Add(Type int16, user_id int32, timeout int64, params []byte) int32 {
 	event_id := db.NextVal(EVENTID_GEN)
 	timer.Add(event_id, timeout, _event_ch)
 
-	event := &Event{Type: Type, UserId: user_id, Timeout: timeout, Params: params}
+	event := &Event{Type: Type, UserId: user_id, EventId: event_id, Timeout: timeout, Params: params}
 	_events_lock.Lock()
 	_events[event_id] = event
 	_events_lock.Unlock()
+
+	// store to db
+	event_tbl.Add(event)
 
 	return event_id
 }
