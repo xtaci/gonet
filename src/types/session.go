@@ -15,11 +15,11 @@ import (
 )
 
 type IPCObject struct {
-	Sender    int32 // sender id
-	Multicast bool  // indicate wheather this message is a multicast message(group)
-	Service   int16
+	Sender    int32  // sender id
+	Multicast bool   // indicate wheather this message should be deliver to a group.
+	Service   int16  // service type
 	Object    []byte // json formatted object
-	Time      int64  // send time
+	Time      int64  // sent time
 }
 
 func (obj *IPCObject) Json() []byte {
