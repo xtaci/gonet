@@ -2,6 +2,7 @@ package geoip
 
 import (
 	"bufio"
+	"encoding/binary"
 	"net"
 	"os"
 	"strings"
@@ -53,7 +54,7 @@ func init() {
 func _int64_ip(_ip net.IP) int64 {
 	ip := _ip.To4()
 	if ip != nil {
-		ipv4 := uint32(ip[0])<<24 | uint32(ip[1])<<16 | uint32(ip[2])<<8 | uint32(ip[3])
+		ipv4 := binary.BigEndian.Uint32(ip)
 		return int64(ipv4)
 	}
 
