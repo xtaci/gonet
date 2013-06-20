@@ -24,7 +24,7 @@
 4.  多播消息在只保留一个固定长度的FIFO, 登录后，多播消息的未读部分 ___HUB___ 会直接forward给玩家goroutine
 
 #### 安装先决条件:
-0. 确保安装好bzr, graphviz
+0. 确保安装好bzr, graphviz, gawk
 1. 确保安装好mongodb
 2. 确保config.ini中的mongo_xxxx配置正确
 3. export GOPATH='当前目录'
