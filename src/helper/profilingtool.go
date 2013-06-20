@@ -83,10 +83,10 @@ func showSystemStat(interval time.Duration, count int) {
 		//http://man7.org/linux/man-pages/man3/vtimes.3.html
 		syscall.Getrusage(syscall.RUSAGE_SELF, usage1)
 
-		utime := usage1.Utime.Sec*1000000000 + usage1.Utime.Usec
-		stime := usage1.Stime.Sec*1000000000 + usage1.Stime.Usec
-		userCPUUtil := float64(int64(utime)-lastUtime) * 100 / float64(interval)
-		sysCPUUtil := float64(int64(stime)-lastStime) * 100 / float64(interval)
+		utime := int64(usage1.Utime.Sec*1000000000) + int64(usage1.Utime.Usec)
+		stime := int64(usage1.Stime.Sec*1000000000) + int64(usage1.Stime.Usec)
+		userCPUUtil := float64(utime-lastUtime) * 100 / float64(interval)
+		sysCPUUtil := float64(stime-lastStime) * 100 / float64(interval)
 		memUtil := usage1.Maxrss * 1024
 
 		lastUtime = int64(utime)
