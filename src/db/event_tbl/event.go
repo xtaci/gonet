@@ -8,27 +8,20 @@ import (
 import (
 	"cfg"
 	. "db"
+	. "types"
 )
 
 const (
 	COLLECTION = "EVENTS"
 )
 
-type Event struct {
-	UserId  int32
-	EventId int32
-	Type    int16
-	Params  []byte
-}
-
-func Push(event_id, user_id int32, _type int16, params []byte) bool {
+func Add(event *Event) bool {
 	config := cfg.Get()
 	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
 
-	event := &Event{UserId: user_id, EventId: event_id, Type: _type, Params: params}
 	err := c.Insert(event)
 	if err != nil {
-		log.Println(err, user_id)
+		log.Println(err, event)
 		return false
 	}
 

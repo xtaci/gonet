@@ -3,11 +3,14 @@ package event_tbl
 import (
 	"fmt"
 	"testing"
+	"time"
+	. "types"
 )
 
 func TestEvent(t *testing.T) {
 	params := []byte("hello")
-	Push(1, 2, 3, params)
+	event := &Event{EventId: 1, UserId: 2, Type: 3, Params: params, Timeout: time.Now().Unix()}
+	Add(event)
 	obj := Get(1)
 	fmt.Println("#", obj, "#")
 	if obj == nil {
