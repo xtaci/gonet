@@ -41,7 +41,7 @@ func parse(file *os.File) {
 			continue
 		}
 
-		// 第一列包含特殊含义
+		// the first column is indexed
 		for i := 1; i < len(fields); i++ {
 			_set(tblname, fields[0], names[i], fields[i])
 		}

@@ -13,4 +13,8 @@ gamedata能处理如下格式的.csv文件
 .....     
 
 列M  | 值M1  | 值M2  | 值M3  | ...... | 值MN |         
-    
+  
+
+表名，第一行，第一列被用来索引 :      
+
+(TABLE, COLUMN, FIELDNAME) -> CELL       
