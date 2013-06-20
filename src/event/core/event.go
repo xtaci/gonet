@@ -7,13 +7,8 @@ import (
 import (
 	"db"
 	"misc/timer"
+	. "types"
 )
-
-type Event struct {
-	_type   int16
-	user_id int32
-	timeout int64
-}
 
 var (
 	_event_ch    chan int32
@@ -49,11 +44,11 @@ func _expire() {
 }
 
 //---------------------------------------------------------- Add a timeout event
-func Add(Type int16, user_id int32, timeout int64) int32 {
+func Add(Type int16, user_id int32, timeout int64, params []byte) int32 {
 	event_id := db.NextVal(EVENTID_GEN)
 	timer.Add(event_id, timeout, _event_ch)
 
-	event := &Event{_type: Type, user_id: user_id, timeout: timeout}
+	event := &Event{Type: Type, UserId: user_id, Timeout: timeout, Params: params}
 	_events_lock.Lock()
 	_events[event_id] = event
 	_events_lock.Unlock()
@@ -69,9 +64,9 @@ func Cancel(event_id int32) {
 }
 
 //---------------------------------------------------------- Load a timeout event at startup
-func Load(Type int16, user_id int32, timeout int64, event_id int32) {
+func Load(event_id int32, Type int16, user_id int32, timeout int64, params []byte) {
 	timer.Add(event_id, timeout, _event_ch)
-	event := &Event{_type: Type, user_id: user_id, timeout: timeout}
+	event := &Event{EventId: event_id, Type: Type, UserId: user_id, Timeout: timeout, Params: params}
 	_events[event_id] = event
 
 	return

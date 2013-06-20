@@ -2,6 +2,7 @@ ADD_EVENT=
 type int16
 user_id int32
 timeout int64
+params array byte
 ===
 
 CANCEL_EVENT=

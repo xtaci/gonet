@@ -45,7 +45,7 @@ func P_ping_req(reader *packet.Packet) []byte {
 
 func P_add_req(reader *packet.Packet) []byte {
 	tbl, _ := PKT_ADD_EVENT(reader)
-	event_id := core.Add(tbl.F_type, tbl.F_user_id, tbl.F_timeout)
+	event_id := core.Add(tbl.F_type, tbl.F_user_id, tbl.F_timeout, tbl.F_params)
 	ret := INT{event_id}
 
 	return packet.Pack(-1, &ret, nil)

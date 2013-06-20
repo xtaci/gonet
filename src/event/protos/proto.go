@@ -6,6 +6,7 @@ type ADD_EVENT struct {
 	F_type    int16
 	F_user_id int32
 	F_timeout int64
+	F_params  []byte
 }
 
 type CANCEL_EVENT struct {
@@ -28,6 +29,9 @@ func PKT_ADD_EVENT(reader *packet.Packet) (tbl ADD_EVENT, err error) {
 	checkErr(err)
 
 	tbl.F_timeout, err = reader.ReadS64()
+	checkErr(err)
+
+	tbl.F_params, err = reader.ReadBytes()
 	checkErr(err)
 
 	return
