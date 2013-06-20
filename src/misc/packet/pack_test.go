@@ -27,8 +27,6 @@ func TestPack(t *testing.T) {
 	test.Sub[1].H = 4096
 	test.Sub[1].I = 8192
 
-	writer := Writer()
-	Pack(128, test, writer)
-	fmt.Println(writer.Data())
 	fmt.Println(Pack(128, test, nil))
+	fmt.Println(Pack(128, &test, nil))
 }

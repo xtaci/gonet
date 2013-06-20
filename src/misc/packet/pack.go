@@ -11,6 +11,11 @@ func Pack(tos int16, tbl interface{}, writer *Packet) []byte {
 	}
 
 	v := reflect.ValueOf(tbl)
+
+	switch v.Kind() {
+	case reflect.Ptr, reflect.Interface:
+		v = v.Elem()
+	}
 	count := v.NumField()
 
 	// write code
