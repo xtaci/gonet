@@ -23,12 +23,13 @@ func Ping() bool {
 	return true
 }
 
-func Add(Type int16, user_id int32, timeout int64) int32 {
+func Add(Type int16, user_id int32, timeout int64, params []byte) int32 {
 	defer _event_err()
 	req := event.ADD_EVENT{}
 	req.F_type = Type
 	req.F_user_id = user_id
 	req.F_timeout = timeout
+	req.F_params = params
 	ret := _call(packet.Pack(event.Code["add_req"], &req, nil))
 	reader := packet.Reader(ret)
 	tbl, _ := event.PKT_INT(reader)
