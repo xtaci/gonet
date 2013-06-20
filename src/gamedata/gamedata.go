@@ -2,6 +2,7 @@ package gamedata
 
 import (
 	"log"
+	"math"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -120,12 +121,9 @@ func _get(tblname string, rowname string, fieldname string) string {
 
 func GetInt(tblname string, rowname string, fieldname string) int32 {
 	val := _get(tblname, rowname, fieldname)
-	if val == "" {
-		return ^int32(0) // return MAX INT
-	}
-
 	v, err := strconv.Atoi(val)
 	if err != nil {
+		v = math.MaxInt32
 		log.Println("cannot parse integer from gamedata", err)
 	}
 
@@ -134,12 +132,9 @@ func GetInt(tblname string, rowname string, fieldname string) int32 {
 
 func GetFloat(tblname string, rowname string, fieldname string) float32 {
 	val := _get(tblname, rowname, fieldname)
-	if val == "" {
-		return 0.0
-	}
-
 	f, err := strconv.ParseFloat(val, 32)
 	if err != nil {
+		f = math.MaxFloat32
 		log.Println("cannot parse float from gamedata", err)
 	}
 
