@@ -38,6 +38,7 @@ type Session struct {
 	Soldiers *soldiers.Manager
 	Heroes   *heroes.Manager
 	Grid     *grid.Grid // Building's bitmap, online constructing...
+	Events   []int32    // event ids
 
 	// session related
 	LoggedIn bool // flag for weather the user is logged in
