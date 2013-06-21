@@ -7,11 +7,16 @@ import (
 )
 
 func TestForward(t *testing.T) {
-	obj := &IPCObject{SrcID: 1, DestID: 2}
+	obj := &IPCObject{SrcID: 0, DestID: 1}
 	fmt.Println(Push(obj))
-	objs := PopAll(2)
+	fmt.Println(Push(obj))
+	objs := PopAll(1)
 
 	for k := range objs {
 		fmt.Println("retrieved:", objs[k])
+	}
+
+	if len(objs) != 2 {
+		t.Fatal("forward db failed getall")
 	}
 }

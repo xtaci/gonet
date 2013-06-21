@@ -1,7 +1,6 @@
 package forward_tbl
 
 import (
-	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
 	"log"
 )
@@ -36,18 +35,14 @@ func PopAll(dest_id int32) []IPCObject {
 	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
 
 	var objects []IPCObject
-	change := mgo.Change{
-		Update: bson.M{"$set": bson.M{"markdelete": true}},
-	}
-
 	// mark delete
-	info, err := c.Find(bson.M{"destid": dest_id}).Apply(change, &objects)
+	info, err := c.UpdateAll(bson.M{"destid": dest_id}, bson.M{"$set": bson.M{"markdelete": true}})
 	if err != nil {
 		log.Println(err, info)
 	}
 
 	// select
-	err = c.Find(bson.M{"destid": dest_id, "markdelete": true}).Sort("time").All(&objects)
+	err = c.Find(bson.M{"destid": dest_id, "markdelete": true}).Sort("-time").All(&objects)
 	if err != nil {
 		log.Println(err)
 	}
