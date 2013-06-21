@@ -23,6 +23,10 @@
 3.  单播消息在玩家离线时会存入db, 登录后的启动过程 ___GS___ 直接读取db，并forward给玩家goroutine。
 4.  多播消息在只保留一个固定长度的FIFO, 登录后，多播消息的未读部分 ___HUB___ 会直接forward给玩家goroutine
 
+#### 服务器状态一致性
+1.  GS节点可以单独重启    
+2.  HUB/ES/SS 重启后，GS必须全部重启。    
+
 #### 安装先决条件:
 0. 确保安装好bzr, graphviz, gawk
 1. 确保安装好mongodb
