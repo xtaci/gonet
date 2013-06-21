@@ -34,7 +34,7 @@ line:
 		;
 
 expr:
-		list|help|quit|inspect|gc
+		list|help|quit|inspect|gc|length
 		;
 
 list:

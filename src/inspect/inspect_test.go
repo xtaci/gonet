@@ -12,5 +12,7 @@ func TestInspect(t *testing.T) {
 	sess.User = &User{Id: 1}
 	ipc.RegisterOnline(&sess, sess.User.Id)
 	Inspect(1, os.Stdout)
+	println("inspect field:")
 	InspectField(1, ".User", os.Stdout)
+	InspectField(1, ".Events", os.Stdout)
 }

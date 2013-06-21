@@ -48,22 +48,27 @@ func InspectField(id int32, field string, output io.Writer) {
 		}
 	}
 
-	Print(output, node.Interface())
+	Print(output, node)
 }
 
 func ListAll(output io.Writer) {
-	Print(output, ipc.ListAll())
+	Print(output, reflect.ValueOf(ipc.ListAll()))
 }
 
 func prompt(output io.Writer) {
 	fmt.Fprint(output, "gonet> ")
 }
 
-func Print(output io.Writer, value interface{}) {
-	txt, err := json.MarshalIndent(value, "", "\t")
+func Print(output io.Writer, value reflect.Value) {
+	txt, err := json.MarshalIndent(value.Interface(), "", "\t")
 	if err != nil {
 		fmt.Fprintln(output, err)
 	} else {
 		fmt.Fprintln(output, string(txt))
+	}
+
+	switch value.Kind() {
+	case reflect.Array, reflect.Map, reflect.Slice, reflect.String:
+		fmt.Fprintln(output, "length:", value.Len())
 	}
 }
