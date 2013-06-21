@@ -16,7 +16,7 @@ import (
 
 type IPCObject struct {
 	SrcID      int32  // sender id
-	DestID     int32  // destination id	
+	DestID     int32  // destination id
 	Multicast  bool   // indicate wheather this message should be deliver to a group.
 	Service    int16  // service type
 	Object     []byte // json formatted object
