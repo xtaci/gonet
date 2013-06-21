@@ -16,6 +16,7 @@ const (
 	COLLECTION = "FORWARDS"
 )
 
+//---------------------------------------------------------- push an ipc object to db
 func Push(req *IPCObject) bool {
 	config := cfg.Get()
 	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
@@ -29,6 +30,7 @@ func Push(req *IPCObject) bool {
 	return true
 }
 
+//---------------------------------------------------------- pop all message for dest user
 func PopAll(dest_id int32) []IPCObject {
 	config := cfg.Get()
 	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
