@@ -45,9 +45,10 @@ func TestLogin(t *testing.T) {
 	}
 }
 
-func BenchmarkLogin(b *testing.B) {
+func BenchmarkLoginout(b *testing.B) {
 	for i := 1; i <= b.N; i++ {
 		Login(int32(i))
+		Logout(int32(i))
 	}
 }
 
