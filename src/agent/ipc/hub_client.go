@@ -14,6 +14,7 @@ import (
 
 import (
 	"cfg"
+	"db/forward_tbl"
 	"helper"
 	"misc/packet"
 	. "types"
@@ -87,30 +88,27 @@ func HubReceiver(conn net.Conn) {
 		// b). Call, sequence number is needed, send will wake up blocking-chan.
 		//
 		if seqval == 0 {
-			reader := packet.Reader(data)
-			dest_id, err := reader.ReadS32()
+			obj := &IPCObject{}
+			err := json.Unmarshal(data, obj)
 			if err != nil {
-				log.Println("forward: read dest_id failed.")
+				log.Println("unable to decode received IPCObject")
 				continue
 			}
 
-			sess := QueryOnline(dest_id)
+			sess := QueryOnline(obj.DestID)
 			if sess == nil {
-				log.Println("forward: user is offline.")
+				// if the user is disconnected
+				forward_tbl.Push(obj)
 			} else {
 				func() {
 					defer func() {
 						if x := recover(); x != nil {
 							log.Println("forward: deliver to MQ failed.")
+							forward_tbl.Push(obj)
 						}
 					}()
-					decoded := &IPCObject{}
-					err := json.Unmarshal(data[reader.Pos():], decoded)
-					if err != nil {
-						log.Println("unable to decode forwared-IPC request")
-					} else {
-						sess.MQ <- *decoded
-					}
+
+					sess.MQ <- *obj
 				}()
 			}
 		} else {
