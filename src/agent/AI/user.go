@@ -49,11 +49,12 @@ func LoginProc(sess *Session) bool {
 	// 开始计算Flush时间
 	sess.LastFlushTime = time.Now().Unix()
 
-	// 最后, 载入离线消息，并push到MQ, 这里小心MQ的buffer长度
-	LoadIPCObjects(sess.User.Id, sess.MQ)
-
 	// 注册为在线
 	ipc.RegisterOnline(sess, sess.User.Id)
+
+	// 最后, 载入离线消息，并push到MQ, 这里小心MQ的buffer长度, 
+	// 不能直接调用，有可能消息超过MQ被永远阻塞
+	go LoadIPCObjects(sess.User.Id, sess.MQ)
 
 	// TODO: 标记在线
 	//sess.LoggedIn = true

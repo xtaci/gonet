@@ -23,7 +23,7 @@ func TestLoginProc(t *testing.T) {
 func BenchmarkLoginProc(b *testing.B) {
 	for i := 1; i <= b.N; i++ {
 		sess := &Session{}
-		sess.MQ = make(chan IPCObject, 1)
+		sess.MQ = make(chan IPCObject, 10)
 		sess.User = &User{Id: int32(i)}
 		LoginProc(sess)
 		user_tbl.Set(sess.User)
