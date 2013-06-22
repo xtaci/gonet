@@ -7,6 +7,7 @@ import (
 )
 
 import (
+	"db/forward_tbl"
 	. "types"
 )
 
@@ -21,16 +22,10 @@ var IPCHandler map[int16]func(*Session, *IPCObject) bool = map[int16]func(*Sessi
 
 //---------------------------------------------------------- p2p send from src_id to dest_id
 func Send(src_id, dest_id int32, service int16, object interface{}) (ret bool) {
-	defer func() {
-		if x := recover(); x != nil {
-			ret = false
-		}
-	}()
-
 	// convert the OBJECT to json, LEVEL-1 encapsulation
 	val, err := json.Marshal(object)
 	if err != nil {
-		log.Println("IPC Send error:", err)
+		log.Println("cannot marshal object to json", err)
 		return false
 	}
 
@@ -39,6 +34,13 @@ func Send(src_id, dest_id int32, service int16, object interface{}) (ret bool) {
 	// first try local delivery, if dest_id is not in the same server, just forward to HUB server.
 	peer := QueryOnline(dest_id)
 	if peer != nil {
+		defer func() {
+			if x := recover(); x != nil {
+				ret = false
+				forward_tbl.Push(req)
+			}
+		}()
+
 		select {
 		case peer.MQ <- *req:
 		case <-time.After(time.Second):
@@ -55,7 +57,7 @@ func Send(src_id, dest_id int32, service int16, object interface{}) (ret bool) {
 func GroupSend(src_id int32, group_id int32, service int16, object interface{}) (ret bool) {
 	val, err := json.Marshal(object)
 	if err != nil {
-		log.Println("IPC Send error:", err)
+		log.Println("cannot marshal object to json:", err)
 		return false
 	}
 
