@@ -1,19 +1,20 @@
-
 //line ./src/inspect/inspect.y:2
 package inspect
+
 import __yyfmt__ "fmt"
+
 //line ./src/inspect/inspect.y:2
-		import (
+import (
 	"fmt"
 	"helper"
 )
 
 //line ./src/inspect/inspect.y:9
 type yySymType struct {
-	yys int 
-	n int;
-	s string;
-	nodes string;
+	yys   int
+	n     int
+	s     string
+	nodes string
 }
 
 const INSPECT = 57346
@@ -40,7 +41,6 @@ const yyErrCode = 2
 const yyMaxDepth = 200
 
 //line ./src/inspect/inspect.y:87
-
 
 //line yacctab:1
 var yyExca = []int{
@@ -331,48 +331,48 @@ yydefault:
 
 	case 3:
 		//line ./src/inspect/inspect.y:30
-		{ 
-				prompt(conn)
-			}
+		{
+			prompt(conn)
+		}
 	case 10:
 		//line ./src/inspect/inspect.y:42
 		{
-				ListAll(conn)
-				prompt(conn)
-			}
+			ListAll(conn)
+			prompt(conn)
+		}
 	case 11:
 		//line ./src/inspect/inspect.y:50
 		{
-				fmt.Fprintln(conn, "\t(p)rint user_id: inspect a user struct")
-				fmt.Fprintln(conn, "\t(p)rint user_id.Field1.Field2...: dotted fields")
-				fmt.Fprintln(conn, "\t(l)ist: list all online users")
-				fmt.Fprintln(conn, "\tgc: force a garbage collection")
-				prompt(conn) 
-			}
+			fmt.Fprintln(conn, "\t(p)rint user_id: inspect a user struct")
+			fmt.Fprintln(conn, "\t(p)rint user_id.Field1.Field2...: dotted fields")
+			fmt.Fprintln(conn, "\t(l)ist: list all online users")
+			fmt.Fprintln(conn, "\tgc: force a garbage collection")
+			prompt(conn)
+		}
 	case 12:
 		//line ./src/inspect/inspect.y:61
-		{ 
-				conn.Close() 
-			}
+		{
+			conn.Close()
+		}
 	case 13:
 		//line ./src/inspect/inspect.y:68
-		{ 
-				Inspect(int32(yyS[yypt-0].n), conn)
-				prompt(conn)
-			}
+		{
+			Inspect(int32(yyS[yypt-0].n), conn)
+			prompt(conn)
+		}
 	case 14:
 		//line ./src/inspect/inspect.y:74
 		{
-				InspectField(int32(yyS[yypt-1].n), yyS[yypt-0].nodes, conn) 
-				prompt(conn)
-			}
+			InspectField(int32(yyS[yypt-1].n), yyS[yypt-0].nodes, conn)
+			prompt(conn)
+		}
 	case 15:
 		//line ./src/inspect/inspect.y:81
 		{
-				helper.GC()
-				helper.FprintGCSummary(conn)
-				prompt(conn)
-			}
+			helper.GC()
+			helper.FprintGCSummary(conn)
+			prompt(conn)
+		}
 	}
 	goto yystack /* stack new state and value */
 }

@@ -24,7 +24,6 @@ func close_work(sess *Session) {
 
 		for len(sess.MQ) > 0 {
 			ipcobject := <-sess.MQ
-			ipcobject.MarkDelete = false
 			forward_tbl.Push(&ipcobject)
 		}
 

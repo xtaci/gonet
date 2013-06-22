@@ -20,6 +20,7 @@ func Push(req *IPCObject) bool {
 	config := cfg.Get()
 	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
 
+	req.MarkDelete = false
 	err := c.Insert(req)
 	if err != nil {
 		log.Println(err, req)
