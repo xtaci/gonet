@@ -29,7 +29,7 @@ func init() {
 		panic(err)
 	}
 
-	session.SetMode(mgo.Eventual, true)
+	session.SetMode(mgo.Monotonic, true)
 	Mongo = session
 }
 
