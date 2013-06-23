@@ -55,13 +55,13 @@ func BenchmarkLoginout(b *testing.B) {
 func BenchmarkForward(b *testing.B) {
 	obj := &TMPObj{A: 10, B: 20, C: "test"}
 	for i := 0; i < b.N; i++ {
-		Send(0, 1, 1, obj)
+		Send(0, 1, 1, false, obj)
 	}
 }
 
 func BenchmarkGroupForward(b *testing.B) {
 	obj := &TMPObj{A: 10, B: 20, C: "test"}
 	for i := 0; i < b.N; i++ {
-		GroupSend(0, 1, 1, obj)
+		Send(0, 1, 1, true, obj)
 	}
 }

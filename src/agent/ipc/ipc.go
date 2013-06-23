@@ -21,7 +21,11 @@ var IPCHandler map[int16]func(*Session, *IPCObject) bool = map[int16]func(*Sessi
 }
 
 //---------------------------------------------------------- p2p send from src_id to dest_id
-func Send(src_id, dest_id int32, service int16, object interface{}) (ret bool) {
+func Send(src_id, dest_id int32, service int16, multicast bool, object interface{}) (ret bool) {
+	if multicast {
+		return _multicast(src_id, dest_id, service, object)
+	}
+
 	// convert the OBJECT to json, LEVEL-1 encapsulation
 	val, err := json.Marshal(object)
 	if err != nil {
@@ -54,7 +58,7 @@ func Send(src_id, dest_id int32, service int16, object interface{}) (ret bool) {
 }
 
 //---------------------------------------------------------- group send
-func GroupSend(src_id int32, group_id int32, service int16, object interface{}) (ret bool) {
+func _multicast(src_id int32, group_id int32, service int16, object interface{}) (ret bool) {
 	val, err := json.Marshal(object)
 	if err != nil {
 		log.Println("cannot marshal object to json:", err)
