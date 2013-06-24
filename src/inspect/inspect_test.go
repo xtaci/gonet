@@ -1,7 +1,7 @@
 package inspect
 
 import (
-	"agent/ipc"
+	"agent/gsdb"
 	"os"
 	"testing"
 	. "types"
@@ -10,7 +10,7 @@ import (
 func TestInspect(t *testing.T) {
 	var sess Session
 	sess.User = &User{Id: 1}
-	ipc.RegisterOnline(&sess, sess.User.Id)
+	gsdb.RegisterOnline(&sess, sess.User.Id)
 	Inspect(1, os.Stdout)
 	println("inspect field:")
 	InspectField(1, ".User", os.Stdout)

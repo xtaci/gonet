@@ -2,6 +2,7 @@ package main
 
 import (
 	"agent/ipc"
+	"agent/gsdb"
 	"math/rand"
 	"sync"
 	"testing"
@@ -30,8 +31,8 @@ func TestIPC(t *testing.T) {
 	go _simple_receiver(&sess1, wg)
 	go _simple_receiver(&sess2, wg)
 
-	ipc.RegisterOnline(&sess1, sess1.User.Id)
-	ipc.RegisterOnline(&sess2, sess2.User.Id)
+	gsdb.RegisterOnline(&sess1, sess1.User.Id)
+	gsdb.RegisterOnline(&sess2, sess2.User.Id)
 
 	if !ipc.Send(1, 2, ipc.SERVICE_PING, false, "ABC") {
 		t.Fatal("ipc.Send failed")
@@ -46,7 +47,7 @@ func BenchmarkIPC(b *testing.B) {
 		var sess Session
 		sess.User = &User{Id: int32(i)}
 		sess.MQ = make(chan IPCObject, 10)
-		ipc.RegisterOnline(&sess, sess.User.Id)
+		gsdb.RegisterOnline(&sess, sess.User.Id)
 		go _simple_receiver(&sess, wg)
 	}
 
