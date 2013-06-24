@@ -9,11 +9,11 @@ import (
 )
 
 import (
-	"agent/ipc"
+	"agent/gsdb"
 )
 
 func Inspect(id int32, output io.Writer) {
-	sess := ipc.QueryOnline(id)
+	sess := gsdb.QueryOnline(id)
 	fmt.Fprintf(output, "%+v\n", sess)
 }
 
@@ -21,7 +21,7 @@ func InspectField(id int32, field string, output io.Writer) {
 	fields := strings.Split(field, ".")
 	fields = fields[1:]
 
-	sess := ipc.QueryOnline(id)
+	sess := gsdb.QueryOnline(id)
 	node := reflect.ValueOf(sess).Elem()
 
 	if sess == nil {
@@ -52,7 +52,7 @@ func InspectField(id int32, field string, output io.Writer) {
 }
 
 func ListAll(output io.Writer) {
-	Print(output, reflect.ValueOf(ipc.ListAll()))
+	Print(output, reflect.ValueOf(gsdb.ListAll()))
 }
 
 func prompt(output io.Writer) {

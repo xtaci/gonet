@@ -7,6 +7,8 @@ import (
 )
 
 import (
+	"agent/gsdb"
+	"agent/hub_client"
 	"db/forward_tbl"
 	. "types"
 )
@@ -38,7 +40,7 @@ func Send(src_id, dest_id int32, service int16, multicast bool, object interface
 	req := &IPCObject{SrcID: src_id, DestID: dest_id, Service: service, Object: val, Time: time.Now().Unix()}
 
 	// first try local delivery, if dest_id is not in the same server, just forward to HUB server.
-	peer := QueryOnline(dest_id)
+	peer := gsdb.QueryOnline(dest_id)
 	if peer != nil {
 		defer func() {
 			if x := recover(); x != nil {
@@ -55,7 +57,7 @@ func Send(src_id, dest_id int32, service int16, multicast bool, object interface
 		return true
 	} else {
 		// convert req to json again, LEVEL-2 encapsulation
-		return _forward(req)
+		return hub_client.Forward(req)
 	}
 }
 
@@ -68,5 +70,5 @@ func _multicast(src_id int32, group_id int32, service int16, object interface{})
 	}
 
 	req := &IPCObject{Multicast: true, SrcID: src_id, DestID: group_id, Service: service, Object: val, Time: time.Now().Unix()}
-	return _group_forward(req)
+	return hub_client.GroupForward(req)
 }

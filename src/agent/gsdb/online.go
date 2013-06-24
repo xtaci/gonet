@@ -1,4 +1,4 @@
-package ipc
+package gsdb
 
 import (
 	"sync"

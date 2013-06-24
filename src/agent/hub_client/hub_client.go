@@ -1,4 +1,4 @@
-package ipc
+package hub_client
 
 import (
 	"encoding/binary"
@@ -13,6 +13,7 @@ import (
 )
 
 import (
+	"agent/gsdb"
 	"cfg"
 	"db/forward_tbl"
 	"helper"
@@ -95,7 +96,7 @@ func HubReceiver(conn net.Conn) {
 				continue
 			}
 
-			sess := QueryOnline(obj.DestID)
+			sess := gsdb.QueryOnline(obj.DestID)
 			if sess == nil {
 				// if the user is disconnected
 				forward_tbl.Push(obj)

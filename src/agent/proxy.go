@@ -6,7 +6,6 @@ import (
 )
 
 import (
-	"agent/client_protos"
 	"agent/ipc"
 	. "helper"
 	"misc/packet"
@@ -40,7 +39,7 @@ func UserRequestProxy(sess *Session, p []byte) []byte {
 	}
 
 	//log.Printf("code:%v\n", b)
-	handle := protos.ProtoHandler[b]
+	handle := ipc.ProtoHandler[b]
 	if handle != nil {
 		ret := handle(sess, reader)
 		if len(ret) != 0 {

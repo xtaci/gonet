@@ -11,7 +11,7 @@ import (
 
 import (
 	"agent/event_client"
-	"agent/ipc"
+	"agent/hub_client"
 	"agent/stats_client"
 	"cfg"
 	"inspect"
@@ -35,7 +35,7 @@ func main() {
 	go inspect.StartInspect()
 
 	// dial HUB
-	ipc.DialHub()
+	hub_client.DialHub()
 	event_client.DialEvent()
 	stats_client.DialStats()
 

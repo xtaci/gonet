@@ -1,4 +1,4 @@
-package protos
+package ipc
 
 import "log"
 import "runtime"

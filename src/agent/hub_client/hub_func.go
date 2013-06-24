@@ -1,4 +1,4 @@
-package ipc
+package hub_client
 
 import (
 	"log"
@@ -183,7 +183,7 @@ func AddUser(id int32) bool {
 }
 
 //------------------------------------------------ Forward to Hub
-func _forward(req *IPCObject) bool {
+func Forward(req *IPCObject) bool {
 	defer _hub_err()
 	// HUB protocol forwarding
 	msg := hub.FORWARDIPC{F_IPC: req.Json()}
@@ -199,7 +199,7 @@ func _forward(req *IPCObject) bool {
 }
 
 //------------------------------------------------ Forward to Hub/Group
-func _group_forward(req *IPCObject) bool {
+func GroupForward(req *IPCObject) bool {
 	defer _hub_err()
 	msg := hub.FORWARDIPC{F_IPC: req.Json()}
 	ret := _call(packet.Pack(hub.Code["forwardgroup_req"], &msg, nil))

@@ -3,11 +3,11 @@
 ##################################################
 ###   client proto & api
 ##################################################
-printf "package protos\n" > proto.go
+printf "package ipc\n" > proto.go
 gawk -f proto.awk proto.txt >> proto.go 
 gawk -f proto_func.awk proto.txt >> proto.go 
 
-printf "package protos\n" > api.go
+printf "package ipc\n" > api.go
 printf "\n" >> api.go
 printf "import \"misc/packet\"\n" >> api.go
 printf "import . \"types\"\n" >> api.go
@@ -20,8 +20,8 @@ printf "var ProtoHandler map[uint16]func(*Session, *packet.Packet) []byte = map[
 gawk -f api_bind_req.awk api.txt >> api.go 
 printf "}" >> api.go
 
-mv -f proto.go ../agent/client_protos
-mv -f api.go ../agent/client_protos
+mv -f proto.go ../agent/ipc
+mv -f api.go ../agent/ipc
 
 ##################################################
 ### hub proto & api

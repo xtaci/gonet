@@ -22,7 +22,7 @@ command_result_pack=
 rst integer
 ===
 
-#ping
+#talk
 talk=
 user string
 msg string

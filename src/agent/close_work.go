@@ -5,7 +5,8 @@ import (
 )
 
 import (
-	"agent/ipc"
+	"agent/gsdb"
+	"agent/hub_client"
 	"db/forward_tbl"
 	. "types"
 )
@@ -13,8 +14,8 @@ import (
 //----------------------------------------------- connection close cleanup work
 func close_work(sess *Session) {
 	if sess.LoggedIn {
-		ipc.Logout(sess.User.Id)
-		ipc.UnregisterOnline(sess.User.Id)
+		hub_client.Logout(sess.User.Id)
+		gsdb.UnregisterOnline(sess.User.Id)
 		close(sess.MQ)
 
 		// 未处理的IPC数据，重新放入db

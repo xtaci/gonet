@@ -1,8 +1,9 @@
-package ipc
+package hub_client
 
 import (
 	"fmt"
 	"testing"
+	. "types"
 )
 
 type TMPObj struct {
@@ -53,15 +54,15 @@ func BenchmarkLoginout(b *testing.B) {
 }
 
 func BenchmarkForward(b *testing.B) {
-	obj := &TMPObj{A: 10, B: 20, C: "test"}
+	obj := &IPCObject{SrcID: 0, DestID: 1, Multicast: false, Object: []byte("abc")}
 	for i := 0; i < b.N; i++ {
-		Send(0, 1, 1, false, obj)
+		Forward(obj)
 	}
 }
 
 func BenchmarkGroupForward(b *testing.B) {
-	obj := &TMPObj{A: 10, B: 20, C: "test"}
+	obj := &IPCObject{SrcID: 0, DestID: 1, Multicast: true, Object: []byte("abc")}
 	for i := 0; i < b.N; i++ {
-		Send(0, 1, 1, true, obj)
+		GroupForward(obj)
 	}
 }
