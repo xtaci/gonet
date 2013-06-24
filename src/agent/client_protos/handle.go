@@ -2,6 +2,7 @@ package protos
 
 import (
 	"agent/AI"
+	"agent/ipc"
 	"db/user_tbl"
 	"misc/packet"
 	. "types"
@@ -22,4 +23,11 @@ func P_user_login_req(sess *Session, reader *packet.Packet) []byte {
 	}
 
 	return packet.Pack(Code["user_login_succeed_ack"], &ret, nil)
+}
+
+func P_talk_req(sess *Session, reader *packet.Packet) []byte {
+	tbl, _ := PKT_talk(reader)
+	dest := user_tbl.Query(tbl.F_user)
+	ipc.Send(sess.User.Id, dest.Id, ipc.SERVICE_TALK, false, tbl.F_msg)
+	return nil
 }

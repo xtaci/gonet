@@ -33,7 +33,7 @@ func TestIPC(t *testing.T) {
 	ipc.RegisterOnline(&sess1, sess1.User.Id)
 	ipc.RegisterOnline(&sess2, sess2.User.Id)
 
-	if !ipc.Send(1, 2, ipc.SERVICE_PING, "ABC") {
+	if !ipc.Send(1, 2, ipc.SERVICE_PING, false, "ABC") {
 		t.Fatal("ipc.Send failed")
 	}
 	wg.Wait()
@@ -55,7 +55,7 @@ func BenchmarkIPC(b *testing.B) {
 		dest := rand.Int31n(int32(b.N)) + 1
 		if src != dest {
 			wg.Add(2)
-			ipc.Send(src, dest, ipc.SERVICE_PING, "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+			ipc.Send(src, dest, ipc.SERVICE_PING, false, "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
 		}
 	}
 	wg.Wait()

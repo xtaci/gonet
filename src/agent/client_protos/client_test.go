@@ -23,11 +23,10 @@ func TestAgent(t *testing.T) {
 		os.Exit(-1)
 	}
 
-	U := user_login_info{}
+	U := &user_login_info{}
 	U.F_user_name = "test1"
 	U.F_mac_addr = "mac1"
-	pkt := packet.Pack(Code["user_login_req"], &U, nil)
-	fmt.Println(pkt)
+	pkt := packet.Pack(Code["user_login_req"], U, nil)
 
 	writer := packet.Writer()
 	writer.WriteU16(uint16(len(pkt) + 4))
@@ -38,6 +37,21 @@ func TestAgent(t *testing.T) {
 
 	ret := make([]byte, 100)
 	conn.Read(ret)
+
+	// talk
+	msg := &talk{}
+	msg.F_user = "test1"
+	msg.F_msg = "hello world"
+	pkt = packet.Pack(Code["talk_req"], msg, nil)
+
+	writer = packet.Writer()
+	writer.WriteU16(uint16(len(pkt) + 4))
+	writer.WriteU32(0)
+	writer.WriteRawBytes(pkt)
+
+	conn.Write(writer.Data())
+	conn.Read(ret)
+	fmt.Println(string(ret))
 }
 
 func BenchmarkAgent(b *testing.B) {

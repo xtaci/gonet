@@ -22,3 +22,13 @@ packet_type:3
 name:user_login_faild_ack
 payload:command_result_pack
 desc:登陆失败
+
+packet_type:1000
+name:talk_req
+payload:talk
+desc:talk给一个用户
+
+packet_type:1001
+name:talk_notify
+payload:talk
+desc:notify客户端

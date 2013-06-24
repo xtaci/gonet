@@ -8,7 +8,7 @@ import (
 	. "types"
 )
 
-func IPC_ping(sess *Session, obj *IPCObject) bool {
+func IPC_ping(sess *Session, obj *IPCObject) []byte {
 	var str string
 	err := json.Unmarshal(obj.Object, &str)
 	if err == nil {
@@ -16,5 +16,15 @@ func IPC_ping(sess *Session, obj *IPCObject) bool {
 			Send(-1, obj.SrcID, SERVICE_PING, false, str)
 		}
 	}
-	return true
+	return nil
+}
+
+func IPC_talk(sess *Session, obj *IPCObject) []byte {
+	var str string
+	err := json.Unmarshal(obj.Object, &str)
+	if err == nil {
+		return []byte(str)
+	}
+
+	return nil
 }

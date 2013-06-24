@@ -21,3 +21,9 @@ server_time integer
 command_result_pack=
 rst integer
 ===
+
+#ping
+talk=
+user string
+msg string
+===

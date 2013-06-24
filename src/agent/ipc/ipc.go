@@ -14,10 +14,12 @@ import (
 const (
 	UNKNOWN = int16(iota)
 	SERVICE_PING
+	SERVICE_TALK
 )
 
-var IPCHandler map[int16]func(*Session, *IPCObject) bool = map[int16]func(*Session, *IPCObject) bool{
+var IPCHandler map[int16]func(*Session, *IPCObject) []byte = map[int16]func(*Session, *IPCObject) []byte{
 	SERVICE_PING: IPC_ping,
+	SERVICE_TALK: IPC_talk,
 }
 
 //---------------------------------------------------------- p2p send from src_id to dest_id

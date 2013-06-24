@@ -2,15 +2,12 @@ package user_tbl
 
 import (
 	"fmt"
-	"math/rand"
 	"testing"
-	"time"
 )
 
 func TestUser(t *testing.T) {
-	rand.Seed(time.Now().UnixNano())
-	user := fmt.Sprintf("test%v", rand.Int())
-	mac := fmt.Sprintf("mac:%v", rand.Int())
+	user := fmt.Sprintf("test%v", 1000000)
+	mac := fmt.Sprintf("mac:%v", 1000000)
 
 	New(user, mac)
 	if LoginMac(user, mac) == nil {
@@ -20,6 +17,11 @@ func TestUser(t *testing.T) {
 	all := GetAll()
 	for _, v := range all {
 		fmt.Println(v)
+	}
+
+	u := Query(user)
+	if u == nil {
+		t.Error("cannot query by name")
 	}
 }
 

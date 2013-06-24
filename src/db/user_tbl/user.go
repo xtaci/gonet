@@ -69,6 +69,21 @@ func New(name, mac string) *User {
 	return nil
 }
 
+//---------------------------------------------------------- query a user by name
+func Query(name string) *User {
+	config := cfg.Get()
+	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
+
+	user := &User{}
+	err := c.Find(bson.M{"name": name}).One(user)
+	if err != nil {
+		log.Println(err, name)
+		return nil
+	}
+
+	return user
+}
+
 //---------------------------------------------------------- load a user
 func Get(id int32) *User {
 	config := cfg.Get()

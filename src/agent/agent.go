@@ -90,7 +90,13 @@ func StartAgent(in chan []byte, conn net.Conn) {
 			if !ok {
 				return
 			}
-			IPCRequestProxy(&sess, &msg)
+
+			if result := IPCRequestProxy(&sess, &msg); result != nil {
+				err := buf.Send(result)
+				if err != nil {
+					return
+				}
+			}
 
 		case <-std_timer:
 			timer_work(&sess)
