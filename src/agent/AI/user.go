@@ -56,7 +56,7 @@ func LoginProc(sess *Session) bool {
 	// 不能直接调用，有可能消息超过MQ被永远阻塞
 	go LoadIPCObjects(sess.User.Id, sess.MQ)
 
-	// TODO: 标记在线
-	//sess.LoggedIn = true
+	// 标记在线
+	sess.LoggedIn = true
 	return true
 }

@@ -25,11 +25,7 @@ func init() {
 
 //----------------------------------------------- Start Agent when a client is connected
 func StartAgent(in chan []byte, conn net.Conn) {
-	defer func() {
-		if x := recover(); x != nil {
-			log.Println("unknown agent routine error")
-		}
-	}()
+	defer helper.PrintPanicStack()
 
 	config := cfg.Get()
 	if config["profile"] == "true" {

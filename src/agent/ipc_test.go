@@ -1,8 +1,8 @@
 package main
 
 import (
-	"agent/ipc"
 	"agent/gsdb"
+	"agent/ipc"
 	"math/rand"
 	"sync"
 	"testing"
