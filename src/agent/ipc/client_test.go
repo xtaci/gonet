@@ -50,8 +50,8 @@ func TestAgent(t *testing.T) {
 	writer.WriteRawBytes(pkt)
 
 	conn.Write(writer.Data())
-	conn.Read(ret)
-	fmt.Println(string(ret))
+	n, _ := conn.Read(ret)
+	fmt.Printf("%q\n", ret[:n])
 }
 
 func BenchmarkAgent(b *testing.B) {
