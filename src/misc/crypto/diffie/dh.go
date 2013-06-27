@@ -1,6 +1,8 @@
-/*
-Diffie–Hellman key exchange
-*/
+/***********************************************************
+ *
+ * Diffie–Hellman key exchange
+ *
+ */
 package diffie
 
 import "math/big"
