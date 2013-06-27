@@ -10,7 +10,7 @@ import "time"
 var rng = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 var DH1BASE = big.NewInt(2)
-var DH1PRIME, _ = big.NewInt(0).SetString("0xFFFFFFFB", 0)
+var DH1PRIME, _ = big.NewInt(0).SetString("2147483647", 0)
 
 //----------------------------------------------- Diffie-Hellman Key-exchange
 func DHGenKey(G, P *big.Int) (*big.Int, *big.Int) {
