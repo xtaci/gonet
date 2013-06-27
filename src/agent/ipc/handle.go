@@ -1,8 +1,14 @@
 package ipc
 
 import (
+	"math/big"
+)
+
+import (
 	"agent/AI"
 	"db/user_tbl"
+	"misc/crypto/diffie"
+	"misc/crypto/pike"
 	"misc/packet"
 	. "types"
 )
@@ -29,4 +35,16 @@ func P_talk_req(sess *Session, reader *packet.Packet) []byte {
 	dest := user_tbl.Query(tbl.F_user)
 	Send(sess.User.Id, dest.Id, SERVICE_TALK, false, tbl.F_msg)
 	return nil
+}
+
+func P_key_exchange_req(sess *Session, reader *packet.Packet) []byte {
+	tbl, _ := PKT_KEY(reader)
+	A := big.NewInt(int64(tbl.F_E))
+	secret, B := diffie.DHGenKey(diffie.DH1BASE, diffie.DH1PRIME)
+
+	key := big.NewInt(0).Exp(A, secret, diffie.DH1PRIME)
+	sess.Crypto = pike.NewCtx(uint32(key.Uint64()))
+
+	ret := KEY{int32(B.Uint64())}
+	return packet.Pack(Code["key_exchange_ack"], &ret, nil)
 }

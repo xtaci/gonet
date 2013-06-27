@@ -10,7 +10,6 @@ import (
 import (
 	"cfg"
 	"helper"
-	"misc/crypto/diffie"
 	"misc/timer"
 	. "types"
 )
@@ -44,9 +43,6 @@ func StartAgent(in chan []byte, conn net.Conn) {
 	sess.ConnectTime = time.Now()
 	sess.LastPacketTime = time.Now().Unix()
 	sess.KickOut = false
-	if config["secure_comm"] == "true" {
-		sess.X, sess.E = diffie.DHGenKey(diffie.DH1BASE, diffie.DH1PRIME)
-	}
 
 	// standard 1-sec timer
 	std_timer := make(chan int32, 1)

@@ -2,7 +2,6 @@ package types
 
 import (
 	"encoding/json"
-	"math/big"
 	"misc/crypto/pike"
 	"net"
 	"time"
@@ -34,7 +33,6 @@ func (obj *IPCObject) Json() []byte {
 type Session struct {
 	IP     net.IP
 	MQ     chan IPCObject // Player's Internal Message Queue
-	X, E   *big.Int       // use diffie-hellman to exchange key
 	Crypto *pike.Pike     // a crypto algorithms
 	// user data
 	User     *User
