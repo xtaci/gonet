@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/json"
+	"math/big"
 	"net"
 	"time"
 )
@@ -30,8 +31,10 @@ func (obj *IPCObject) Json() []byte {
 }
 
 type Session struct {
-	IP net.IP
-	MQ chan IPCObject // Player's Internal Message Queue
+	IP   net.IP
+	MQ   chan IPCObject // Player's Internal Message Queue
+	X, E *big.Int       // use diffie-hellman to exchange key
+	Key  uint32         // the key
 	// user data
 	User     *User
 	Estates  *estates.Manager

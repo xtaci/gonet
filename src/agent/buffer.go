@@ -10,7 +10,9 @@ import (
 
 import (
 	"cfg"
+	"misc/crypto/pike"
 	"misc/packet"
+	. "types"
 )
 
 type Buffer struct {
@@ -18,21 +20,25 @@ type Buffer struct {
 	pending chan []byte // pending Packet
 	max     int         // max queue size
 	conn    net.Conn    // connection
+	sess    Session     // session
+	ctx     *pike.Pike  // a crypto algorithms
 }
 
 const (
-	DEFAULT_QUEUE_SIZE = 5
+	DEFAULT_QUEUE_SIZE = 15
 )
 
 //------------------------------------------------ send packet
 func (buf *Buffer) Send(data []byte) (err error) {
 	// len of Channel: the number of elements queued (un-sent) in the channel buffer
 	if len(buf.pending) < buf.max {
+		if buf.ctx != nil {
+			buf.ctx.Codec(data)
+		}
 		buf.pending <- data
 		return nil
 	} else {
-		IP := net.ParseIP(buf.conn.RemoteAddr().String())
-		Ban(IP)
+		Ban(buf.sess.IP)
 		return errors.New(fmt.Sprintf("Send Buffer Overflow, possible DoS attack. Remote: %v", buf.conn.RemoteAddr()))
 	}
 }
@@ -69,7 +75,7 @@ func (buf *Buffer) raw_send(data []byte) {
 }
 
 //------------------------------------------------ create a new write buffer
-func NewBuffer(conn net.Conn, ctrl chan bool) *Buffer {
+func NewBuffer(sess *Session, conn net.Conn, ctrl chan bool) *Buffer {
 	config := cfg.Get()
 	max, err := strconv.Atoi(config["packet_queue"])
 	if err != nil {
