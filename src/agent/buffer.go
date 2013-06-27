@@ -10,7 +10,6 @@ import (
 
 import (
 	"cfg"
-	"misc/crypto/pike"
 	"misc/packet"
 	. "types"
 )
@@ -21,7 +20,6 @@ type Buffer struct {
 	max     int         // max queue size
 	conn    net.Conn    // connection
 	sess    Session     // session
-	ctx     *pike.Pike  // a crypto algorithms
 }
 
 const (
@@ -32,8 +30,8 @@ const (
 func (buf *Buffer) Send(data []byte) (err error) {
 	// len of Channel: the number of elements queued (un-sent) in the channel buffer
 	if len(buf.pending) < buf.max {
-		if buf.ctx != nil {
-			buf.ctx.Codec(data)
+		if buf.sess.Crypto != nil {
+			buf.sess.Crypto.Codec(data)
 		}
 		buf.pending <- data
 		return nil
