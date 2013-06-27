@@ -64,7 +64,14 @@ func main() {
 		if err != nil {
 			continue
 		}
-		go handleClient(conn)
+
+		// DoS prevention
+		IP := net.ParseIP(conn.RemoteAddr().String())
+		if !IsBanned(IP) {
+			go handleClient(conn)
+		} else {
+			conn.Close()
+		}
 	}
 }
 

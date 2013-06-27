@@ -57,6 +57,6 @@ func LoginProc(sess *Session) bool {
 	go LoadIPCObjects(sess.User.Id, sess.MQ)
 
 	// 标记在线
-	sess.LoggedIn = true
+	//sess.LoggedIn = true
 	return true
 }

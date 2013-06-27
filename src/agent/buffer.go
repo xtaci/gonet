@@ -31,6 +31,8 @@ func (buf *Buffer) Send(data []byte) (err error) {
 		buf.pending <- data
 		return nil
 	} else {
+		IP := net.ParseIP(buf.conn.RemoteAddr().String())
+		Ban(IP)
 		return errors.New(fmt.Sprintf("Send Buffer Overflow, possible DoS attack. Remote: %v", buf.conn.RemoteAddr()))
 	}
 }
