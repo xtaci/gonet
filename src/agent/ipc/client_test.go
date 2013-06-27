@@ -36,7 +36,8 @@ func TestAgent(t *testing.T) {
 	conn.Write(writer.Data())
 
 	ret := make([]byte, 100)
-	conn.Read(ret)
+	n, _ := conn.Read(ret)
+	fmt.Printf("%q\n", ret[:n])
 
 	// talk
 	msg := &talk{}
@@ -50,7 +51,7 @@ func TestAgent(t *testing.T) {
 	writer.WriteRawBytes(pkt)
 
 	conn.Write(writer.Data())
-	n, _ := conn.Read(ret)
+	n, _ = conn.Read(ret)
 	fmt.Printf("%q\n", ret[:n])
 }
 
