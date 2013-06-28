@@ -10,6 +10,7 @@ const (
 
 type User struct {
 	Id             int32  // 用户id
+	Domain         string // 玩家所在分服
 	Type           int32  // 用户类型
 	GroupId        int32  // 所属群ID
 	GroupMsgId     uint32 // 收到的群消息最大编号

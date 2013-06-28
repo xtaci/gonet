@@ -25,6 +25,7 @@ func LoginProc(sess *Session) bool {
 		e := &estates.Manager{}
 		e.UserId = sess.User.Id
 		sess.Estates = e
+		sess.OpCount++
 	} else {
 		// 创建Grid
 		sess.Grid = CreateGrid(sess.Estates)
@@ -35,15 +36,13 @@ func LoginProc(sess *Session) bool {
 		s.UserId = sess.User.Id
 		s.Init()
 		sess.LatencySamples = s
+		sess.OpCount++
 	}
 
 	//
 	if sess.User.CountryCode == "" {
 		sess.User.CountryCode = geoip.Query(sess.IP)
-	}
-
-	if sess.User.CreatedAt == 0 {
-		sess.User.CreatedAt = time.Now().Unix()
+		sess.OpCount++
 	}
 
 	// 开始计算Flush时间

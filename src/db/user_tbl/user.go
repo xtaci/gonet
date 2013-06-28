@@ -5,6 +5,7 @@ import (
 	"io"
 	"labix.org/v2/mgo/bson"
 	"log"
+	"time"
 )
 
 import (
@@ -58,6 +59,9 @@ func New(name, mac string) *User {
 		user.Id = NextVal(COUNTER_NAME)
 		user.Name = name
 		user.Mac = mac
+		user.Domain = config["domain"]
+		user.Type = USER_TYPE_NORMAL
+		user.CreatedAt = time.Now().Unix()
 		err := c.Insert(user)
 		if err != nil {
 			log.Println(err, name, mac)
