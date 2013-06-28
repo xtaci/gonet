@@ -1,5 +1,5 @@
 ###A game server implemented with golang.
-![Architecture](/doc/arch.png)
+![Architecture](/gonet/blob/develop/doc/arch.png)
 
 #### 部署:     
 * Game Server(GS):  
