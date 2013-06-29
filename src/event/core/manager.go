@@ -54,11 +54,11 @@ func Add(Type int16, user_id int32, timeout int64, params []byte) int32 {
 	_events[event_id] = event
 	_events_lock.Unlock()
 
-	// then put in timer
-	timer.Add(event_id, timeout, _event_ch)
-
-	// store to db
+	// then store to db
 	event_tbl.Add(event)
+
+	// and finally, put in timer
+	timer.Add(event_id, timeout, _event_ch)
 
 	return event_id
 }
@@ -70,9 +70,8 @@ func Cancel(event_id int32) {
 	_events_lock.Unlock()
 }
 
-//---------------------------------------------------------- Load a timeout event at startup
+//---------------------------------------------------------- load a event at startup
 func Load(ev *Event) {
 	_events[ev.EventId] = ev
 	timer.Add(ev.EventId, ev.Timeout, _event_ch)
-	return
 }
