@@ -47,12 +47,15 @@ func _expire() {
 //---------------------------------------------------------- Add a timeout event, return event id
 func Add(Type int16, user_id int32, timeout int64, params []byte) int32 {
 	event_id := db.NextVal(EVENTID_GEN)
-	timer.Add(event_id, timeout, _event_ch)
 
+	// first add to hashmap
 	event := &Event{Type: Type, UserId: user_id, EventId: event_id, Timeout: timeout, Params: params}
 	_events_lock.Lock()
 	_events[event_id] = event
 	_events_lock.Unlock()
+
+	// then put in timer
+	timer.Add(event_id, timeout, _event_ch)
 
 	// store to db
 	event_tbl.Add(event)
@@ -68,10 +71,8 @@ func Cancel(event_id int32) {
 }
 
 //---------------------------------------------------------- Load a timeout event at startup
-func Load(event_id int32, Type int16, user_id int32, timeout int64, params []byte) {
-	timer.Add(event_id, timeout, _event_ch)
-	event := &Event{EventId: event_id, Type: Type, UserId: user_id, Timeout: timeout, Params: params}
-	_events[event_id] = event
-
+func Load(ev *Event) {
+	_events[ev.EventId] = ev
+	timer.Add(ev.EventId, ev.Timeout, _event_ch)
 	return
 }
