@@ -18,7 +18,7 @@ const (
 
 type Counter struct {
 	Name    string
-	NextVal int32
+	NextVal int64
 }
 
 func init() {
@@ -56,5 +56,6 @@ func NextVal(countername string) int32 {
 		return -1
 	}
 
-	return next.NextVal
+	// round the nextval to 2^31
+	return int32(next.NextVal % 2147483648)
 }
