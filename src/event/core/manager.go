@@ -2,6 +2,7 @@ package core
 
 import (
 	"sync"
+	"time"
 )
 
 import (
@@ -18,14 +19,16 @@ var (
 )
 
 const (
-	EVENT_CHAN_MAX = 200000
-	EVENTID_GEN    = "EVENTID_GEN"
+	EVENT_CHAN_MAX   = 200000
+	EVENTID_GEN      = "EVENTID_GEN"
+	CLEANUP_INTERVAL = 3600
 )
 
 func init() {
 	_event_ch = make(chan int32, EVENT_CHAN_MAX)
 	_events = make(map[int32]*Event)
 	go _expire()
+	go _cleanup()
 }
 
 func _expire() {
@@ -41,6 +44,14 @@ func _expire() {
 			delete(_events, event_id)
 			_events_lock.Unlock()
 		}
+	}
+}
+
+//---------------------------------------------------------- 周期性的清空数据库中已发生的事件 
+func _cleanup() {
+	for {
+		time.Sleep(time.Second * CLEANUP_INTERVAL)
+		event_tbl.RemoveOld(time.Now().Unix() - CLEANUP_INTERVAL)
 	}
 }
 

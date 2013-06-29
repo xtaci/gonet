@@ -42,6 +42,19 @@ func Remove(event_id int32) bool {
 	return true
 }
 
+//----------------------------------------------------------  remove old events
+func RemoveOld(before int64) int {
+	config := cfg.Get()
+	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
+
+	info, err := c.RemoveAll(bson.M{"timeout": bson.M{"$lt": before}})
+	if err != nil {
+		log.Println(err, info)
+	}
+
+	return info.Removed
+}
+
 //----------------------------------------------------------  get an event
 func Get(event_id int32) *Event {
 	config := cfg.Get()

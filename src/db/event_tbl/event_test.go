@@ -27,4 +27,8 @@ func TestEvent(t *testing.T) {
 	if !Remove(1) {
 		t.Fatal("cannot remove event")
 	}
+
+	Add(event)
+	time.Sleep(1)
+	fmt.Println("remove old count:", RemoveOld(time.Now().Unix()))
 }
