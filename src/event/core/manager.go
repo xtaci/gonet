@@ -44,7 +44,7 @@ func _expire() {
 	}
 }
 
-//---------------------------------------------------------- Add a timeout event
+//---------------------------------------------------------- Add a timeout event, return event id
 func Add(Type int16, user_id int32, timeout int64, params []byte) int32 {
 	event_id := db.NextVal(EVENTID_GEN)
 	timer.Add(event_id, timeout, _event_ch)
@@ -60,7 +60,7 @@ func Add(Type int16, user_id int32, timeout int64, params []byte) int32 {
 	return event_id
 }
 
-//---------------------------------------------------------- cancel an oid's timeout
+//---------------------------------------------------------- cancel an event with id
 func Cancel(event_id int32) {
 	_events_lock.Lock()
 	delete(_events, event_id)
