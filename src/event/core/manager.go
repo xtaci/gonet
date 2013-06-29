@@ -51,7 +51,7 @@ func _expire() {
 func _cleanup() {
 	for {
 		time.Sleep(time.Second * CLEANUP_INTERVAL)
-		event_tbl.RemoveOld(time.Now().Unix() - CLEANUP_INTERVAL)
+		event_tbl.RemoveOld(time.Now().Unix())
 	}
 }
 
