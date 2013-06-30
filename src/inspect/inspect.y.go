@@ -39,7 +39,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyMaxDepth = 200
 
-//line ./src/inspect/inspect.y:99
+//line ./src/inspect/inspect.y:105
 
 //line yacctab:1
 var yyExca = []int{
@@ -48,7 +48,7 @@ var yyExca = []int{
 	-2, 0,
 }
 
-const yyNprod = 18
+const yyNprod = 19
 const yyPrivate = 57344
 
 var yyTokenNames []string
@@ -75,12 +75,12 @@ var yyPgo = []int{
 var yyR1 = []int{
 
 	0, 1, 1, 2, 2, 3, 3, 3, 3, 3,
-	4, 5, 6, 7, 7, 9, 9, 8,
+	4, 5, 6, 7, 7, 7, 9, 9, 8,
 }
 var yyR2 = []int{
 
 	0, 2, 0, 2, 3, 1, 1, 1, 1, 1,
-	1, 1, 1, 2, 3, 3, 2, 1,
+	1, 1, 1, 1, 2, 3, 3, 2, 1,
 }
 var yyChk = []int{
 
@@ -91,8 +91,8 @@ var yyChk = []int{
 var yyDef = []int{
 
 	2, -2, 1, 0, 0, 5, 6, 7, 8, 9,
-	10, 11, 12, 0, 17, 3, 0, 13, 4, 14,
-	0, 16, 15,
+	10, 11, 12, 13, 18, 3, 0, 14, 4, 15,
+	0, 17, 16,
 }
 var yyTok1 = []int{
 
@@ -363,27 +363,33 @@ yydefault:
 	case 13:
 		//line ./src/inspect/inspect.y:67
 		{
-			Inspect(int32(yyS[yypt-0].n), conn)
+			fmt.Fprintln(conn, "\t(p)rint what?")
 			prompt(conn)
 		}
 	case 14:
 		//line ./src/inspect/inspect.y:73
 		{
-			InspectField(int32(yyS[yypt-1].n), yyS[yypt-0].s, conn)
+			Inspect(int32(yyS[yypt-0].n), conn)
 			prompt(conn)
 		}
 	case 15:
-		//line ./src/inspect/inspect.y:81
+		//line ./src/inspect/inspect.y:79
+		{
+			InspectField(int32(yyS[yypt-1].n), yyS[yypt-0].s, conn)
+			prompt(conn)
+		}
+	case 16:
+		//line ./src/inspect/inspect.y:87
 		{
 			yyVAL.s = "." + yyS[yypt-1].s + yyS[yypt-0].s
 		}
-	case 16:
-		//line ./src/inspect/inspect.y:86
+	case 17:
+		//line ./src/inspect/inspect.y:92
 		{
 			yyVAL.s = "." + yyS[yypt-0].s
 		}
-	case 17:
-		//line ./src/inspect/inspect.y:93
+	case 18:
+		//line ./src/inspect/inspect.y:99
 		{
 			helper.GC()
 			helper.FprintGCSummary(conn)

@@ -63,6 +63,12 @@ quit:
 		;
 	
 inspect:	
+		INSPECT
+		{
+			fmt.Fprintln(conn,"\t(p)rint what?")
+			prompt(conn)
+		}
+		|
 		INSPECT NUM
 		{ 
 			Inspect(int32($2.n), conn)
