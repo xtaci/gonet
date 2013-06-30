@@ -11,26 +11,25 @@ import (
 
 //line ./src/inspect/inspect.y:9
 type yySymType struct {
-	yys   int
-	n     int
-	s     string
-	nodes string
+	yys int
+	n   int
+	s   string
 }
 
 const INSPECT = 57346
 const GC = 57347
-const FIELD = 57348
-const LIST = 57349
-const ID = 57350
+const LIST = 57348
+const NUM = 57349
+const VARIABLE = 57350
 const QUIT = 57351
 const HELP = 57352
 
 var yyToknames = []string{
 	"INSPECT",
 	"GC",
-	"FIELD",
 	"LIST",
-	"ID",
+	"NUM",
+	"VARIABLE",
 	"QUIT",
 	"HELP",
 }
@@ -40,7 +39,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyMaxDepth = 200
 
-//line ./src/inspect/inspect.y:87
+//line ./src/inspect/inspect.y:99
 
 //line yacctab:1
 var yyExca = []int{
@@ -49,52 +48,59 @@ var yyExca = []int{
 	-2, 0,
 }
 
-const yyNprod = 16
+const yyNprod = 18
 const yyPrivate = 57344
 
 var yyTokenNames []string
 var yyStates []string
 
-const yyLast = 19
+const yyLast = 23
 
 var yyAct = []int{
 
-	13, 14, 18, 10, 15, 12, 11, 3, 16, 17,
-	19, 9, 8, 7, 6, 5, 4, 2, 1,
+	19, 13, 14, 10, 20, 18, 12, 11, 3, 21,
+	15, 16, 17, 9, 8, 7, 6, 5, 4, 2,
+	1, 0, 22,
 }
 var yyPact = []int{
 
-	-1000, -4, -1000, -8, -3, -1000, -1000, -1000, -1000, -1000,
-	-1000, -1000, -1000, 1, -1000, -1000, -10, 4, -1000, -1000,
+	-1000, -3, -1000, -2, 0, -1000, -1000, -1000, -1000, -1000,
+	-1000, -1000, -1000, 5, -1000, -1000, -7, -9, -1000, -1000,
+	1, -9, -1000,
 }
 var yyPgo = []int{
 
-	0, 18, 17, 16, 15, 14, 13, 12, 11,
+	0, 20, 19, 18, 17, 16, 15, 14, 13, 0,
 }
 var yyR1 = []int{
 
 	0, 1, 1, 2, 2, 3, 3, 3, 3, 3,
-	4, 5, 6, 7, 7, 8,
+	4, 5, 6, 7, 7, 9, 9, 8,
 }
 var yyR2 = []int{
 
 	0, 2, 0, 2, 3, 1, 1, 1, 1, 1,
-	1, 1, 1, 2, 3, 1,
+	1, 1, 1, 2, 3, 3, 2, 1,
 }
 var yyChk = []int{
 
 	-1000, -1, -2, 11, -3, -4, -5, -6, -7, -8,
-	7, 10, 9, 4, 5, 12, 11, 8, 12, 6,
+	6, 10, 9, 4, 5, 12, 11, 7, 12, -9,
+	13, 8, -9,
 }
 var yyDef = []int{
 
 	2, -2, 1, 0, 0, 5, 6, 7, 8, 9,
-	10, 11, 12, 0, 15, 3, 0, 13, 4, 14,
+	10, 11, 12, 0, 17, 3, 0, 13, 4, 14,
+	0, 16, 15,
 }
 var yyTok1 = []int{
 
 	1, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	12, 3, 3, 11,
+	12, 3, 3, 11, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	3, 3, 3, 3, 3, 3, 13,
 }
 var yyTok2 = []int{
 
@@ -330,18 +336,18 @@ yydefault:
 	switch yynt {
 
 	case 3:
-		//line ./src/inspect/inspect.y:30
+		//line ./src/inspect/inspect.y:29
 		{
 			prompt(conn)
 		}
 	case 10:
-		//line ./src/inspect/inspect.y:42
+		//line ./src/inspect/inspect.y:41
 		{
 			ListAll(conn)
 			prompt(conn)
 		}
 	case 11:
-		//line ./src/inspect/inspect.y:50
+		//line ./src/inspect/inspect.y:49
 		{
 			fmt.Fprintln(conn, "\t(p)rint user_id: inspect a user struct")
 			fmt.Fprintln(conn, "\t(p)rint user_id.Field1.Field2...: dotted fields")
@@ -350,24 +356,34 @@ yydefault:
 			prompt(conn)
 		}
 	case 12:
-		//line ./src/inspect/inspect.y:61
+		//line ./src/inspect/inspect.y:60
 		{
 			conn.Close()
 		}
 	case 13:
-		//line ./src/inspect/inspect.y:68
+		//line ./src/inspect/inspect.y:67
 		{
 			Inspect(int32(yyS[yypt-0].n), conn)
 			prompt(conn)
 		}
 	case 14:
-		//line ./src/inspect/inspect.y:74
+		//line ./src/inspect/inspect.y:73
 		{
-			InspectField(int32(yyS[yypt-1].n), yyS[yypt-0].nodes, conn)
+			InspectField(int32(yyS[yypt-1].n), yyS[yypt-0].s, conn)
 			prompt(conn)
 		}
 	case 15:
 		//line ./src/inspect/inspect.y:81
+		{
+			yyVAL.s = "." + yyS[yypt-1].s + yyS[yypt-0].s
+		}
+	case 16:
+		//line ./src/inspect/inspect.y:86
+		{
+			yyVAL.s = "." + yyS[yypt-0].s
+		}
+	case 17:
+		//line ./src/inspect/inspect.y:93
 		{
 			helper.GC()
 			helper.FprintGCSummary(conn)

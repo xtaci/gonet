@@ -9,14 +9,13 @@ import (
 %union { 
 	n int;
 	s string;
-	nodes string;
 } 
 
 %token INSPECT 
 %token GC 
-%token FIELD
 %token LIST 
-%token ID 
+%token NUM
+%token VARIABLE
 %token QUIT
 %token HELP 
 %%
@@ -64,18 +63,31 @@ quit:
 		;
 	
 inspect:	
-		INSPECT ID 
+		INSPECT NUM
 		{ 
 			Inspect(int32($2.n), conn)
 			prompt(conn)
 		}
 		|
-		INSPECT ID FIELD 
+		INSPECT NUM fields
 		{
-			InspectField(int32($2.n), $3.nodes, conn) 
+			InspectField(int32($2.n), $3.s, conn) 
 			prompt(conn)
 		}
 		;
+
+fields: 
+		'.' VARIABLE fields
+		{
+			$$.s = "." + $2.s + $3.s
+		}
+		|
+		'.' VARIABLE 
+		{
+			$$.s = "." + $2.s
+		}
+		;
+
 gc:
 		GC
 		{

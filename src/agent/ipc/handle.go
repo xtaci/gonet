@@ -1,6 +1,7 @@
 package ipc
 
 import (
+	"log"
 	"math/big"
 )
 
@@ -33,7 +34,11 @@ func P_user_login_req(sess *Session, reader *packet.Packet) []byte {
 func P_talk_req(sess *Session, reader *packet.Packet) []byte {
 	tbl, _ := PKT_talk(reader)
 	dest := user_tbl.Query(tbl.F_user)
-	Send(sess.User.Id, dest.Id, SERVICE_TALK, false, tbl.F_msg)
+	if dest != nil {
+		Send(sess.User.Id, dest.Id, SERVICE_TALK, false, tbl.F_msg)
+	} else {
+		log.Println("no such user :", tbl.F_user)
+	}
 	return nil
 }
 
