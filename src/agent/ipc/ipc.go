@@ -42,7 +42,7 @@ func Send(src_id, dest_id int32, service int16, casttype int32, object interface
 
 	switch casttype {
 	case MULTICAST:
-		hub_client.Forward(req)
+		return hub_client.Forward(req)
 	case GLOBAL_BROADCAST:
 		hub_client.Forward(req)
 		fallthrough
