@@ -160,7 +160,7 @@ func P_forward_req(hostid int32, pkt *packet.Packet) []byte {
 	err := json.Unmarshal(tbl.F_IPC, obj)
 
 	if err != nil {
-		log.Println("decode forward IPCObject error")
+		log.Println("decode forward IPCObject error", err)
 		return nil
 	}
 
