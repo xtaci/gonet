@@ -8,23 +8,20 @@ import (
 
 //----------------------------------------------- parse & load a game data file into dictionary
 func parse(file *os.File) {
-	r := bufio.NewReader(file)
-
 	isLineOne := true
 	var names []string
 	var tblname string
 
-	for {
-		line, e := r.ReadString('\n')
-		line = strings.TrimSpace(line)
+	// using scanner to read csv file
+	scanner := bufio.NewScanner(file)
+	scanner.Split(bufio.ScanLines)
 
-		// empty-line & #comment
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+
+		// ignore empty-line
 		if line == "" {
-			if e == nil {
-				continue
-			} else {
-				break
-			}
+			continue
 		}
 
 		// split fields
