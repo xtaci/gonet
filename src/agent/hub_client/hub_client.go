@@ -159,8 +159,6 @@ func _call(data []byte) (ret []byte) {
 func _deliver(obj *IPCObject) {
 	switch obj.CastType {
 	case GLOBAL_BROADCAST:
-		fallthrough
-	case LOCAL_BROADCAST:
 		users := gsdb.ListAll()
 		defer func() {
 			recover()
