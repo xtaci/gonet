@@ -25,17 +25,14 @@ func init() {
 		panic("error opening geoip file")
 	}
 
-	r := bufio.NewReader(file)
-	for {
-		line, e := r.ReadString('\n')
-		line = strings.TrimSpace(line)
+	scanner := bufio.NewScanner(file)
+	scanner.Split(bufio.ScanLines)
+
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
 
 		if line == "" {
-			if e == nil {
-				continue
-			} else {
-				break
-			}
+			continue
 		}
 
 		fields := strings.Split(line, ",")
