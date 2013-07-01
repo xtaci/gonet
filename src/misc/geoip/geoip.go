@@ -42,7 +42,7 @@ func init() {
 		ifrom := _int64_ip(from)
 		ito := _int64_ip(to)
 
-		if ifrom*ito != 0 {
+		if ifrom <= ito {
 			_geoip.Insert(ifrom, ito, strings.Trim(fields[4], `"`))
 		}
 	}
