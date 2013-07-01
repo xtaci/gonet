@@ -171,6 +171,8 @@ func P_forward_req(hostid int32, pkt *packet.Packet) []byte {
 		_multicast(hostid, obj)
 	case GLOBAL_BROADCAST:
 		_broadcast(hostid, obj)
+	default:
+		log.Println("CastType error", hostid, obj)
 	}
 
 	ret := INT{F_v: 1}
