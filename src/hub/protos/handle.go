@@ -186,7 +186,6 @@ func _unicast(hostid int32, obj *IPCObject) {
 	switch state {
 	case core.ON_PROT, core.ON_FREE:
 		host := core.Host(obj.DestID)
-
 		ch := ForwardChan(host)
 
 		if ch != nil {
@@ -202,7 +201,7 @@ func _unicast(hostid int32, obj *IPCObject) {
 func _broadcast(hostid int32, obj *IPCObject) {
 	all := AllServers()
 	for _, v := range all {
-		if v != hostid { // ignore sender server
+		if v != hostid { // ignore sender's server
 			host := core.Host(v)
 			ch := ForwardChan(host)
 
