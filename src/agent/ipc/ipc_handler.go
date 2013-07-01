@@ -14,7 +14,7 @@ func IPC_ping(sess *Session, obj *IPCObject) []byte {
 	err := json.Unmarshal(obj.Object, &str)
 	if err == nil {
 		if obj.SrcID != -1 {
-			Send(-1, obj.SrcID, SERVICE_PING, false, str)
+			Send(-1, obj.SrcID, SERVICE_PING, UNICAST, str)
 		}
 	}
 	return nil

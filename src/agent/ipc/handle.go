@@ -35,7 +35,7 @@ func P_talk_req(sess *Session, reader *packet.Packet) []byte {
 	tbl, _ := PKT_talk(reader)
 	dest := user_tbl.Query(tbl.F_user)
 	if dest != nil {
-		Send(sess.User.Id, dest.Id, SERVICE_TALK, false, tbl.F_msg)
+		Send(sess.User.Id, dest.Id, SERVICE_TALK, UNICAST, tbl.F_msg)
 	} else {
 		log.Println("no such user :", tbl.F_user)
 	}

@@ -54,15 +54,8 @@ func BenchmarkLoginout(b *testing.B) {
 }
 
 func BenchmarkForward(b *testing.B) {
-	obj := &IPCObject{SrcID: 0, DestID: 1, Multicast: false, Object: []byte("abc")}
+	obj := &IPCObject{SrcID: 0, DestID: 1, CastType: UNICAST, Object: []byte("abc")}
 	for i := 0; i < b.N; i++ {
 		Forward(obj)
-	}
-}
-
-func BenchmarkGroupForward(b *testing.B) {
-	obj := &IPCObject{SrcID: 0, DestID: 1, Multicast: true, Object: []byte("abc")}
-	for i := 0; i < b.N; i++ {
-		GroupForward(obj)
 	}
 }

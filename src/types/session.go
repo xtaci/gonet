@@ -15,10 +15,18 @@ import (
 	"types/soldiers"
 )
 
+//---------------------------------------------------------- special casttype
+const (
+	UNICAST          = int32(iota) // send to user
+	MULTICAST                      // mutlicast to group
+	LOCAL_BROADCAST                // broadcast only to this server's online users
+	GLOBAL_BROADCAST               // broadcast to global online users
+)
+
 type IPCObject struct {
 	SrcID      int32  // sender id
 	DestID     int32  // destination id
-	Multicast  bool   // indicate wheather this message should be deliver to a group.
+	CastType   int32  //  indicate the cast type
 	Service    int16  // service type
 	Object     []byte // json formatted object
 	Time       int64  // sent time

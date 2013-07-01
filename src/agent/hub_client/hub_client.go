@@ -96,22 +96,7 @@ func HubReceiver(conn net.Conn) {
 				continue
 			}
 
-			sess := gsdb.QueryOnline(obj.DestID)
-			if sess == nil {
-				// if the user is disconnected
-				forward_tbl.Push(obj)
-			} else {
-				func() {
-					defer func() {
-						if x := recover(); x != nil {
-							log.Println("forward: deliver to MQ failed.")
-							forward_tbl.Push(obj)
-						}
-					}()
-
-					sess.MQ <- *obj
-				}()
-			}
+			_deliver(obj)
 		} else {
 			_wait_ack_lock.Lock()
 			if ack, ok := _wait_ack[seqval]; ok {
@@ -168,6 +153,44 @@ func _call(data []byte) (ret []byte) {
 	}
 
 	return nil
+}
+
+//---------------------------------------------------------- deliver
+func _deliver(obj *IPCObject) {
+	switch obj.CastType {
+	case GLOBAL_BROADCAST:
+		fallthrough
+	case LOCAL_BROADCAST:
+		users := gsdb.ListAll()
+		defer func() {
+			recover()
+		}()
+
+		for _, v := range users {
+			peer := gsdb.QueryOnline(v)
+			if peer != nil {
+				peer.MQ <- *obj
+			}
+		}
+
+	case UNICAST:
+		sess := gsdb.QueryOnline(obj.DestID)
+		if sess != nil {
+			func() {
+				defer func() {
+					if x := recover(); x != nil {
+						forward_tbl.Push(obj)
+					}
+				}()
+
+				sess.MQ <- *obj
+			}()
+		} else {
+			forward_tbl.Push(obj)
+		}
+	default:
+		log.Println("Invalid packet from HUB")
+	}
 }
 
 func init() {

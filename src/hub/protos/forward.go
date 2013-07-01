@@ -28,6 +28,20 @@ func ForwardChan(hostid int32) chan []byte {
 	return _servers[hostid]
 }
 
+func AllServers() []int32 {
+	_serverlock.RLock()
+	defer _serverlock.RUnlock()
+
+	_all := make([]int32, len(_servers))
+	idx := 0
+	for k := range _servers {
+		_all[idx] = k
+		idx++
+	}
+
+	return _all
+}
+
 func init() {
 	_servers = make(map[int32]chan []byte)
 }

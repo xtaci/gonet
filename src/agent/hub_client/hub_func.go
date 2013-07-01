@@ -198,21 +198,6 @@ func Forward(req *IPCObject) bool {
 	return true
 }
 
-//------------------------------------------------ Forward to Hub/Group
-func GroupForward(req *IPCObject) bool {
-	defer _hub_err()
-	msg := hub.FORWARDIPC{F_IPC: req.Json()}
-	ret := _call(packet.Pack(hub.Code["forwardgroup_req"], &msg, nil))
-	reader := packet.Reader(ret)
-	tbl, err := hub.PKT_INT(reader)
-
-	if err != nil || tbl.F_v == 0 {
-		return false
-	}
-
-	return true
-}
-
 func _hub_err() {
 	if x := recover(); x != nil {
 		log.Println(x)

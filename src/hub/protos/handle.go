@@ -156,60 +156,68 @@ func P_getinfo_req(hostid int32, pkt *packet.Packet) []byte {
 func P_forward_req(hostid int32, pkt *packet.Packet) []byte {
 	tbl, _ := PKT_FORWARDIPC(pkt)
 
-	object := &IPCObject{}
-	err := json.Unmarshal(tbl.F_IPC, object)
+	obj := &IPCObject{}
+	err := json.Unmarshal(tbl.F_IPC, obj)
 
 	if err != nil {
 		log.Println("decode forward IPCObject error")
 		return nil
 	}
 
-	// if user is online, send to the server, or else send to database
-	state := core.State(object.DestID)
-
-	//fmt.Println(tbl.F_dest_id, tbl.F_IPC)
-	switch state {
-	case core.ON_PROT, core.ON_FREE:
-		host := core.Host(object.DestID)
-
-		ch := ForwardChan(host)
-
-		if ch != nil {
-			ch <- tbl.F_IPC
-		} else {
-			forward_tbl.Push(object)
-		}
-	default:
-		forward_tbl.Push(object)
+	switch obj.CastType {
+	case UNICAST:
+		_unicast(hostid, obj)
+	case MULTICAST:
+		_multicast(hostid, obj)
+	case GLOBAL_BROADCAST:
+		_broadcast(hostid, obj)
 	}
 
 	ret := INT{F_v: 1}
 	return packet.Pack(-1, &ret, nil)
 }
 
-func P_forwardgroup_req(hostid int32, pkt *packet.Packet) (r []byte) {
-	tbl, _ := PKT_FORWARDIPC(pkt)
-	ret := INT{F_v: 1}
+func _unicast(hostid int32, obj *IPCObject) {
+	// if user is online, send to the server, or else send to database
+	state := core.State(obj.DestID)
 
-	defer func() {
-		r = packet.Pack(-1, &ret, nil)
-	}()
+	switch state {
+	case core.ON_PROT, core.ON_FREE:
+		host := core.Host(obj.DestID)
 
-	object := &IPCObject{}
-	err := json.Unmarshal(tbl.F_IPC, object)
-	if err != nil {
-		ret.F_v = 0
-		log.Println("decode group IPCObject error")
-		return
+		ch := ForwardChan(host)
+
+		if ch != nil {
+			ch <- obj.Json()
+		} else {
+			forward_tbl.Push(obj)
+		}
+	default:
+		forward_tbl.Push(obj)
 	}
+}
 
-	group := core.Group(object.DestID)
+func _broadcast(hostid int32, obj *IPCObject) {
+	all := AllServers()
+	for _, v := range all {
+		if v != hostid { // ignore sender server
+			host := core.Host(v)
+			ch := ForwardChan(host)
+
+			if ch != nil {
+				ch <- obj.Json()
+			}
+		}
+	}
+}
+
+func _multicast(hostid int32, obj *IPCObject) {
+	group := core.Group(obj.DestID)
 	if group == nil {
-		ret.F_v = 0
 		log.Println("forward ipc: no such group")
 		return
 	}
-	group.Push(object)
+	group.Push(obj)
 
 	// send to online users directly
 	members := group.Members()
@@ -221,7 +229,7 @@ func P_forwardgroup_req(hostid int32, pkt *packet.Packet) (r []byte) {
 
 			ch := ForwardChan(host)
 			if ch != nil {
-				ch <- tbl.F_IPC
+				ch <- obj.Json()
 			}
 		}
 	}

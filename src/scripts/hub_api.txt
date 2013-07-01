@@ -68,8 +68,3 @@ packet_type:100
 name:forward_req
 payload:FORWARDIPC
 desc:转发IPC消息
-
-packet_type:101
-name:forwardgroup_req
-payload:FORWARDIPC
-desc:转发IPC消息到联盟
