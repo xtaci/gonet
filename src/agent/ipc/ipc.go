@@ -53,12 +53,10 @@ func Send(src_id, dest_id int32, service int16, casttype int32, object interface
 		}()
 
 		for _, v := range users {
-			peer := gsdb.QueryOnline(v)
-			if peer != nil {
-				select {
-				case peer.MQ <- *req:
-				case <-time.After(time.Second):
-					panic("deadlock") // rare case, when both chan is full
+			if v != src_id {
+				peer := gsdb.QueryOnline(v)
+				if peer != nil {
+					peer.MQ <- *req
 				}
 			}
 		}
