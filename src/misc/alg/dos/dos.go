@@ -91,15 +91,15 @@ func (t *Tree) ByScore(score int) (n *Node, rank int) {
 		return
 	}
 
-	rank = 0
+	base := 0
 	for n != nil {
 		if score == n.score {
-			rank += _nodesize(n.left) + 1
+			rank = base + _nodesize(n.left) + 1
 			return
 		} else if score > n.score {
 			n = n.left
 		} else {
-			rank += _nodesize(n.left) + 1
+			base += _nodesize(n.left) + 1
 			n = n.right
 		}
 	}
@@ -138,18 +138,20 @@ func (t *Tree) Insert(score int, data interface{}) {
 }
 
 func (t *Tree) DeleteNode(n *Node) {
-	// phase 1. fix up size
-	fixup_size(n)
-
-	// phase 2. handle red-black properties, and deletion work.
+	// handle red-black properties, and deletion work.
 	if n.left != nil && n.right != nil {
 		/* Copy fields from predecessor and then delete it instead */
-		pred := maximum_node(n.left)
+		pred := maximum_node(n.right)
+		// copy score, id
 		n.score = pred.score
-		n.size = pred.size
-		n.data = pred.data
+		n.id = pred.id
+
+		// deal with predecessor after.
 		n = pred
 	}
+
+	// fixup from maximum_node
+	fixup_size(n)
 
 	var child *Node
 	if n.right == nil {
