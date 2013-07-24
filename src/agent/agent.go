@@ -38,7 +38,8 @@ func StartAgent(in chan []byte, conn net.Conn) {
 	}
 
 	var sess Session
-	sess.IP = net.ParseIP(conn.RemoteAddr().String())
+	sess.IP = net.ParseIP(strings.Split(conn.RemoteAddr().String(), ":")[0])
+	log.Println("connected from", sess.IP)
 	sess.MQ = make(chan IPCObject, DEFAULT_MQ_SIZE)
 	sess.ConnectTime = time.Now()
 	sess.LastPacketTime = time.Now().Unix()
