@@ -43,6 +43,9 @@ func main() {
 	// signal
 	go SignalProc()
 
+	// sys routine
+	go SysRoutine()
+
 	// Listen
 	service := ":8080"
 	if config["service"] != "" {

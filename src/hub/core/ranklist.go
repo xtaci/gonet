@@ -32,7 +32,7 @@ func UpdateScore(id, oldscore, newscore int32) bool {
 	_lock_ranklist.Lock()
 	defer _lock_ranklist.Unlock()
 
-	tmplist := make([]interface{}, 0, 64)
+	tmplist := make([]int32, 0, 64)
 
 	defer func() {
 		for i := range tmplist {
@@ -47,7 +47,7 @@ func UpdateScore(id, oldscore, newscore int32) bool {
 			return false
 		}
 
-		if n.Data().(int32) == id {
+		if n.Id() == id {
 			_ranklist.DeleteNode(n)
 			_ranklist.Insert(int(newscore), id)
 			_id_score[id] = newscore
@@ -55,7 +55,7 @@ func UpdateScore(id, oldscore, newscore int32) bool {
 		} else {
 			// temporary delete
 			_ranklist.DeleteNode(n)
-			tmplist = append(tmplist, n.Data())
+			tmplist = append(tmplist, n.Id())
 		}
 	}
 
@@ -84,7 +84,7 @@ func GetList(A, B int) (id []int32, score []int32) {
 
 	for i := A; i <= B; i++ {
 		n := _ranklist.Rank(i)
-		id[i-A] = n.Data().(int32)
+		id[i-A] = n.Id()
 		score[i-A] = int32(n.Score())
 	}
 

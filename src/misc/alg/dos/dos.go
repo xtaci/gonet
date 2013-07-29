@@ -14,11 +14,11 @@ type Node struct {
 	size  int // the size of this subtree
 	color int
 
-	data interface{} // associated data
+	id int32 // associated data
 }
 
-func (n *Node) Data() interface{} {
-	return n.data
+func (n *Node) Id() int32 {
+	return n.id
 }
 
 func (n *Node) Score() int {
@@ -64,8 +64,8 @@ func lookup_node(n *Node, rank int) *Node {
 	return lookup_node(n.right, rank-size)
 }
 
-func new_node(score int, data interface{}, color int, left, right *Node) *Node {
-	n := Node{score: score, color: color, left: left, right: right, size: 1, data: data}
+func new_node(score int, id int32, color int, left, right *Node) *Node {
+	n := Node{score: score, color: color, left: left, right: right, size: 1, id: id}
 	return &n
 }
 
@@ -107,8 +107,8 @@ func (t *Tree) ByScore(score int) (n *Node, rank int) {
 	return
 }
 
-func (t *Tree) Insert(score int, data interface{}) {
-	inserted_node := new_node(score, data, RED, nil, nil)
+func (t *Tree) Insert(score int, id int32) {
+	inserted_node := new_node(score, id, RED, nil, nil)
 	if t.root == nil {
 		t.root = inserted_node
 	} else {
