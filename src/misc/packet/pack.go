@@ -25,21 +25,21 @@ func Pack(tos int16, tbl interface{}, writer *Packet) []byte {
 
 	for i := 0; i < count; i++ {
 		f := v.Field(i)
-		if _is_primitive(f) {
-			_write_primitive(f, writer)
-		} else {
-			switch f.Type().Kind() {
-			case reflect.Slice, reflect.Array:
-				writer.WriteU16(uint16(f.Len()))
-				for a := 0; a < f.Len(); a++ {
-					if _is_primitive(f.Index(a)) {
-						_write_primitive(f.Index(a), writer)
-					} else {
-						elem := f.Index(a).Interface()
-						Pack(-1, elem, writer)
-					}
+		switch f.Type().Kind() {
+		case reflect.Slice, reflect.Array:
+			writer.WriteU16(uint16(f.Len()))
+			for a := 0; a < f.Len(); a++ {
+				if _is_primitive(f.Index(a)) {
+					_write_primitive(f.Index(a), writer)
+				} else {
+					elem := f.Index(a).Interface()
+					Pack(-1, elem, writer)
 				}
 			}
+		case reflect.Struct:
+			Pack(-1, f.Interface(), writer)
+		default:
+			_write_primitive(f, writer)
 		}
 	}
 
