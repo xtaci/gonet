@@ -308,8 +308,8 @@ func (t *Tree) insert_case5(n *Node) {
 }
 
 func maximum_node(n *Node) *Node {
-	for n.right != nil {
-		n = n.right
+	for n.left != nil {
+		n = n.left
 	}
 	return n
 }
