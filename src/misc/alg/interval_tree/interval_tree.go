@@ -122,6 +122,11 @@ func (t *Tree) DeleteNode(n *Node) {
 	}
 
 	t.replace_node(n, child)
+	if child != nil { // copy low, high & data
+		n.low = child.low
+		n.high = child.high
+		n.data = child.data
+	}
 
 	if n.parent == nil && child != nil {
 		child.color = BLACK

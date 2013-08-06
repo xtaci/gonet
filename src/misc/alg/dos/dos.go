@@ -166,6 +166,10 @@ func (t *Tree) DeleteNode(n *Node) {
 	}
 
 	t.replace_node(n, child)
+	if child != nil { //copy from child
+		n.id = child.id
+		n.score = child.score
+	}
 
 	if n.parent == nil && child != nil {
 		child.color = BLACK
