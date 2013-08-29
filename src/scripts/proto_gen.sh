@@ -16,7 +16,7 @@ printf "\n" >> api.go
 gawk -f api.awk api.txt >> api.go 
 gawk -f api_rcode.awk api.txt >> api.go 
 
-printf "var ProtoHandler map[uint16]func(*Session, *packet.Packet) []byte = map[uint16]func(*Session, *packet.Packet) []byte {\n" >> api.go
+printf "var ProtoHandler = map[uint16]func(*Session, *packet.Packet) []byte {\n" >> api.go
 gawk -f api_bind_req.awk api.txt >> api.go 
 printf "}" >> api.go
 
@@ -38,7 +38,7 @@ printf "\n" >> api.go
 gawk -f api.awk hub_api.txt >> api.go 
 gawk -f api_rcode.awk hub_api.txt >> api.go 
 
-printf "var ProtoHandler map[uint16]func(int32, *packet.Packet) []byte = map[uint16]func(int32, *packet.Packet) []byte {\n" >> api.go
+printf "var ProtoHandler = map[uint16]func(int32, *packet.Packet) []byte {\n" >> api.go
 gawk -f api_bind_req.awk hub_api.txt >> api.go 
 printf "}" >> api.go
 
@@ -60,7 +60,7 @@ printf "\n" >> api.go
 gawk -f api.awk event_api.txt >> api.go 
 gawk -f api_rcode.awk event_api.txt >> api.go 
 
-printf "var ProtoHandler map[uint16]func(*packet.Packet) []byte = map[uint16]func(*packet.Packet) []byte {\n" >> api.go
+printf "var ProtoHandler = map[uint16]func(*packet.Packet) []byte {\n" >> api.go
 gawk -f api_bind_req.awk event_api.txt >> api.go 
 printf "}" >> api.go
 

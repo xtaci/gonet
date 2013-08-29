@@ -2,7 +2,7 @@ package protos
 
 import "misc/packet"
 
-var Code map[string]int16 = map[string]int16{
+var Code = map[string]int16{
 	"ping_req":        0,   // PING
 	"login_req":       1,   // 登陆
 	"logout_req":      2,   // 登出
@@ -16,7 +16,7 @@ var Code map[string]int16 = map[string]int16{
 	"forward_req":     100, // 转发IPC消息
 }
 
-var RCode map[int16]string = map[int16]string{
+var RCode = map[int16]string{
 	0:   "ping_req",        // PING
 	1:   "login_req",       // 登陆
 	2:   "logout_req",      // 登出
@@ -30,7 +30,7 @@ var RCode map[int16]string = map[int16]string{
 	100: "forward_req",     // 转发IPC消息
 }
 
-var ProtoHandler map[uint16]func(int32, *packet.Packet) []byte = map[uint16]func(int32, *packet.Packet) []byte{
+var ProtoHandler = map[uint16]func(int32, *packet.Packet) []byte{
 	0:   P_ping_req,
 	1:   P_login_req,
 	2:   P_logout_req,
