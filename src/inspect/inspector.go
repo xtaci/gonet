@@ -1,74 +1,107 @@
 package inspect
 
 import (
-	"encoding/json"
+	"bufio"
 	"fmt"
-	"io"
-	"reflect"
-	"strings"
+	"github.com/aarzilli/golua/lua"
+	"github.com/stevedonovan/luar"
+	"log"
+	"net"
+	"os"
 )
 
 import (
 	"agent/gsdb"
 )
 
-func Inspect(id int32, output io.Writer) {
-	sess := gsdb.QueryOnline(id)
-	fmt.Fprintf(output, "%+v\n", sess)
-}
+//---------------------------------------------------------- bind 8800 to localhost
+func StartInspect() {
+	// Listen
+	service := "127.0.0.1:8800"
+	tcpAddr, err := net.ResolveTCPAddr("tcp4", service)
+	checkError(err)
 
-func InspectField(id int32, field string, output io.Writer) {
-	fields := strings.Split(field, ".")
-	fields = fields[1:]
+	listener, err := net.ListenTCP("tcp", tcpAddr)
+	checkError(err)
 
-	sess := gsdb.QueryOnline(id)
-	node := reflect.ValueOf(sess).Elem()
+	for {
+		conn, err := listener.Accept()
 
-	if sess == nil {
-		fmt.Fprintln(output, "user offline")
-		return
-	}
-
-	for _, v := range fields {
-		node = node.FieldByName(v)
-
-		switch node.Kind() {
-		case reflect.Ptr, reflect.Interface:
-			if !node.IsNil() {
-				node = node.Elem()
-			} else {
-				fmt.Fprintln(output, "<nil>")
-				return
-			}
+		if err != nil {
+			continue
 		}
-
-		if !node.IsValid() {
-			fmt.Fprintln(output, "no such field")
-			return
-		}
+		go handleClient(conn)
 	}
-
-	Print(output, node)
 }
 
-func ListAll(output io.Writer) {
-	Print(output, reflect.ValueOf(gsdb.ListAll()))
+func handleClient(conn net.Conn) {
+	defer func() {
+		if x := recover(); x != nil {
+			fmt.Fprintln(conn, x)
+		}
+		conn.Close()
+	}()
+
+	fmt.Fprintln(conn, "GameServer LUA Console")
+
+	vm := _lua_vm(conn)
+	defer func() {
+		vm.Close()
+	}()
+
+	// using scanner to read
+	scanner := bufio.NewScanner(conn)
+	scanner.Split(bufio.ScanLines)
+
+	prompt(conn)
+	for scanner.Scan() {
+		err := vm.DoString(scanner.Text())
+		if err != nil {
+			fmt.Fprintln(conn, err)
+		}
+		prompt(conn)
+	}
 }
 
-func prompt(output io.Writer) {
-	fmt.Fprint(output, "gonet> ")
-}
-
-func Print(output io.Writer, value reflect.Value) {
-	txt, err := json.MarshalIndent(value.Interface(), "", "\t")
+func checkError(err error) {
 	if err != nil {
-		fmt.Fprintln(output, err)
-	} else {
-		fmt.Fprintln(output, string(txt))
+		log.Printf("Fatal error: %v", err)
+		os.Exit(-1)
 	}
+}
 
-	switch value.Kind() {
-	case reflect.Array, reflect.Map, reflect.Slice, reflect.String:
-		fmt.Fprintln(output, "length:", value.Len())
-	}
+var script = `function print(...)
+				for i=1,arg.n do
+					Print(conn, tostring(arg[i]))
+				end			
+			  end
+		      `
+
+func _lua_vm(conn net.Conn) *lua.State {
+	lua := luar.Init()
+	lua.DoString(script)
+	_push_funcs(conn, lua)
+	return lua
+}
+
+func prompt(conn net.Conn) {
+	fmt.Fprint(conn, "> ")
+}
+
+//---------------------------------------------------------- funcs need be pushed in
+func _push_funcs(conn net.Conn, L *lua.State) {
+	luar.Register(L, "", luar.Map{
+		"conn":  conn,
+		"Print": Print,
+	})
+
+	luar.Register(L, "gsdb", luar.Map{
+		"ListAll":     gsdb.ListAll,
+		"QueryOnline": gsdb.QueryOnline,
+	})
+}
+
+//---------------------------------------------------------- hijack lua print
+func Print(conn net.Conn, s string) {
+	fmt.Fprintln(conn, s)
 }

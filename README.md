@@ -35,6 +35,8 @@
 
 #### 安装:
 * xtaci@ubuntu:~/gonet$ go get labix.org/v2/mgo      
+* xtaci@ubuntu:~/gonet$ go get github.com/stevedonovan/luar
+* xtaci@ubuntu:~/gonet$ go get github.com/aarzilli/golua/lua
 * xtaci@ubuntu:~/gonet$ make    
 * xtaci@ubuntu:~/gonet$ ./startall  
 
