@@ -37,7 +37,7 @@ func StartInspect() {
 func handleClient(conn net.Conn) {
 	defer func() {
 		if x := recover(); x != nil {
-			fmt.Fprintln(conn, x)
+			log.Println(x)
 		}
 		conn.Close()
 	}()
