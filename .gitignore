@@ -19,4 +19,3 @@ production.log
 /config.ini
 /startall.sh
 /log/*
-/src/stats/stats_client/client
