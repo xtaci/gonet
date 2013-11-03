@@ -23,8 +23,7 @@ func close_work(sess *Session) {
 			log.Println("re-push ipcobject back to db")
 		}
 
-		for len(sess.MQ) > 0 {
-			ipcobject := <-sess.MQ
+		for ipcobject, ok := <-sess.MQ; ok; {
 			forward_tbl.Push(&ipcobject)
 		}
 
