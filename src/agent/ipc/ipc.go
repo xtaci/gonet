@@ -76,7 +76,7 @@ func Send(src_id, dest_id int32, service int16, casttype int32, object interface
 			select {
 			case peer.MQ <- *req:
 			case <-time.After(time.Second):
-				panic("deadlock") // rare case, when both chan is full
+				panic("deadlock") // rare case, when both chans are full
 			}
 			return true
 		} else {
