@@ -19,12 +19,9 @@ func close_work(sess *Session) {
 		close(sess.MQ)
 
 		// 未处理的IPC数据，重新放入db
-		if len(sess.MQ) > 0 {
-			log.Println("re-push ipcobject back to db")
-		}
-
-		for ipcobject, ok := <-sess.MQ; ok; ipcobject, ok = <-sess.MQ {
+		for ipcobject := range sess.MQ {
 			forward_tbl.Push(&ipcobject)
+			log.Println("re-push ipcobject back to db")
 		}
 
 		// 持久化逻辑#3: 离线时，刷入数据库
