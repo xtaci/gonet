@@ -51,10 +51,11 @@ func (buf *Buffer) Start() {
 		select {
 		case data := <-buf.pending:
 			buf.raw_send(data)
-		case _, ok := <-buf.ctrl:
-			if !ok {
-				return
+		case <-buf.ctrl: // session end, send final data
+			for data := range buf.pending {
+				buf.raw_send(data)
 			}
+			return
 		}
 	}
 }
