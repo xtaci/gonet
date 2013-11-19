@@ -10,9 +10,9 @@ import (
 )
 
 import (
-	"agent/event_client"
 	"agent/hub_client"
 	"agent/stats_client"
+	"agent/event_client"
 	"cfg"
 	"inspect"
 )
@@ -40,10 +40,11 @@ func main() {
 	stats_client.DialStats()
 
 	log.Println("Starting the server.")
-	// signal
+
+	// Signal Handler
 	go SignalProc()
 
-	// sys routine
+	// SYS ROUTINE for this game server
 	go SysRoutine()
 
 	// Listen
@@ -62,13 +63,13 @@ func main() {
 	log.Println("Game Server OK.")
 
 	for {
+		// Accept and go!
 		conn, err := listener.Accept()
-
 		if err != nil {
 			continue
 		}
 
-		// DoS prevention
+		// test whether this IP is banned
 		IP := net.ParseIP(conn.RemoteAddr().String())
 		if !IsBanned(IP) {
 			go handleClient(conn)
@@ -88,7 +89,7 @@ func handleClient(conn net.Conn) {
 	go StartAgent(ch, conn)
 
 	for {
-		// header
+		// read header : 2-bytes
 		n, err := io.ReadFull(conn, header)
 		if n == 0 && err == io.EOF {
 			break
@@ -97,18 +98,20 @@ func handleClient(conn net.Conn) {
 			break
 		}
 
-		// data
+		// read payload, the size of the payload is given by header
 		size := binary.BigEndian.Uint16(header)
 		data := make([]byte, size)
 		n, err = io.ReadFull(conn, data)
-
 		if err != nil {
-			log.Println("error receiving msg:", err)
+			log.Println("error receiving payload:", err)
 			break
 		}
+
+		// NOTICE: slice is passed by reference; don't re-use a single buffer.
 		ch <- data
 	}
 
+	// close the channel, agent will notified by close
 	close(ch)
 }
 

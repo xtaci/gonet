@@ -71,7 +71,7 @@ func StartAgent(in chan []byte, conn net.Conn) {
 	// the main message loop
 	for {
 		select {
-		case msg, ok := <-in:
+		case msg, ok := <-in: // message from network
 			if !ok {
 				return
 			}
@@ -84,7 +84,7 @@ func StartAgent(in chan []byte, conn net.Conn) {
 			}
 			sess.LastPacketTime = time.Now().Unix()
 
-		case msg, ok := <-sess.MQ: // async
+		case msg, ok := <-sess.MQ: // internal message -- IPCObject
 			if !ok {
 				return
 			}
@@ -96,7 +96,7 @@ func StartAgent(in chan []byte, conn net.Conn) {
 				}
 			}
 
-		case <-std_timer:
+		case <-std_timer: // per-session 1-sec timer
 			timer_work(&sess)
 			if session_timeout(&sess) {
 				return
@@ -104,12 +104,12 @@ func StartAgent(in chan []byte, conn net.Conn) {
 			timer.Add(1, time.Now().Unix()+1, std_timer)
 		}
 
-		// 持久化逻辑#1： 超过一定的操作数量，刷入数据库
+		// Data Persistence #1: Too many operations , flush to db.
 		if sess.OpCount > flush_ops {
 			_flush(&sess)
 		}
 
-		// 是否被逻辑踢出
+		// kicked out?
 		if sess.KickOut {
 			return
 		}

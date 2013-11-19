@@ -17,12 +17,13 @@ const (
 
 //----------------------------------------------- timer work
 func timer_work(sess *Session) {
-	// check whether the user is logged in
+	// if the user is not logged in
+	// just return
 	if !sess.LoggedIn {
 		return
 	}
 
-	// 持久化逻辑#2： 超过一定的时间，刷入数据库
+	// Data Persistence #2：Exceeds max flush interval? flush!
 	config := cfg.Get()
 	ivl, err := strconv.Atoi(config["flush_interval"])
 	if err != nil {
@@ -31,7 +32,6 @@ func timer_work(sess *Session) {
 	}
 
 	if sess.OpCount > 0 && time.Now().Unix()-sess.LastFlushTime > int64(ivl) {
-		// 刷入数据到数据库
 		_flush(sess)
 	}
 }

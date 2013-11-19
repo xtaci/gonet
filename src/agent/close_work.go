@@ -18,13 +18,13 @@ func close_work(sess *Session) {
 		gsdb.UnregisterOnline(sess.User.Id)
 		close(sess.MQ)
 
-		// 未处理的IPC数据，重新放入db
+		// un-delivered IPCObject(s) should be saved back to database!
 		for ipcobject := range sess.MQ {
 			forward_tbl.Push(&ipcobject)
 			log.Println("re-push ipcobject back to db")
 		}
 
-		// 持久化逻辑#3: 离线时，刷入数据库
+		// Data Persistence #3: offline flush
 		_flush(sess)
 	}
 }
