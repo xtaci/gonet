@@ -20,7 +20,9 @@ const (
 	GC_INTERVAL = 300
 )
 
-//---------------------------------------------------------- 系统routine,用户ID为0
+//---------------------------------------------------------- system routine, ID->0
+// SYS ROUTINE should be considered as a server manager, use sys routine for
+// cross-server message broadcast(IPC service), cache clean and timer work.
 func SysRoutine() {
 	var sess Session
 	sess.MQ = make(chan IPCObject, SYS_MQ_SIZE)

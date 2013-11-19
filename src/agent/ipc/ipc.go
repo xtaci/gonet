@@ -40,6 +40,9 @@ func Send(src_id, dest_id int32, service int16, casttype int32, object interface
 		Object:   val,
 		Time:     time.Now().Unix()}
 
+	// !NOTICE ON IPC DESIGN!
+	// In practice, implement BROADCAST as "AN IPC SERVICE OF SYS_USR(ID:0, SYS ROUTINE)" is a better idea,
+	// and also simpler than direct message delivery.
 	switch casttype {
 	case MULTICAST:
 		return hub_client.Forward(req)
