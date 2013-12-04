@@ -84,11 +84,7 @@ func StartAgent(in chan []byte, conn net.Conn) {
 			}
 			sess.LastPacketTime = time.Now().Unix()
 
-		case msg, ok := <-sess.MQ: // internal message -- IPCObject
-			if !ok {
-				return
-			}
-
+		case msg := <-sess.MQ: // internal message -- IPCObject
 			if result := IPCRequestProxy(&sess, &msg); result != nil {
 				err := buf.Send(result)
 				if err != nil {

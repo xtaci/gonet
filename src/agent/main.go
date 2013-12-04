@@ -7,12 +7,13 @@ import (
 	"log"
 	"net"
 	"os"
+	"time"
 )
 
 import (
+	"agent/event_client"
 	"agent/hub_client"
 	"agent/stats_client"
-	"agent/event_client"
 	"cfg"
 	"inspect"
 )
@@ -22,6 +23,10 @@ func init() {
 		flag.Parse()
 	}
 }
+
+const (
+	TCP_TIMEOUT = 120
+)
 
 //----------------------------------------------- Game Server Start
 func main() {
@@ -90,6 +95,7 @@ func handleClient(conn net.Conn) {
 
 	for {
 		// read header : 2-bytes
+		conn.SetReadDeadline(time.Now().Add(TCP_TIMEOUT * time.Second))
 		n, err := io.ReadFull(conn, header)
 		if n == 0 && err == io.EOF {
 			break
@@ -101,6 +107,7 @@ func handleClient(conn net.Conn) {
 		// read payload, the size of the payload is given by header
 		size := binary.BigEndian.Uint16(header)
 		data := make([]byte, size)
+		conn.SetReadDeadline(time.Now().Add(TCP_TIMEOUT * time.Second))
 		n, err = io.ReadFull(conn, data)
 		if err != nil {
 			log.Println("error receiving payload:", err)
