@@ -43,10 +43,6 @@ func (buf *Buffer) Send(data []byte) (err error) {
 
 //------------------------------------------------ packet sender goroutine
 func (buf *Buffer) Start() {
-	defer func() {
-		recover()
-	}()
-
 	for {
 		select {
 		case data := <-buf.pending:
@@ -55,6 +51,7 @@ func (buf *Buffer) Start() {
 			for data := range buf.pending {
 				buf.raw_send(data)
 			}
+			close(buf.pending)
 			return
 		}
 	}
