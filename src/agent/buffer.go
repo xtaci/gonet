@@ -48,10 +48,10 @@ func (buf *Buffer) Start() {
 		case data := <-buf.pending:
 			buf.raw_send(data)
 		case <-buf.ctrl: // session end, send final data
+			close(buf.pending)
 			for data := range buf.pending {
 				buf.raw_send(data)
 			}
-			close(buf.pending)
 			return
 		}
 	}
