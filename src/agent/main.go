@@ -107,7 +107,6 @@ func handleClient(conn net.Conn) {
 		// read payload, the size of the payload is given by header
 		size := binary.BigEndian.Uint16(header)
 		data := make([]byte, size)
-		conn.SetReadDeadline(time.Now().Add(TCP_TIMEOUT * time.Second))
 		n, err = io.ReadFull(conn, data)
 		if err != nil {
 			log.Println("error receiving payload:", err)
