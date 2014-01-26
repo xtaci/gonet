@@ -25,7 +25,8 @@ func init() {
 }
 
 const (
-	TCP_TIMEOUT = 120
+	TCP_TIMEOUT  = 120
+	MAX_DELAY_IN = 60
 )
 
 //----------------------------------------------- Game Server Start
@@ -114,7 +115,12 @@ func handleClient(conn net.Conn) {
 		}
 
 		// NOTICE: slice is passed by reference; don't re-use a single buffer.
-		ch <- data
+		select {
+		case ch <- data:
+		case <-time.After(MAX_DELAY_IN * time.Second):
+			log.Println("server busy or agent closed")
+			return
+		}
 	}
 
 	// close the channel, agent will notified by close
