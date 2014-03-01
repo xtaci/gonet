@@ -4,16 +4,24 @@ import "testing"
 import "fmt"
 
 func TestPike(t *testing.T) {
-	ctx := NewCtx(0)
+	ctx := NewCtx(1234)
 	fmt.Println("###")
 	fmt.Println(ctx.sd)
 	fmt.Println(ctx.addikey[0].buffer)
 	fmt.Println(ctx.addikey[1].buffer)
 	fmt.Println(ctx.addikey[2].buffer)
-	data := []byte{1, 2, 3, 4, 5, 6, 7, 8}
+
+	data := make([]byte, 1024*1024)
+	for i := 0; i < len(data); i++ {
+		data[i] = byte(i % 256)
+	}
 	ctx.Codec(data)
-	fmt.Println("encode:", data)
-	ctx1 := NewCtx(0)
+	//fmt.Println("ciphertext:", string(data), len(data))
+	ctx1 := NewCtx(1234)
 	ctx1.Codec(data)
-	fmt.Println("decode:", data)
+	for i := 0; i < 1024*1024; i++ {
+		if data[i] != byte(i%256) {
+			t.Error("解码错误")
+		}
+	}
 }

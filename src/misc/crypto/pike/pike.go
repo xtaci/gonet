@@ -5,13 +5,13 @@ type ff_addikey struct {
 	dis1   int32
 	dis2   int32
 	index  int32
-	carry  int8
+	carry  int32
 	buffer [64]uint32
 }
 
 type Pike struct {
 	sd      uint32
-	index   int
+	index   int32
 	addikey [3]ff_addikey
 	buffer  [4096]byte
 }
@@ -22,12 +22,12 @@ const (
 
 //----------------------------------------------- Encode/Decode a given buffer
 func (ctx *Pike) Codec(data []byte) {
-	length := len(data)
+	length := int32(len(data))
 	if length == 0 {
 		return
 	}
 
-	idx := 0
+	off := int32(0)
 
 	for {
 		remnant := 4096 - ctx.index
@@ -39,15 +39,12 @@ func (ctx *Pike) Codec(data []byte) {
 		if remnant > length {
 			remnant = length
 		}
-
 		length -= remnant
-		base := ctx.index
 
-		for i := 0; i < remnant; i++ {
-			data[idx] ^= ctx.buffer[base+idx]
-			idx++
+		for i := int32(0); i < remnant; i++ {
+			data[off] ^= ctx.buffer[ctx.index+i]
+			off++
 		}
-
 		ctx.index += remnant
 
 		if length <= 0 {
@@ -115,7 +112,7 @@ func _addikey_next(addikey *ff_addikey) {
 }
 
 func _generate(ctx *Pike) {
-	for i := uint(0); i < 1024; i++ {
+	for i := 0; i < 1024; i++ {
 		carry := ctx.addikey[0].carry + ctx.addikey[1].carry + ctx.addikey[2].carry
 
 		if carry == 0 || carry == 3 { /*!< 如果三个位相同(全0或全1),那么钟控所有的发生器*/
@@ -123,7 +120,7 @@ func _generate(ctx *Pike) {
 			_addikey_next(&ctx.addikey[1])
 			_addikey_next(&ctx.addikey[2])
 		} else { /*!< 如果三个位不全相同,则钟控两个相同的发生器*/
-			flag := int8(0)
+			flag := int32(0)
 
 			if carry == 2 {
 				flag = 1
@@ -136,12 +133,11 @@ func _generate(ctx *Pike) {
 			}
 		}
 
-		tmp := ctx.addikey[2].buffer[ctx.addikey[2].index] ^ ctx.addikey[1].buffer[ctx.addikey[1].index] ^ ctx.addikey[0].buffer[ctx.addikey[0].index]
-
-		for j := uint(0); j < 4; j++ {
-			mask := uint32(0xFF) << (j * 8)
-			ctx.buffer[i*4+j] = byte(tmp & mask >> (j * 8))
-		}
+		tmp := ctx.addikey[0].buffer[ctx.addikey[0].index] ^ ctx.addikey[1].buffer[ctx.addikey[1].index] ^ ctx.addikey[2].buffer[ctx.addikey[2].index]
+		ctx.buffer[i*4] = byte(tmp & 0xFF)
+		ctx.buffer[i*4+1] = byte((tmp & 0xFF00) >> 8)
+		ctx.buffer[i*4+2] = byte((tmp & 0xFF0000) >> 16)
+		ctx.buffer[i*4+3] = byte((tmp & 0xFF000000) >> 24)
 	}
 
 	ctx.index = 0
