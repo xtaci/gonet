@@ -4,7 +4,6 @@ DOT=dot
 GOYACC=$(GO) tool yacc
 
 PROGS = hub \
-	 event \
 	 stats \
 	 agent 
 

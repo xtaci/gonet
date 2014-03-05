@@ -11,7 +11,6 @@ import (
 )
 
 import (
-	"agent/event_client"
 	"agent/hub_client"
 	"agent/stats_client"
 	"cfg"
@@ -42,7 +41,6 @@ func main() {
 
 	// dial HUB
 	hub_client.DialHub()
-	event_client.DialEvent()
 	stats_client.DialStats()
 
 	log.Println("Starting the server.")
