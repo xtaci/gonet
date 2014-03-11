@@ -43,7 +43,7 @@ func PopAll(dest_id int32) []IPCObject {
 	}
 
 	// select
-	err = c.Find(bson.M{"destid": dest_id, "markdelete": true}).Sort("-time").All(&objects)
+	err = c.Find(bson.M{"destid": dest_id, "markdelete": true}).Sort("$natural").All(&objects)
 	if err != nil {
 		log.Println(err)
 	}
