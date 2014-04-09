@@ -14,30 +14,13 @@ import (
 )
 
 const (
-	SVC_PING                        = int16(iota) // 协议ping, 测试用
-	SVC_CHAT                                      // 聊天消息
-	SVC_NEWMAIL                                   // 邮件
-	SVC_NOTIFY12PM                                // 通知今日PM:12到达
-	SVC_NOTIFYALLIANCE                            // 通知联盟信息变更
-	SVC_NOTIFYALLIANCEREQUEST                     // 通知联盟信息请求
-	SVC_NOTIFYLEAVELALLIANCEREQUEST               //通知退出联盟
-	SVC_KICK                                      // 踢人
-	SVC_MUTE                                      // 禁言
-	SVC_UNMUTE                                    // 解除禁言
-	SVC_BAN                                       // 禁止登录
-	SVC_NEWITEM                                   // 新道具产生
+	SVC_PING = int16(iota) // 协议ping, 测试用
+	SVC_CHAT               // 聊天消息
+	SVC_KICK               // 踢人
 
 	// 系统服务
 	SYS_BROADCAST // 系统进程专有服务, 转发实时广播
 	SYS_MULTICAST // 系统进程专有服务, 多播
-	SYS_RELOADGD  // 执行GAMEDATA的重新载入
-	// SYS_RELOADBANLIST  // 执行BANLIST的重新载入
-	SYS_RELOADACTIVITY // 执行ACTIVITY的重新载入
-	SYS_CUPCHANGE      // 同步排名变更
-	SYS_CHATSYNC       // 同步频道聊天
-
-	SVC_NEWGIFT          = 100 // 发放礼包
-	SVC_NOTIFYTASKUPDATE = 101 // 通知任务数据更新
 )
 
 //---------------------------------------------------------- 异步消息发送

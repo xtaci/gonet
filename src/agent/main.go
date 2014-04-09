@@ -30,7 +30,7 @@ func main() {
 		INFO(http.ListenAndServe("0.0.0.0:6060", nil))
 	}()
 
-	// 基本服务启动
+	// start basic services
 	startup()
 
 	// Listen
@@ -56,7 +56,6 @@ func main() {
 			continue
 		}
 
-		// 注意，conn在buffer退出的时候关闭，保证队列中数据的发送
 		go handleClient(conn)
 	}
 }
@@ -69,7 +68,7 @@ func handleClient(conn *net.TCPConn) {
 		}
 	}()
 
-	// 数据包进入队列大小
+	// input buffer
 	inqueue_size := DEFAULT_INQUEUE_SIZE
 	config := cfg.Get()
 	s, err := strconv.Atoi(config["inqueue_size"])
@@ -78,7 +77,7 @@ func handleClient(conn *net.TCPConn) {
 		WARN("cannot parse inqueue_size from config", err, "using default:", inqueue_size)
 	}
 
-	// 初始化
+	// init
 	header := make([]byte, 2)
 	in := make(chan []byte, inqueue_size)
 	bufctrl := make(chan bool)

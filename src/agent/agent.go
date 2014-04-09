@@ -56,7 +56,7 @@ func StartAgent(sess *Session, in chan []byte, out *Buffer) {
 				}
 			}
 			sess.LastPacketTime = sess.PacketTime
-			sess.PacketCount++ // 计数
+			sess.PacketCount++ // packet count
 		case msg := <-sess.MQ: // internal IPC
 			if result := IPCRequestProxy(sess, &msg); result != nil {
 				err := out.Send(result)
@@ -70,7 +70,7 @@ func StartAgent(sess *Session, in chan []byte, out *Buffer) {
 			timer.Add(-1, time.Now().Unix()+CUSTOM_TIMER, custom_timer)
 		}
 
-		// 是否被逻辑踢出
+		// is the session been kicked out
 		if sess.Flag&SESS_KICKED_OUT != 0 {
 			return
 		}

@@ -12,26 +12,24 @@ import (
 	. "types"
 )
 
-//---------------------------------------------------------- 系统routine,用户ID为0
+//---------------------------------------------------------- system routine
 func SysRoutine() {
 	var sess Session
 	sess.MQ = make(chan IPCObject, SYS_MQ_SIZE)
 	gsdb.RegisterOnline(&sess, SYS_USR)
 
-	// 定时器组
+	// timer
 	gc_timer := make(chan int32, 10)
-	// 初始触发
 	gc_timer <- 1
 
 	for {
 		select {
-		case msg, ok := <-sess.MQ: // IPC消息
+		case msg, ok := <-sess.MQ: // IPCObject to system routine
 			if !ok {
 				return
 			}
-			// 只处理消息, 没有客户端可以返回
 			IPCRequestProxy(&sess, &msg)
-		case <-gc_timer: // 强制垃圾回收并打印性能日志
+		case <-gc_timer:
 			runtime.GC()
 			INFO("== PERFORMANCE LOG ==")
 			INFO("Goroutine Count:", runtime.NumGoroutine())

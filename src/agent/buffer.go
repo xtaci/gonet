@@ -29,9 +29,9 @@ func (buf *Buffer) Send(data []byte) (err error) {
 		}
 	}()
 
-	if buf.sess.Flag&SESS_ENCRYPT != 0 { // 第一次交换密钥后开启加密
+	if buf.sess.Flag&SESS_ENCRYPT != 0 { // if encryption has setup
 		buf.sess.Encoder.Codec(data)
-	} else if buf.sess.Flag&SESS_KEYEXCG != 0 { // 是否已经交换完成密钥, 刚完成密钥交换时不能加密
+	} else if buf.sess.Flag&SESS_KEYEXCG != 0 { // whether we just exchanged the key
 		buf.sess.Flag &= ^SESS_KEYEXCG
 		buf.sess.Flag |= SESS_ENCRYPT
 	}

@@ -9,23 +9,24 @@ import (
 	. "types"
 )
 
-//----------------------------------------------- 会话结束时的扫尾清理工作
+//----------------------------------------------- cleanup work after disconnection
 func close_work(sess *Session) {
 	defer PrintPanicStack()
 	if sess.Flag&SESS_LOGGED_IN == 0 {
 		return
 	}
 
-	// 退出时玩家数据<<强制>>刷入数据库
+	// must flush user data
 	_flush(sess)
 
-	// 通知HUB离线
+	// notify hub
 	hub_client.Logout(sess.User.Id)
-	// 在GSDB反注册
+
+	// unregister online at this server
 	gsdb.UnregisterOnline(sess.User.Id)
-	// 关闭chan时，如果有sender，有可能panic，注意IPC对panic的处理
+
+	// close MQ, and save the queue to db
 	close(sess.MQ)
-	// 未处理的IPC数据，重新放入db, 注意:必须先close MQ
 	for ipcobject := range sess.MQ {
 		forward_tbl.Push(&ipcobject)
 		NOTICE("re-pushed ipcobject back to db, userid:", sess.User.Id)

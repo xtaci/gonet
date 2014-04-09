@@ -22,11 +22,11 @@ func SignalProc() {
 	for {
 		msg := <-ch
 		switch msg {
-		case syscall.SIGHUP: // 重载入 config/gamedata等配置数据
+		case syscall.SIGHUP: // reload config
 			log.Println("\033[043;1m[SIGHUP]\033[0m")
 			cfg.Reload()
 			gamedata.Reload()
-		case syscall.SIGTERM: // 关闭agent
+		case syscall.SIGTERM: // server close
 			atomic.StoreInt32(&SIGTERM, 1)
 			log.Println("\033[043;1m[SIGTERM]\033[0m")
 			INFO("waiting for agents close, please wait...")

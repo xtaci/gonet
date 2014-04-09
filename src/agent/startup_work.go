@@ -7,7 +7,7 @@ import (
 	. "helper"
 )
 
-//---------------------------------------------------------- 服务器启动流程
+//---------------------------------------------------------- game server start-up procedure
 func startup() {
 	INFO("Starting GS.")
 	// start logger
