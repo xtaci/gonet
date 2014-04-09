@@ -16,7 +16,7 @@ import (
 	"types/soldiers"
 )
 
-//------------------------------------------------ 刷入数据库控制(interval + dirty flag)
+//------------------------------------------------ data flush control (interval + dirty flag)
 func _flush_work(sess *Session) {
 	config := cfg.Get()
 	fi := config["flush_interval"]
@@ -30,7 +30,7 @@ func _flush_work(sess *Session) {
 	}
 }
 
-//------------------------------------------------ 同步所有玩家数据到数据库
+//------------------------------------------------ save to db
 func _flush(sess *Session) {
 	if sess.User != nil {
 		sess.User.LastSaveTime = time.Now().Unix()
