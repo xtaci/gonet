@@ -7,7 +7,6 @@ import (
 
 func startup_work() {
 	load_ranklist()
-	core.LoadGroups()
 }
 
 //----------------------------------------------- load user table into memory

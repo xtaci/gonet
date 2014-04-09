@@ -6,7 +6,6 @@ import (
 )
 
 import (
-	"cfg"
 	. "db"
 	. "types"
 )
@@ -17,9 +16,8 @@ const (
 
 //---------------------------------------------------------- push an ipc object to db
 func Push(req *IPCObject) bool {
-	config := cfg.Get()
-	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
-
+	ms, c := C(COLLECTION)
+	defer ms.Close()
 	req.MarkDelete = false
 	err := c.Insert(req)
 	if err != nil {
@@ -32,8 +30,8 @@ func Push(req *IPCObject) bool {
 
 //---------------------------------------------------------- pop all message for dest user
 func PopAll(dest_id int32) []IPCObject {
-	config := cfg.Get()
-	c := Mongo.DB(config["mongo_db"]).C(COLLECTION)
+	ms, c := C(COLLECTION)
+	defer ms.Close()
 
 	var objects []IPCObject
 	// mark delete

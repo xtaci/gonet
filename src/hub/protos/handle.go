@@ -50,18 +50,6 @@ func P_login_req(hostid int32, pkt *packet.Packet) []byte {
 
 	if core.Login(tbl.F_id, hostid) {
 		ret.F_success = true
-
-		// 登陆后，将联盟消息push给玩家
-		group := core.Group(tbl.F_group)
-		if group != nil {
-			ch := ForwardChan(hostid)
-			objs := group.Recv(tbl.F_groupmsgmax + 1)
-			for _, v := range objs {
-				ch <- v.Json()
-			}
-
-			ret.F_groupmsgmax = group.MaxMsgId
-		}
 	}
 
 	return packet.Pack(-1, &ret, nil)
@@ -167,8 +155,6 @@ func P_forward_req(hostid int32, pkt *packet.Packet) []byte {
 	switch obj.CastType {
 	case UNICAST:
 		_unicast(hostid, obj)
-	case MULTICAST:
-		_multicast(hostid, obj)
 	case GLOBAL_BROADCAST:
 		_broadcast(hostid, obj)
 	default:
@@ -210,32 +196,6 @@ func _broadcast(hostid int32, obj *IPCObject) {
 			}
 		}
 	}
-}
-
-func _multicast(hostid int32, obj *IPCObject) {
-	group := core.Group(obj.DestID)
-	if group == nil {
-		log.Println("forward ipc: no such group")
-		return
-	}
-	group.Push(obj)
-
-	// send to online users directly
-	members := group.Members()
-	for _, user_id := range members {
-		state := core.State(user_id)
-		switch state {
-		case core.ON_PROT, core.ON_FREE:
-			host := core.Host(user_id)
-
-			ch := ForwardChan(host)
-			if ch != nil {
-				ch <- obj.Json()
-			}
-		}
-	}
-
-	return
 }
 
 func P_adduser_req(hostid int32, pkt *packet.Packet) []byte {

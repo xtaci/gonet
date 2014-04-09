@@ -3,14 +3,15 @@ package db
 import (
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
-	"log"
+	"os"
 )
 
 import (
 	"cfg"
+	. "helper"
 )
 
-var Mongo *mgo.Session
+var _global_ms *mgo.Session
 
 const (
 	COUNTERS = "COUNTERS"
@@ -23,25 +24,31 @@ type Counter struct {
 
 func init() {
 	config := cfg.Get()
-	session, err := mgo.Dial(config["mongo_host"])
-
+	// dial mongodb
+	sess, err := mgo.Dial(config["mongo_host"])
 	if err != nil {
-		panic(err)
+		ERR("cannot connect to", config["mongo_host"], err)
+		os.Exit(-1)
 	}
 
-	session.SetMode(mgo.Monotonic, true)
-	Mongo = session
+	// set default session mode to strong for saving player's data
+	sess.SetMode(mgo.Strong, true)
+	_global_ms = sess
 }
 
-//------------------------------------------------ for very simple use
-func Collection(name string) *mgo.Collection {
+//------------------------------------------------ copy connection
+// !IMPORTANT!  NEVER FORGET -----> defer ms.Close() <-----
+func C(collection string) (*mgo.Session, *mgo.Collection) {
 	config := cfg.Get()
-	return Mongo.DB(config["mongo_db"]).C(name)
+	ms := _global_ms.Copy()
+	c := ms.DB(config["mongo_db"]).C(collection)
+	return ms, c
 }
 
+//---------------------------------------------------------- ID GENERATOR
 func NextVal(countername string) int32 {
-	config := cfg.Get()
-	c := Mongo.DB(config["mongo_db"]).C(COUNTERS)
+	ms, c := C(COUNTERS)
+	defer ms.Close()
 
 	change := mgo.Change{
 		Update:    bson.M{"$inc": bson.M{"nextval": 1}},
@@ -52,7 +59,7 @@ func NextVal(countername string) int32 {
 	next := &Counter{}
 	info, err := c.Find(bson.M{"name": countername}).Apply(change, &next)
 	if err != nil {
-		log.Println(info, err)
+		ERR(info, err)
 		return -1
 	}
 
