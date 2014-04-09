@@ -14,7 +14,6 @@ type Info struct {
 	ProtectTime int64
 }
 
-//---------------------------------------------------------- 测试HUB连通性
 func Ping() bool {
 	defer _hub_err()
 	req := INT{}
@@ -27,20 +26,6 @@ func Ping() bool {
 	return true
 }
 
-//---------------------------------------------------------- 读取某玩家状态
-func GetState(id int32) int32 {
-	defer _hub_err()
-
-	req := ID{}
-	req.F_id = id
-	ret := _call(packet.Pack(Code["getstate_req"], &req, nil))
-	reader := packet.Reader(ret)
-	tbl, _ := PKT_INT(reader)
-
-	return tbl.F_v
-}
-
-//---------------------------------------------------------- 新用户注册，告知HUB
 func AddUser(id int32) bool {
 	defer _hub_err()
 	req := ID{}
@@ -57,7 +42,6 @@ func AddUser(id int32) bool {
 	return true
 }
 
-//---------------------------------------------------------- FSM:  登陆
 func Login(id int32) bool {
 	defer _hub_err()
 	req := LOGIN_REQ{}
@@ -74,7 +58,6 @@ func Login(id int32) bool {
 	return true
 }
 
-//---------------------------------------------------------- FSM:  登出
 func Logout(id int32) bool {
 	defer _hub_err()
 	req := ID{}
@@ -91,7 +74,6 @@ func Logout(id int32) bool {
 	return true
 }
 
-//---------------------------------------------------------- FSM:  攻击
 func Raid(id int32) bool {
 	defer _hub_err()
 
@@ -109,7 +91,6 @@ func Raid(id int32) bool {
 	return true
 }
 
-//---------------------------------------------------------- FSM: 保护
 func Protect(id int32, until int64) bool {
 	defer _hub_err()
 
@@ -128,7 +109,6 @@ func Protect(id int32, until int64) bool {
 	return true
 }
 
-//---------------------------------------------------------- FSM: 撤销保护
 func Free(id int32) bool {
 	defer _hub_err()
 
@@ -146,7 +126,7 @@ func Free(id int32) bool {
 	return true
 }
 
-//---------------------------------------------------------- 转发IPCObject
+//---------------------------------------------------------- Forward IPCObject
 func Forward(req *IPCObject) bool {
 	defer _hub_err()
 	// HUB protocol forwarding
