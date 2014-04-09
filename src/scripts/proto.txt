@@ -29,6 +29,7 @@ msg string
 ===
 
 #key exchange
-KEY=
-E integer 
+key_info=
+send_seed integer 
+recv_seed integer
 ===

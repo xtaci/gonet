@@ -61,7 +61,6 @@ func New(name, mac string) *User {
 		user.Name = name
 		user.Mac = mac
 		user.Domain = config["domain"]
-		user.Type = USER_TYPE_NORMAL
 		user.CreatedAt = time.Now().Unix()
 		err := c.Insert(user)
 		if err != nil {

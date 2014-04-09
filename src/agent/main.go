@@ -2,132 +2,135 @@ package main
 
 import (
 	"encoding/binary"
-	"flag"
 	"io"
-	"log"
 	"net"
+	"net/http"
+	_ "net/http/pprof"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 )
 
 import (
-	"agent/hub_client"
-	"agent/stats_client"
 	"cfg"
-	"inspect"
+	. "helper"
+	"misc/geoip"
+	. "types"
 )
 
-func init() {
-	if !flag.Parsed() {
-		flag.Parse()
-	}
-}
-
-const (
-	TCP_TIMEOUT  = 120
-	MAX_DELAY_IN = 60
-)
-
-//----------------------------------------------- Game Server Start
 func main() {
-	// start logger
-	config := cfg.Get()
-	if config["gs_log"] != "" {
-		cfg.StartLogger(config["gs_log"])
-	}
+	defer func() {
+		if x := recover(); x != nil {
+			ERR("caught panic in main()", x)
+		}
+	}()
 
-	// inspector
-	go inspect.StartInspect()
+	go func() {
+		INFO(http.ListenAndServe("0.0.0.0:6060", nil))
+	}()
 
-	// dial HUB
-	hub_client.DialHub()
-	stats_client.DialStats()
-
-	log.Println("Starting the server.")
-
-	// Signal Handler
-	go SignalProc()
-
-	// SYS ROUTINE for this game server
-	go SysRoutine()
+	// 基本服务启动
+	startup()
 
 	// Listen
+	config := cfg.Get()
 	service := ":8080"
 	if config["service"] != "" {
 		service = config["service"]
 	}
 
-	log.Println("Service:", service)
+	INFO("Service:", service)
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", service)
 	checkError(err)
 
 	listener, err := net.ListenTCP("tcp", tcpAddr)
 	checkError(err)
 
-	log.Println("Game Server OK.")
+	INFO("Game Server OK.")
 
 	for {
-		// Accept and go!
-		conn, err := listener.Accept()
+		conn, err := listener.AcceptTCP()
 		if err != nil {
+			WARN("accept failed", err)
 			continue
 		}
 
-		// test whether this IP is banned
-		IP := net.ParseIP(conn.RemoteAddr().String())
-		if !IsBanned(IP) {
-			go handleClient(conn)
-		} else {
-			conn.Close()
-		}
+		// 注意，conn在buffer退出的时候关闭，保证队列中数据的发送
+		go handleClient(conn)
 	}
 }
 
 //----------------------------------------------- start a goroutine when a new connection is accepted
-func handleClient(conn net.Conn) {
-	defer conn.Close()
+func handleClient(conn *net.TCPConn) {
+	defer func() {
+		if x := recover(); x != nil {
+			ERR("caught panic in handleClient", x)
+		}
+	}()
 
+	// 数据包进入队列大小
+	inqueue_size := DEFAULT_INQUEUE_SIZE
+	config := cfg.Get()
+	s, err := strconv.Atoi(config["inqueue_size"])
+	if err != nil {
+		inqueue_size = s
+		WARN("cannot parse inqueue_size from config", err, "using default:", inqueue_size)
+	}
+
+	// 初始化
 	header := make([]byte, 2)
-	ch := make(chan []byte, 10)
+	in := make(chan []byte, inqueue_size)
+	bufctrl := make(chan bool)
 
-	go StartAgent(ch, conn)
+	defer func() {
+		close(bufctrl)
+		close(in)
+	}()
+
+	// create new session
+	var sess Session
+	sess.IP = net.ParseIP(strings.Split(conn.RemoteAddr().String(), ":")[0])
+	NOTICE("new connection from:", sess.IP, "country:", geoip.Query(sess.IP))
+
+	// create write buffer
+	out := NewBuffer(&sess, conn, bufctrl)
+	go out.Start()
+
+	// start agent!!
+	go StartAgent(&sess, in, out)
 
 	for {
-		// read header : 2-bytes
+		// header
 		conn.SetReadDeadline(time.Now().Add(TCP_TIMEOUT * time.Second))
 		n, err := io.ReadFull(conn, header)
-		if n == 0 && err == io.EOF {
-			break
-		} else if err != nil {
-			log.Println("error receiving header:", err)
+		if err != nil {
+			WARN("error receiving header, bytes:", n, "reason:", err)
 			break
 		}
 
-		// read payload, the size of the payload is given by header
+		// data
 		size := binary.BigEndian.Uint16(header)
 		data := make([]byte, size)
 		n, err = io.ReadFull(conn, data)
 		if err != nil {
-			log.Println("error receiving payload:", err)
+			WARN("error receiving msg, bytes:", n, "reason:", err)
 			break
 		}
 
 		// NOTICE: slice is passed by reference; don't re-use a single buffer.
 		select {
-		case ch <- data:
+		case in <- data:
 		case <-time.After(MAX_DELAY_IN * time.Second):
-			log.Println("server busy or agent closed")
+			WARN("server busy or agent closed, session flag:", sess.Flag)
 			return
 		}
 	}
-
-	// close the channel, agent will notified by close
-	close(ch)
 }
 
 func checkError(err error) {
 	if err != nil {
-		log.Println("Fatal error: %v", err)
+		ERR("Fatal error:", err)
 		os.Exit(-1)
 	}
 }

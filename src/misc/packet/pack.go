@@ -4,24 +4,29 @@ import (
 	"reflect"
 )
 
-//----------------------------------------------- write-out struct fields with packet writer.
+//----------------------------------------------- export struct fields with packet writer.
 func Pack(tos int16, tbl interface{}, writer *Packet) []byte {
 	if writer == nil {
 		writer = Writer()
 	}
 
-	v := reflect.ValueOf(tbl)
+	// write code
+	if tos != -1 {
+		writer.WriteU16(uint16(tos))
+	}
 
+	// is nil?
+	v := reflect.ValueOf(tbl)
+	if !v.IsValid() {
+		return writer.Data()
+	}
+
+	// deal with pointers
 	switch v.Kind() {
 	case reflect.Ptr, reflect.Interface:
 		v = v.Elem()
 	}
 	count := v.NumField()
-
-	// write code
-	if tos != -1 {
-		writer.WriteU16(uint16(tos))
-	}
 
 	for i := 0; i < count; i++ {
 		f := v.Field(i)

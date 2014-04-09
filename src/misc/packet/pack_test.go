@@ -37,4 +37,5 @@ func TestPack(t *testing.T) {
 
 	fmt.Println(Pack(128, test, nil))
 	fmt.Println(Pack(128, &test, nil))
+	fmt.Println(Pack(129, nil, nil))
 }

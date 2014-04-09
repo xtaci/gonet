@@ -23,7 +23,7 @@ func HandleRequest(hostid int32, reader *packet.Packet, output chan []byte) {
 		return
 	}
 
-	b, err := reader.ReadU16()
+	b, err := reader.ReadS16()
 	if err != nil {
 		log.Println("read protocol error")
 		return
@@ -46,10 +46,10 @@ func P_ping_req(hostid int32, reader *packet.Packet) []byte {
 
 func P_login_req(hostid int32, pkt *packet.Packet) []byte {
 	tbl, _ := PKT_LOGIN_REQ(pkt)
-	ret := LOGIN_ACK{F_success: false}
+	ret := LOGIN_ACK{F_success: 0}
 
 	if core.Login(tbl.F_id, hostid) {
-		ret.F_success = true
+		ret.F_success = 1
 	}
 
 	return packet.Pack(-1, &ret, nil)
@@ -61,32 +61,6 @@ func P_logout_req(hostid int32, pkt *packet.Packet) []byte {
 
 	if core.Logout(tbl.F_id) {
 		ret.F_v = 1
-	}
-
-	return packet.Pack(-1, &ret, nil)
-}
-
-func P_changescore_req(hostid int32, pkt *packet.Packet) []byte {
-	tbl, _ := PKT_CHGSCORE(pkt)
-	ret := INT{F_v: 0}
-
-	if core.UpdateScore(tbl.F_id, tbl.F_oldscore, tbl.F_newscore) {
-		ret.F_v = 1
-	}
-
-	return packet.Pack(-1, &ret, nil)
-}
-
-func P_getlist_req(hostid int32, pkt *packet.Packet) []byte {
-	tbl, _ := PKT_GETLIST(pkt)
-	ret := LIST{}
-
-	ids, scores := core.GetList(int(tbl.F_A), int(tbl.F_B))
-	ret.F_items = make([]ID_SCORE, len(ids))
-
-	for k := range ids {
-		ret.F_items[k].F_id = ids[k]
-		ret.F_items[k].F_score = scores[k]
 	}
 
 	return packet.Pack(-1, &ret, nil)
@@ -125,22 +99,6 @@ func P_free_req(hostid int32, pkt *packet.Packet) []byte {
 	return packet.Pack(-1, &ret, nil)
 }
 
-func P_getinfo_req(hostid int32, pkt *packet.Packet) []byte {
-	tbl, _ := PKT_ID(pkt)
-	ret := INFO{}
-	ret.F_id = tbl.F_id
-	ret.F_state = core.State(tbl.F_id)
-	ret.F_score = core.Score(tbl.F_id)
-	ret.F_protecttime = core.ProtectTimeout(tbl.F_id)
-	if ret.F_state == 0 {
-		ret.F_flag = false
-	} else {
-		ret.F_flag = true
-	}
-
-	return packet.Pack(-1, &ret, nil)
-}
-
 func P_forward_req(hostid int32, pkt *packet.Packet) []byte {
 	tbl, _ := PKT_FORWARDIPC(pkt)
 
@@ -152,13 +110,11 @@ func P_forward_req(hostid int32, pkt *packet.Packet) []byte {
 		return nil
 	}
 
-	switch obj.CastType {
-	case UNICAST:
+	// to SYS_USR or to player
+	if obj.DestID == SYS_USR {
+		Syscast(hostid, obj)
+	} else {
 		_unicast(hostid, obj)
-	case GLOBAL_BROADCAST:
-		_broadcast(hostid, obj)
-	default:
-		log.Println("CastType error", hostid, obj)
 	}
 
 	ret := INT{F_v: 1}
@@ -170,12 +126,12 @@ func _unicast(hostid int32, obj *IPCObject) {
 	state := core.State(obj.DestID)
 
 	switch state {
-	case core.ON_PROT, core.ON_FREE:
+	case ON_PROT, ON_FREE:
 		host := core.Host(obj.DestID)
 		ch := ForwardChan(host)
 
 		if ch != nil {
-			ch <- obj.Json()
+			ch <- *obj
 		} else {
 			forward_tbl.Push(obj)
 		}
@@ -184,15 +140,14 @@ func _unicast(hostid int32, obj *IPCObject) {
 	}
 }
 
-func _broadcast(hostid int32, obj *IPCObject) {
+func Syscast(hostid int32, obj *IPCObject) {
 	all := AllServers()
 	for _, v := range all {
 		if v != hostid { // ignore sender's server
-			host := core.Host(v)
-			ch := ForwardChan(host)
+			ch := ForwardChan(v)
 
 			if ch != nil {
-				ch <- obj.Json()
+				ch <- *obj
 			}
 		}
 	}

@@ -1,8 +1,13 @@
-# 增加一个统计数据
-ADD_REQ=
-data array byte
+#累计信息
+SET_ADDS_REQ=
+key string
+value integer
+lang string
 ===
 
-INT=
-v int32
+#更新信息
+SET_UPDATE_REQ=
+key string
+value string 
+lang string
 ===

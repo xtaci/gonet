@@ -1,37 +1,40 @@
 package main
 
 import (
-	"log"
 	"strconv"
+	"sync/atomic"
 	"time"
 )
 
 import (
 	"cfg"
+	"helper"
 	. "types"
 )
 
-const (
-	DEFAULT_FLUSH_INTERVAL = 30
-)
-
-//----------------------------------------------- timer work
+//----------------------------------------------- 1分钟定时器，主要用于需要定时器的活动
 func timer_work(sess *Session) {
-	// if the user is not logged in
-	// just return
-	if !sess.LoggedIn {
+	if sess.Flag&SESS_LOGGED_IN == 0 {
 		return
 	}
 
-	// Data Persistence #2：Exceeds max flush interval? flush!
-	config := cfg.Get()
-	ivl, err := strconv.Atoi(config["flush_interval"])
-	if err != nil {
-		log.Println("cannot parse flush_interval from config", err)
-		ivl = DEFAULT_FLUSH_INTERVAL
+	// SIGTERM 信号检测
+	if atomic.LoadInt32(&SIGTERM) == 1 {
+		sess.Flag |= SESS_KICKED_OUT
+		helper.NOTICE("收到SIGTERM, 玩家被动退出", sess.User.Id, sess.User.Name)
 	}
 
-	if sess.OpCount > 0 && time.Now().Unix()-sess.LastFlushTime > int64(ivl) {
-		_flush(sess)
+	// 发包频率控制，太高的RPS直接踢掉
+	config := cfg.Get()
+	rpm_limit, _ := strconv.ParseFloat(config["rpm_limit"], 32)
+	rpm := float64(sess.PacketCount) / float64(time.Now().Unix()-sess.ConnectTime.Unix()) * 60
+
+	if rpm > rpm_limit {
+		sess.Flag |= SESS_KICKED_OUT
+		helper.ERR("玩家RPM太高", sess.User.Id, sess.User.Name, "RPM:", rpm)
+		return
 	}
+
+	// 尝试持久化
+	_flush_work(sess)
 }

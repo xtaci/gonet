@@ -1,55 +1,43 @@
 package main
 
 import (
-	"log"
 	"runtime"
 	"time"
 )
 
 import (
 	"agent/gsdb"
-	"cfg"
+	. "helper"
 	"misc/timer"
-	"strconv"
 	. "types"
 )
 
-const (
-	SYS_USR     = 0
-	SYS_MQ_SIZE = 65535
-	GC_INTERVAL = 300
-)
-
-//---------------------------------------------------------- system routine, ID->0
-// SYS ROUTINE should be considered as a server manager, use sys routine for
-// cross-server message broadcast(IPC service), cache clean and timer work.
+//---------------------------------------------------------- 系统routine,用户ID为0
 func SysRoutine() {
 	var sess Session
 	sess.MQ = make(chan IPCObject, SYS_MQ_SIZE)
 	gsdb.RegisterOnline(&sess, SYS_USR)
 
-	// timer
-	gc_timer := make(chan int32, 1)
-	timer.Add(0, time.Now().Unix()+GC_INTERVAL, gc_timer)
+	// 定时器组
+	gc_timer := make(chan int32, 10)
+	// 初始触发
+	gc_timer <- 1
 
 	for {
-		config := cfg.Get()
-		gc_interval, e := strconv.Atoi(config["gc_interval"])
-		if e != nil {
-			gc_interval = GC_INTERVAL
-		}
-
 		select {
-		case msg, ok := <-sess.MQ: // async
+		case msg, ok := <-sess.MQ: // IPC消息
 			if !ok {
 				return
 			}
+			// 只处理消息, 没有客户端可以返回
 			IPCRequestProxy(&sess, &msg)
-		case <-gc_timer:
+		case <-gc_timer: // 强制垃圾回收并打印性能日志
 			runtime.GC()
-			log.Println("GC executed")
-			log.Println("NumGoroutine", runtime.NumGoroutine())
-			timer.Add(0, time.Now().Unix()+int64(gc_interval), gc_timer)
+			INFO("== PERFORMANCE LOG ==")
+			INFO("Goroutine Count:", runtime.NumGoroutine())
+			INFO("GC Summary:", GCSummary())
+			INFO("Sysroutine MQ size:", len(sess.MQ))
+			timer.Add(0, time.Now().Unix()+GC_INTERVAL, gc_timer)
 		}
 	}
 }

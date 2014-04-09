@@ -1,21 +1,9 @@
-# 统计服务器通信
+packet_type:100
+name:set_adds_req
+payload:SET_ADDS_REQ
+desc:累计信息
 
-packet_type:0
-name:ping_req
-payload:INT
-desc:PING
-
-packet_type:1000
-name:ping_ack
-payload:INT
-desc:返回请求数值
-
-packet_type:1
-name:add_req
-payload:ADD_REQ
-desc:加入一个统计数
-
-packet_type:1001
-name:add_ack
-payload:INT
-desc:返回0
+packet_type:200
+name:set_update_req
+payload:SET_UPDATE_REQ
+desc:更新信息

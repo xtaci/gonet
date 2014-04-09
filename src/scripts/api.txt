@@ -36,9 +36,9 @@ desc:notify客户端
 packet_type:2000
 name:key_exchange_req
 payload:key
-desc:Diffie-Hellman
+desc:keyexchange
 
 packet_type:2001
 name:key_exchange_ack
 payload:key
-desc:Diffie-Hellman
+desc:keyexchange
