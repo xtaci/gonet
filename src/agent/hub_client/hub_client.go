@@ -48,7 +48,7 @@ RETRY:
 	addr, err := net.ResolveTCPAddr("tcp", config["hub_service"])
 	if err != nil {
 		ERR(err, addr)
-		panic("无法解析hub_service")
+		panic("cannot read hub_service from config")
 	}
 
 	conn, err := net.DialTCP("tcp", nil, addr)
