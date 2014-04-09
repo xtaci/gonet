@@ -64,8 +64,6 @@ func handleClient(conn *net.UDPConn) {
 	defer close(ch)
 
 	go StatsAgent(ch, conn)
-	// start http server
-	go StartGM()
 
 	// loop receiving
 	for {
