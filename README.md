@@ -15,14 +15,14 @@
 统计服务器会访问到两个mongodb数据库，玩家数据库(只读)和统计数据库，最终会汇入统计数据库。
 
 #### 通信原则:     
-1.  GS到HUB/SS/ES的通信，都是Call同步调用，即GS必须等待ACK。         
+1.  GS到HUB/SS的通信，都是Call同步调用，即GS必须等待ACK。         
 2.  HUB到GS的通信，只有forward数据包。       
 3.  单播消息在玩家离线时会存入db, 登录后的启动过程 ___GS___ 直接读取db，并forward给玩家goroutine。
 4.  多播消息在只保留一个固定长度的FIFO, 登录后，多播消息的未读部分 ___HUB___ 会直接forward给玩家goroutine
 
 #### 服务器状态一致性
 1.  GS节点可以单独重启    
-2.  HUB/ES/SS 重启后，GS必须全部重启。    
+2.  HUB/SS 重启后，GS必须全部重启。    
 
 #### 安装先决条件:
 0. 确保安装好bzr, graphviz, gawk, liblua5.1(ubuntu需要手动连接liblua5.1.so) 
