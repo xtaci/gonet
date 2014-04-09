@@ -25,15 +25,13 @@
 2.  HUB/SS 重启后，GS必须全部重启。    
 
 #### 安装先决条件:
-0. 确保安装好bzr, graphviz, gawk, liblua5.1(ubuntu需要手动连接liblua5.1.so) 
+0. 确保安装好bzr, graphviz, gawk
 1. 确保安装好mongodb
 2. 确保config.ini中的mongo_xxxx配置正确
 3. export GOPATH='当前目录'
 
 #### 安装:
 * xtaci@ubuntu:~/gonet$ go get labix.org/v2/mgo      
-* xtaci@ubuntu:~/gonet$ go get github.com/stevedonovan/luar
-* xtaci@ubuntu:~/gonet$ go get github.com/aarzilli/golua/lua
 * xtaci@ubuntu:~/gonet$ make    
 * xtaci@ubuntu:~/gonet$ ./startall  
 
