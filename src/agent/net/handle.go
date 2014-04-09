@@ -43,15 +43,8 @@ func P_talk_req(sess *Session, reader *packet.Packet) []byte {
 }
 
 func P_key_exchange_req(sess *Session, reader *packet.Packet) []byte {
-	client_send_seed := LCG()
-	client_receive_seed := LCG()
-	ret := key_info{int32(client_send_seed), int32(client_receive_seed)}
-	// 服务器加密种子是客户端解密种子
-	sess.Encoder = pike.NewCtx(client_receive_seed)
-	sess.Decoder = pike.NewCtx(client_send_seed)
-	sess.Flag |= SESS_KEYEXCG
-	return packet.Pack(Code["key_exchange_ack"], &ret, nil)
 }
+
 func checkErr(err error) {
 	if err != nil {
 		ERR(err)
