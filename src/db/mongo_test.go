@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"labix.org/v2/mgo"
 	"labix.org/v2/mgo/bson"
+	"math"
 	"testing"
 )
 
@@ -38,4 +39,27 @@ func TestMongo(t *testing.T) {
 	}
 
 	fmt.Println("Phone:", result.Phone)
+}
+
+func TestOverflow(t *testing.T) {
+	config := cfg.Get()
+	c := Mongo.DB(config["mongo_db"]).C(COUNTERS)
+
+	counter := &Counter{Name: "testcounter", NextVal: math.MaxInt32}
+	c.Remove(bson.M{"name": "testcounter"})
+	c.Insert(counter)
+
+	v := NextVal("testcounter")
+	fmt.Println(v)
+
+	if v != 0 {
+		t.Fatal("failed to overflow int32 to 0")
+	}
+
+	v = NextVal("testcounter")
+	fmt.Println(v)
+
+	if v != 1 {
+		t.Fatal("failed to overflow int32 to 1")
+	}
 }

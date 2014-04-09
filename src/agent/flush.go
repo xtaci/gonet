@@ -1,22 +1,43 @@
 package main
 
 import (
+	"strconv"
 	"time"
 )
 
 import (
+	"cfg"
 	"db/data_tbl"
 	"db/user_tbl"
+	"helper"
 	. "types"
 	"types/estates"
 	"types/heroes"
-	"types/samples"
 	"types/soldiers"
 )
 
-//------------------------------------------------ flush all user data
+//------------------------------------------------ data flush control (interval + dirty flag)
+func _flush_work(sess *Session) {
+	config := cfg.Get()
+	fi := config["flush_interval"]
+	inter, _ := strconv.Atoi(fi)
+	fo := config["flush_ops"]
+	ops, _ := strconv.Atoi(fo)
+
+	if sess.DirtyCount() > int32(ops) || (sess.DirtyCount() > 0 && time.Now().Unix()-sess.User.LastSaveTime > int64(inter)) {
+		helper.NOTICE("flush dirtycount:", sess.DirtyCount(), "duration(sec):", time.Now().Unix()-sess.User.LastSaveTime)
+		_flush(sess)
+	}
+}
+
+//------------------------------------------------ save to db
 func _flush(sess *Session) {
-	user_tbl.Set(sess.User)
+	if sess.User != nil {
+		sess.User.LastSaveTime = time.Now().Unix()
+		user_tbl.Set(sess.User)
+		helper.NOTICE(sess.User.Id, sess.User.Name, "data flushed")
+	}
+
 	if sess.Estates != nil {
 		data_tbl.Set(estates.COLLECTION, sess.Estates)
 	}
@@ -29,10 +50,5 @@ func _flush(sess *Session) {
 		data_tbl.Set(heroes.COLLECTION, sess.Heroes)
 	}
 
-	if sess.LatencySamples != nil {
-		data_tbl.Set(samples.COLLECTION, sess.LatencySamples)
-	}
-
-	sess.LastFlushTime = time.Now().Unix()
-	sess.OpCount = 0
+	sess.MarkClean()
 }

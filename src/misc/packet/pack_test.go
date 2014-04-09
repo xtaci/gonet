@@ -3,6 +3,10 @@ package packet
 import "testing"
 import "fmt"
 
+type SUB2 struct {
+	M []int16
+}
+
 type SUB struct {
 	H int16
 	I uint16
@@ -16,6 +20,8 @@ type TEST struct {
 	E    float64
 	F    []byte
 	Sub  []SUB
+	S2   SUB
+	S3   SUB2
 }
 
 func TestPack(t *testing.T) {
@@ -26,7 +32,10 @@ func TestPack(t *testing.T) {
 	test.Sub[0].I = 2048
 	test.Sub[1].H = 4096
 	test.Sub[1].I = 8192
+	test.S2.H = 100
+	test.S3.M = make([]int16, 10)
 
 	fmt.Println(Pack(128, test, nil))
 	fmt.Println(Pack(128, &test, nil))
+	fmt.Println(Pack(129, nil, nil))
 }

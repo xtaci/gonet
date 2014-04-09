@@ -8,7 +8,6 @@ digraph G {
 		Agent2;
 		Agent3;
 		Agent4;
-		Agent5;
 	}
 
 	subgraph GS {
@@ -20,7 +19,6 @@ digraph G {
 
 	subgraph {
 		node [style=filled shape="doublecircle" color=8];
-		Event;
 		Hub;
 		Stats;
 	}
@@ -36,13 +34,10 @@ digraph G {
 		Agent2->GS1;
 		Agent3->GS2;
 		Agent4->GS2;
-		Agent5->GS2;
 	}
 
 	GS1->Hub [dir=both];
 	GS2->Hub [dir=both];
-	GS1->Event;
-	GS2->Event; 
 	GS1->Stats;
 	GS2->Stats; 
 	GS1->GameDB;
@@ -52,7 +47,6 @@ digraph G {
 	Telnet->GS1 [style=dotted];
 
 	Hub->GameDB;
-	Event->GameDB;
 	Stats->GameDB;
 	Stats->StatsDB;
 }

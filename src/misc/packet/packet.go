@@ -5,6 +5,10 @@ import (
 	"math"
 )
 
+const (
+	PACKET_LIMIT = 65533 // 2^16 - 1 - 2
+)
+
 type Packet struct {
 	pos  uint
 	data []byte
@@ -167,7 +171,12 @@ func (p *Packet) ReadFloat32() (ret float32, err error) {
 		return float32(0), _err
 	}
 
-	return math.Float32frombits(bits), nil
+	ret = math.Float32frombits(bits)
+	if math.IsNaN(float64(ret)) || math.IsInf(float64(ret), 0) {
+		return 0, nil
+	}
+
+	return ret, nil
 }
 
 func (p *Packet) ReadFloat64() (ret float64, err error) {
@@ -176,7 +185,12 @@ func (p *Packet) ReadFloat64() (ret float64, err error) {
 		return float64(0), _err
 	}
 
-	return math.Float64frombits(bits), nil
+	ret = math.Float64frombits(bits)
+	if math.IsNaN(ret) || math.IsInf(ret, 0) {
+		return 0, nil
+	}
+
+	return ret, nil
 }
 
 //================================================ Writers

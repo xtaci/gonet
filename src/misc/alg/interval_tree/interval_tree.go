@@ -97,18 +97,17 @@ func (t *Tree) Insert(low, high int64, data interface{}) {
 }
 
 func (t *Tree) DeleteNode(n *Node) {
-	// phase 1. fix up size
-	fixup_m(n)
-
-	// phase 2. handle red-black properties, and deletion work.
+	/* Copy fields from predecessor and then delete it instead */
 	if n.left != nil && n.right != nil {
-		/* Copy fields from predecessor and then delete it instead */
 		pred := maximum_node(n.left)
 		n.low = pred.low
 		n.high = pred.high
 		n.data = pred.data
 		n = pred
 	}
+
+	// fix up size
+	fixup_m(n)
 
 	var child *Node
 	if n.right == nil {
@@ -123,6 +122,11 @@ func (t *Tree) DeleteNode(n *Node) {
 	}
 
 	t.replace_node(n, child)
+	if child != nil { // copy low, high & data
+		n.low = child.low
+		n.high = child.high
+		n.data = child.data
+	}
 
 	if n.parent == nil && child != nil {
 		child.color = BLACK

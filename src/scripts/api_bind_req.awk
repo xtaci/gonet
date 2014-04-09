@@ -13,7 +13,7 @@ BEGIN { RS = ""; FS ="\n" }
 		if (a[1] == "packet_type") {
 			array["packet_type"] = a[2]
 		} else if (a[1] == "name") {
-			if (a[2] !~ /.*_req/) {
+			if (a[2] !~ /.*_req$/) {
 				break
 			} else {
 				array["name"] = a[2]

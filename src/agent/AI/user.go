@@ -10,7 +10,6 @@ import (
 	"misc/geoip"
 	. "types"
 	"types/estates"
-	"types/samples"
 )
 
 //------------------------------------------------ 登陆后的数据加载
@@ -30,24 +29,13 @@ func LoginProc(sess *Session) bool {
 		sess.Grid = CreateGrid(sess.Estates)
 	}
 
-	if !data_tbl.Get(samples.COLLECTION, sess.User.Id, &sess.LatencySamples) {
-		s := &samples.Samples{}
-		s.UserId = sess.User.Id
-		s.Init()
-		sess.LatencySamples = s
-	}
-
 	//
 	if sess.User.CountryCode == "" {
 		sess.User.CountryCode = geoip.Query(sess.IP)
 	}
 
-	if sess.User.CreatedAt == 0 {
-		sess.User.CreatedAt = time.Now().Unix()
-	}
-
 	// 开始计算Flush时间
-	sess.LastFlushTime = time.Now().Unix()
+	sess.LastFlushTime = time.Now()
 
 	// 注册为在线
 	gsdb.RegisterOnline(sess, sess.User.Id)
@@ -56,7 +44,5 @@ func LoginProc(sess *Session) bool {
 	// 不能直接调用，有可能消息超过MQ被永远阻塞
 	go LoadIPCObjects(sess.User.Id, sess.MQ)
 
-	// 标记在线
-	//sess.LoggedIn = true
 	return true
 }

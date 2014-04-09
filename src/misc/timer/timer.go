@@ -49,19 +49,23 @@ func _timer() {
 		// 最小的时间间隔，处理为1s
 		_eventqueue_lock.Lock()
 		for k, v := range _eventqueue {
+			// 处理微小间隔
 			diff := v.Timeout - time.Now().Unix()
 			if diff <= 0 {
 				diff = 1
 			}
 
+			// 发到合适的框
 			for i := TIMER_LEVEL - 1; i >= 0; i-- {
 				if diff >= 1<<i {
 					_eventlist[i][k] = v
 					break
 				}
 			}
+
+			// 从队列中删除这个事件
+			delete(_eventqueue, k)
 		}
-		_eventqueue = make(map[uint32]*_timer_event)
 		_eventqueue_lock.Unlock()
 
 		// 检查事件触发

@@ -2,7 +2,7 @@
 ## Scripts for generate protocol code(uint16)->(string)
 ##
 BEGIN { RS = ""; FS ="\n" 
-print "var RCode map[int16]string = map[int16]string {"
+print "var RCode = map[int16]string {"
 }
 {
 	for (i=1;i<=NF;i++)

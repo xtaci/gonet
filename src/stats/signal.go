@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	//    "sync/atomic"
 )
 
 import (
@@ -15,10 +16,18 @@ import (
 func SignalProc() {
 	ch := make(chan os.Signal)
 	signal.Notify(ch, syscall.SIGHUP)
-
 	for {
 		msg := <-ch
-		log.Println("Recevied signal:", msg)
-		cfg.Reload()
+		switch msg {
+		case syscall.SIGHUP:
+			log.Println("Recevied signal:", msg)
+			cfg.Reload()
+			/*
+			   case syscall.SIGTREM:
+			       atomic.StoreInt32(&SIGTREM,1)
+			       wg.Wait()
+			       os.Exit(-1)
+			*/
+		}
 	}
 }

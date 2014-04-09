@@ -7,14 +7,13 @@ import (
 )
 
 import (
-	"cfg"
 	. "db"
 )
 
 //------------------------------------------------ pass-in *ptr
 func Set(collection string, data interface{}) bool {
-	config := cfg.Get()
-	c := Mongo.DB(config["mongo_db"]).C(collection)
+	ms, c := C(collection)
+	defer ms.Close()
 	v := reflect.ValueOf(data).Elem()
 
 	version := v.FieldByName("Version")
@@ -43,8 +42,8 @@ func Set(collection string, data interface{}) bool {
 
 //------------------------------------------------ pass-in  *ptr or **ptr
 func Get(collection string, user_id int32, data interface{}) bool {
-	config := cfg.Get()
-	c := Mongo.DB(config["mongo_db"]).C(collection)
+	ms, c := C(collection)
+	defer ms.Close()
 
 	err := c.Find(bson.M{"userid": user_id}).One(data)
 	if err != nil {
@@ -57,8 +56,8 @@ func Get(collection string, user_id int32, data interface{}) bool {
 
 //------------------------------------------------ pass-in *[]slice
 func GetAll(collection string, all interface{}) bool {
-	config := cfg.Get()
-	c := Mongo.DB(config["mongo_db"]).C(collection)
+	ms, c := C(collection)
+	defer ms.Close()
 
 	err := c.Find(nil).All(all)
 	if err != nil {

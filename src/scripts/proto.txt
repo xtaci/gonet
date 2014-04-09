@@ -27,8 +27,3 @@ talk=
 user string
 msg string
 ===
-
-#key exchange
-KEY=
-E integer 
-===

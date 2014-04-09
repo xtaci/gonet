@@ -1,12 +1,7 @@
 package hub_client
 
 import (
-	"log"
-	"time"
-)
-
-import (
-	hub "hub/protos"
+	. "helper"
 	"misc/packet"
 	. "types"
 )
@@ -15,17 +10,32 @@ type Info struct {
 	Id          int32
 	State       byte
 	Score       int32
+	Rank        int32
 	ProtectTime int64
 }
 
 func Ping() bool {
 	defer _hub_err()
-	req := hub.INT{}
+	req := INT{}
 	req.F_v = 1
-	ret := _call(packet.Pack(hub.Code["ping_req"], &req, nil))
+	ret := _call(packet.Pack(Code["ping_req"], &req, nil))
+	if ret == nil {
+		ERR("HUB Ping return", false)
+		return false
+	}
+	return true
+}
+
+func AddUser(id int32) bool {
+	defer _hub_err()
+	req := ID{}
+	req.F_id = id
+	ret := _call(packet.Pack(Code["adduser_req"], &req, nil))
 	reader := packet.Reader(ret)
-	tbl, _ := hub.PKT_INT(reader)
-	if tbl.F_v != req.F_v {
+	tbl, err := PKT_INT(reader)
+
+	if err != nil || tbl.F_v == 0 {
+		NOTICE("HUB AddUser  return", false, "param", id)
 		return false
 	}
 
@@ -34,13 +44,14 @@ func Ping() bool {
 
 func Login(id int32) bool {
 	defer _hub_err()
-	req := hub.LOGIN_REQ{}
+	req := LOGIN_REQ{}
 	req.F_id = id
-	ret := _call(packet.Pack(hub.Code["login_req"], &req, nil))
+	ret := _call(packet.Pack(Code["login_req"], &req, nil))
 	reader := packet.Reader(ret)
-	tbl, err := hub.PKT_LOGIN_ACK(reader)
+	tbl, _ := PKT_LOGIN_ACK(reader)
 
-	if err != nil || !tbl.F_success {
+	if tbl.F_success == 0 {
+		NOTICE("HUB Login return  ", false, "param", id)
 		return false
 	}
 
@@ -49,13 +60,14 @@ func Login(id int32) bool {
 
 func Logout(id int32) bool {
 	defer _hub_err()
-	req := hub.ID{}
+	req := ID{}
 	req.F_id = id
-	ret := _call(packet.Pack(hub.Code["logout_req"], &req, nil))
+	ret := _call(packet.Pack(Code["logout_req"], &req, nil))
 	reader := packet.Reader(ret)
-	tbl, err := hub.PKT_INT(reader)
+	tbl, _ := PKT_INT(reader)
 
-	if err != nil || tbl.F_v == 0 {
+	if tbl.F_v == 0 {
+		NOTICE("HUB Logout return  ", false, "param", id)
 		return false
 	}
 
@@ -65,29 +77,32 @@ func Logout(id int32) bool {
 func Raid(id int32) bool {
 	defer _hub_err()
 
-	req := hub.ID{}
+	req := ID{}
 	req.F_id = id
-	ret := _call(packet.Pack(hub.Code["raid_req"], &req, nil))
+	ret := _call(packet.Pack(Code["raid_req"], &req, nil))
 	reader := packet.Reader(ret)
-	tbl, err := hub.PKT_INT(reader)
+	tbl, _ := PKT_INT(reader)
 
-	if err != nil || tbl.F_v == 0 {
+	if tbl.F_v == 0 {
+		NOTICE("HUB Raid return ", false, "param", id)
 		return false
 	}
 
 	return true
 }
 
-func Protect(id int32, until time.Time) bool {
+func Protect(id int32, until int64) bool {
 	defer _hub_err()
 
-	req := hub.ID{}
+	req := PROTECT{}
 	req.F_id = id
-	ret := _call(packet.Pack(hub.Code["protect_req"], &req, nil))
+	req.F_protecttime = until
+	ret := _call(packet.Pack(Code["protect_req"], &req, nil))
 	reader := packet.Reader(ret)
-	tbl, err := hub.PKT_INT(reader)
+	tbl, _ := PKT_INT(reader)
 
-	if err != nil || tbl.F_v == 0 {
+	if tbl.F_v == 0 {
+		NOTICE("HUB Protect return", false, "param", id, until)
 		return false
 	}
 
@@ -97,116 +112,31 @@ func Protect(id int32, until time.Time) bool {
 func Free(id int32) bool {
 	defer _hub_err()
 
-	req := hub.ID{}
+	req := ID{}
 	req.F_id = id
-	ret := _call(packet.Pack(hub.Code["free_req"], &req, nil))
+	ret := _call(packet.Pack(Code["free_req"], &req, nil))
 	reader := packet.Reader(ret)
-	tbl, err := hub.PKT_INT(reader)
+	tbl, _ := PKT_INT(reader)
 
-	if err != nil || tbl.F_v == 0 {
+	if tbl.F_v == 0 {
+		NOTICE("HUB Free return", false, "param", id)
 		return false
 	}
 
 	return true
 }
 
-func Unprotect(id int32) bool {
-	defer _hub_err()
-
-	req := hub.ID{}
-	req.F_id = id
-	ret := _call(packet.Pack(hub.Code["unprotect_req"], &req, nil))
-	reader := packet.Reader(ret)
-	tbl, err := hub.PKT_INT(reader)
-
-	if err != nil || tbl.F_v == 0 {
-		return false
-	}
-
-	return true
-}
-
-func GetInfo(id int32) (info Info, flag bool) {
-	defer _hub_err()
-
-	req := hub.ID{}
-	req.F_id = id
-	ret := _call(packet.Pack(hub.Code["getinfo_req"], &req, nil))
-	reader := packet.Reader(ret)
-	tbl, _err := hub.PKT_INFO(reader)
-	if _err == nil && tbl.F_flag {
-		info.Id = tbl.F_id
-		info.State = tbl.F_state
-		info.Score = tbl.F_score
-		info.ProtectTime = tbl.F_protecttime
-		flag = true
-		return
-	}
-
-	flag = false
-	return
-}
-
-func GetList(A, B int32) (ids, scores []int32, err error) {
-	defer _hub_err()
-
-	req := hub.GETLIST{}
-	req.F_A = A
-	req.F_B = B
-	ret := _call(packet.Pack(hub.Code["getlist_req"], &req, nil))
-	reader := packet.Reader(ret)
-	tbl, _err := hub.PKT_LIST(reader)
-	ids = make([]int32, len(ids))
-	scores = make([]int32, len(scores))
-
-	for k := range tbl.F_items {
-		ids[k] = tbl.F_items[k].F_id
-		scores[k] = tbl.F_items[k].F_score
-	}
-
-	return ids, scores, _err
-}
-
-func AddUser(id int32) bool {
-	defer _hub_err()
-	req := hub.ID{}
-	req.F_id = id
-	ret := _call(packet.Pack(hub.Code["adduser_req"], &req, nil))
-	reader := packet.Reader(ret)
-	tbl, err := hub.PKT_INT(reader)
-
-	if err != nil || tbl.F_v == 0 {
-		return false
-	}
-
-	return true
-}
-
-//------------------------------------------------ Forward to Hub
+//---------------------------------------------------------- Forward IPCObject
 func Forward(req *IPCObject) bool {
 	defer _hub_err()
 	// HUB protocol forwarding
-	msg := hub.FORWARDIPC{F_IPC: req.Json()}
-	ret := _call(packet.Pack(hub.Code["forward_req"], &msg, nil))
+	msg := FORWARDIPC{F_IPC: req.Json()}
+	ret := _call(packet.Pack(Code["forward_req"], &msg, nil))
 	reader := packet.Reader(ret)
-	tbl, err := hub.PKT_INT(reader)
+	tbl, err := PKT_INT(reader)
 
 	if err != nil || tbl.F_v == 0 {
-		return false
-	}
-
-	return true
-}
-
-//------------------------------------------------ Forward to Hub/Group
-func GroupForward(req *IPCObject) bool {
-	defer _hub_err()
-	msg := hub.FORWARDIPC{F_IPC: req.Json()}
-	ret := _call(packet.Pack(hub.Code["forwardgroup_req"], &msg, nil))
-	reader := packet.Reader(ret)
-	tbl, err := hub.PKT_INT(reader)
-
-	if err != nil || tbl.F_v == 0 {
+		ERR("HUB Forward return false", "param", req)
 		return false
 	}
 
@@ -215,6 +145,6 @@ func GroupForward(req *IPCObject) bool {
 
 func _hub_err() {
 	if x := recover(); x != nil {
-		log.Println(x)
+		ERR(x)
 	}
 }

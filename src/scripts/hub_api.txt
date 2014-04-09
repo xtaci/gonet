@@ -16,49 +16,24 @@ name:logout_req
 payload:id
 desc:登出
 
-####
-
 packet_type:3
-name:changescore_req
-payload:changescore
-desc:改变分数
-
-####
-
-packet_type:4
-name:getlist_req
-payload:getlist
-desc:获取列表
-
-####
-
-packet_type:5
 name:raid_req
 payload:id
 desc:攻击
 
-####
-
-packet_type:6
+packet_type:4
 name:protect_req
 payload:PROTECT
 desc:加保护
 
 ###
-packet_type:7
+packet_type:5
 name:free_req
 payload:id
 desc:结束攻击
 
-####
-
-packet_type:8
-name:getinfo_req
-payload:id
-desc:读取玩家信息
-
 #####
-packet_type:9
+packet_type:6
 name:adduser_req
 payload:id
 desc:注册一个新注册的玩家
@@ -68,8 +43,3 @@ packet_type:100
 name:forward_req
 payload:FORWARDIPC
 desc:转发IPC消息
-
-packet_type:101
-name:forwardgroup_req
-payload:FORWARDIPC
-desc:转发IPC消息到联盟

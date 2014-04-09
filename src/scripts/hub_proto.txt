@@ -6,14 +6,11 @@ IPC array byte
 #用户登陆发包
 LOGIN_REQ=
 id int32
-group int32
-groupmsgmax uint32 
 ===
 
 #用户登录回包
 LOGIN_ACK=
-success bool
-groupmsgmax uint32
+success int32
 ===
 
 #只携带ID的包
@@ -24,28 +21,6 @@ id int32
 PROTECT=
 id int32
 protecttime int64
-===
-
-#玩家信息
-INFO=
-flag bool
-id int32
-state byte
-score int32
-protecttime int64
-===
-
-#改变分数
-CHGSCORE=
-id	int32
-oldscore int32
-newscore int32
-===
-
-#获取排行榜
-GETLIST=
-A int32
-B int32
 ===
 
 ID_SCORE=

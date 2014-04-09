@@ -1,5 +1,9 @@
 package dos
 
+import (
+	"fmt"
+)
+
 const (
 	RED = iota
 	BLACK
@@ -10,18 +14,18 @@ type Node struct {
 	right  *Node
 	parent *Node
 
-	score int // the score
 	size  int // the size of this subtree
 	color int
 
-	data interface{} // associated data
+	score int32 // the score
+	id    int32 // associated id
 }
 
-func (n *Node) Data() interface{} {
-	return n.data
+func (n *Node) Id() int32 {
+	return n.id
 }
 
-func (n *Node) Score() int {
+func (n *Node) Score() int32 {
 	return n.score
 }
 
@@ -64,51 +68,83 @@ func lookup_node(n *Node, rank int) *Node {
 	return lookup_node(n.right, rank-size)
 }
 
-func new_node(score int, data interface{}, color int, left, right *Node) *Node {
-	n := Node{score: score, color: color, left: left, right: right, size: 1, data: data}
+func new_node(score int32, id int32, color int, left, right *Node) *Node {
+	n := Node{score: score, color: color, left: left, right: right, size: 1, id: id}
 	return &n
 }
 
 //--------------------------------------------------------- Lookup by Rank
+// READ-LOCK
 func (t *Tree) Rank(rank int) *Node {
 	return lookup_node(t.root, rank)
 }
 
 //--------------------------------------------------------- Lookup by Rank
+// READ-LOCK
 func (t *Tree) Count() int {
 	if t.root != nil {
-		return t.root.size
+		return _nodesize(t.root.left) + _nodesize(t.root.right) + 1
 	}
 
 	return 0
 }
 
 //--------------------------------------------------------- Lookup by score
-func (t *Tree) ByScore(score int) (n *Node, rank int) {
+func (t *Tree) _lookup_score(score int32) (rank int, n *Node) {
 	n = t.root
 
 	if n == nil {
-		return
+		return -1, nil
 	}
 
-	rank = 0
+	base := 0
 	for n != nil {
 		if score == n.score {
-			rank += _nodesize(n.left) + 1
-			return
+			rank = base + _nodesize(n.left) + 1
+			return rank, n
 		} else if score > n.score {
 			n = n.left
 		} else {
-			rank += _nodesize(n.left) + 1
+			base += _nodesize(n.left) + 1
 			n = n.right
 		}
 	}
 
-	return
+	return -1, nil
 }
 
-func (t *Tree) Insert(score int, data interface{}) {
-	inserted_node := new_node(score, data, RED, nil, nil)
+//---------------------------------------------------------- locate a score & id
+// WRITE-LOCK
+func (t *Tree) Locate(score int32, id int32) (int, *Node) {
+	tmplist := make([]int32, 0, 64)
+
+	defer func() {
+		for i := range tmplist {
+			t.Insert(score, tmplist[i])
+		}
+	}()
+
+	for {
+		rank, node := t._lookup_score(score)
+
+		if node == nil { // no such score exists
+			return -1, nil
+		}
+
+		if node.id == id { // found matched id
+			return rank, node
+		} else {
+			// temporary delete
+			tmplist = append(tmplist, node.id)
+			t.DeleteNode(node)
+		}
+	}
+}
+
+//---------------------------------------------------------- Insert an element
+// WRITE-LOCK
+func (t *Tree) Insert(score int32, id int32) {
+	inserted_node := new_node(score, id, RED, nil, nil)
 	if t.root == nil {
 		t.root = inserted_node
 	} else {
@@ -137,19 +173,22 @@ func (t *Tree) Insert(score int, data interface{}) {
 	t.insert_case1(inserted_node)
 }
 
+//---------------------------------------------------------- Delete an element
+// WRITE-LOCK
 func (t *Tree) DeleteNode(n *Node) {
-	// phase 1. fix up size
-	fixup_size(n)
-
-	// phase 2. handle red-black properties, and deletion work.
+	// handle red-black properties, and deletion work.
 	if n.left != nil && n.right != nil {
 		/* Copy fields from predecessor and then delete it instead */
 		pred := maximum_node(n.left)
+		// copy score, id
 		n.score = pred.score
-		n.size = pred.size
-		n.data = pred.data
+		n.id = pred.id
+		// deal with predecessor after.
 		n = pred
 	}
+
+	// fixup from maximum_node
+	fixup_size(n)
 
 	var child *Node
 	if n.right == nil {
@@ -381,5 +420,30 @@ func (t *Tree) delete_case6(n *Node) {
 	} else {
 		sibling(n).left.color = BLACK
 		t.rotate_right(n.parent)
+	}
+}
+
+//---------------------------------------------------------- tree print
+const INDENT_STEP = 4
+
+func Print_helper(n *Node, indent int) {
+	if n == nil {
+		fmt.Printf("<empty tree>")
+		return
+	}
+	if n.right != nil {
+		Print_helper(n.right, indent+INDENT_STEP)
+	}
+	for i := 0; i < indent; i++ {
+		fmt.Printf(" ")
+	}
+	if n.color == BLACK {
+		fmt.Printf("[score:%v size:%v id:%v]\n", n.score, n.size, n.id)
+	} else {
+		fmt.Printf("*[score:%v size:%v id:%v]\n", n.score, n.size, n.id)
+	}
+
+	if n.left != nil {
+		Print_helper(n.left, indent+INDENT_STEP)
 	}
 }

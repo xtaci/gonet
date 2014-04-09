@@ -2,95 +2,109 @@ package main
 
 import (
 	"encoding/binary"
-	"flag"
 	"io"
-	"log"
 	"net"
+	"net/http"
+	_ "net/http/pprof"
 	"os"
+	"strconv"
+	"strings"
+	"time"
 )
 
 import (
-	"agent/event_client"
-	"agent/hub_client"
-	"agent/stats_client"
 	"cfg"
-	"inspect"
+	. "helper"
+	"misc/geoip"
+	. "types"
 )
 
-func init() {
-	if !flag.Parsed() {
-		flag.Parse()
-	}
-}
-
-//----------------------------------------------- Game Server Start
 func main() {
-	// start logger
-	config := cfg.Get()
-	if config["gs_log"] != "" {
-		cfg.StartLogger(config["gs_log"])
-	}
+	defer func() {
+		if x := recover(); x != nil {
+			ERR("caught panic in main()", x)
+		}
+	}()
 
-	// inspector
-	go inspect.StartInspect()
+	go func() {
+		INFO(http.ListenAndServe("0.0.0.0:6060", nil))
+	}()
 
-	// dial HUB
-	hub_client.DialHub()
-	event_client.DialEvent()
-	stats_client.DialStats()
-
-	log.Println("Starting the server.")
-	// signal
-	go SignalProc()
+	// start basic services
+	startup()
 
 	// Listen
+	config := cfg.Get()
 	service := ":8080"
 	if config["service"] != "" {
 		service = config["service"]
 	}
 
-	log.Println("Service:", service)
+	INFO("Service:", service)
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", service)
 	checkError(err)
 
 	listener, err := net.ListenTCP("tcp", tcpAddr)
 	checkError(err)
 
-	log.Println("Game Server OK.")
+	INFO("Game Server OK.")
 
 	for {
-		conn, err := listener.Accept()
-
+		conn, err := listener.AcceptTCP()
 		if err != nil {
+			WARN("accept failed", err)
 			continue
 		}
 
-		// DoS prevention
-		IP := net.ParseIP(conn.RemoteAddr().String())
-		if !IsBanned(IP) {
-			go handleClient(conn)
-		} else {
-			conn.Close()
-		}
+		go handleClient(conn)
 	}
 }
 
 //----------------------------------------------- start a goroutine when a new connection is accepted
-func handleClient(conn net.Conn) {
-	defer conn.Close()
+func handleClient(conn *net.TCPConn) {
+	defer func() {
+		if x := recover(); x != nil {
+			ERR("caught panic in handleClient", x)
+		}
+	}()
 
+	// input buffer
+	inqueue_size := DEFAULT_INQUEUE_SIZE
+	config := cfg.Get()
+	s, err := strconv.Atoi(config["inqueue_size"])
+	if err != nil {
+		inqueue_size = s
+		WARN("cannot parse inqueue_size from config", err, "using default:", inqueue_size)
+	}
+
+	// init
 	header := make([]byte, 2)
-	ch := make(chan []byte, 10)
+	in := make(chan []byte, inqueue_size)
+	bufctrl := make(chan bool)
 
-	go StartAgent(ch, conn)
+	defer func() {
+		close(bufctrl)
+		close(in)
+	}()
+
+	// create new session
+	var sess Session
+	sess.IP = net.ParseIP(strings.Split(conn.RemoteAddr().String(), ":")[0])
+	NOTICE("new connection from:", sess.IP, "country:", geoip.Query(sess.IP))
+
+	// create write buffer
+	out := NewBuffer(&sess, conn, bufctrl)
+	go out.Start()
+
+	// start agent!!
+	go StartAgent(&sess, in, out)
 
 	for {
 		// header
+		conn.SetReadDeadline(time.Now().Add(TCP_TIMEOUT * time.Second))
 		n, err := io.ReadFull(conn, header)
-		if n == 0 && err == io.EOF {
-			break
-		} else if err != nil {
-			log.Println("error receiving header:", err)
+		if err != nil {
+			WARN("error receiving header, bytes:", n, "reason:", err)
 			break
 		}
 
@@ -98,20 +112,24 @@ func handleClient(conn net.Conn) {
 		size := binary.BigEndian.Uint16(header)
 		data := make([]byte, size)
 		n, err = io.ReadFull(conn, data)
-
 		if err != nil {
-			log.Println("error receiving msg:", err)
+			WARN("error receiving msg, bytes:", n, "reason:", err)
 			break
 		}
-		ch <- data
-	}
 
-	close(ch)
+		// NOTICE: slice is passed by reference; don't re-use a single buffer.
+		select {
+		case in <- data:
+		case <-time.After(MAX_DELAY_IN * time.Second):
+			WARN("server busy or agent closed, session flag:", sess.Flag)
+			return
+		}
+	}
 }
 
 func checkError(err error) {
 	if err != nil {
-		log.Println("Fatal error: %v", err)
+		ERR("Fatal error:", err)
 		os.Exit(-1)
 	}
 }

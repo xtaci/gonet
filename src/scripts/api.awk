@@ -7,7 +7,7 @@
 ## desc:心跳包..
 ##
 BEGIN { RS = ""; FS ="\n" 
-print "var Code map[string]int16 = map[string]int16 {"
+print "var Code = map[string]int16 {"
 }
 {
 	for (i=1;i<=NF;i++)

@@ -49,34 +49,17 @@ func _load_config(path string) (ret map[string]string) {
 
 	re := regexp.MustCompile(`[\t ]*([0-9A-Za-z_]+)[\t ]*=[\t ]*([^\t\n\f\r# ]+)[\t #]*`)
 
-	r := bufio.NewReader(f)
+	// using scanner to read config file
+	scanner := bufio.NewScanner(f)
+	scanner.Split(bufio.ScanLines)
 
-	for {
-		line, e := r.ReadString('\n')
-		line = strings.TrimSpace(line)
-
-		// empty-line & #comment
-		if line == "" {
-			if e == nil {
-				continue
-			} else {
-				break
-			}
-		}
-
-		if []byte(line)[0] == '#' {
-			continue
-		}
-
-		// maping
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		// expression match
 		slice := re.FindStringSubmatch(line)
 
 		if slice != nil {
 			ret[slice[1]] = slice[2]
-		}
-
-		if e != nil {
-			break
 		}
 	}
 

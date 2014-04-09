@@ -1,54 +1,14 @@
 package protos
 
 import (
-	"fmt"
 	"log"
 	"runtime"
 )
 
 import (
-	. "helper"
+	"db/stats_tbl"
 	"misc/packet"
 )
-
-func HandleRequest(reader *packet.Packet, output chan []byte) {
-	defer PrintPanicStack()
-
-	seqid, err := reader.ReadU64() // read seqid
-	if err != nil {
-		log.Println("Read Sequence Id failed.", err)
-		return
-	}
-
-	b, err := reader.ReadU16()
-	if err != nil {
-		log.Println("read protocol error")
-		return
-	}
-
-	fmt.Println("proto: ", b)
-	handle := ProtoHandler[b]
-	if handle != nil {
-		ret := handle(reader)
-		if len(ret) != 0 {
-			SendChan(seqid, ret, output)
-		}
-	}
-}
-
-func P_ping_req(reader *packet.Packet) []byte {
-	tbl, _ := PKT_INT(reader)
-	ret := INT{tbl.F_v}
-	return packet.Pack(-1, &ret, nil)
-}
-
-func P_add_req(reader *packet.Packet) []byte {
-	tbl, _ := PKT_ADD_REQ(reader)
-	ret := INT{0}
-
-	fmt.Println(tbl)
-	return packet.Pack(-1, &ret, nil)
-}
 
 func checkErr(err error) {
 	if err != nil {
@@ -59,4 +19,20 @@ func checkErr(err error) {
 
 		panic("error occured in Stats Protocol Module")
 	}
+}
+
+func P_set_adds_req(reader *packet.Packet) []byte {
+	tbl, err := PKT_SET_ADDS_REQ(reader)
+	//log.Println(tbl)
+	checkErr(err)
+	stats_tbl.SetAdds(tbl.F_key, tbl.F_value, tbl.F_lang)
+	return nil
+}
+
+func P_set_update_req(reader *packet.Packet) []byte {
+	tbl, err := PKT_SET_UPDATE_REQ(reader)
+	//log.Println(tbl)
+	checkErr(err)
+	stats_tbl.SetUpdate(tbl.F_key, tbl.F_value, tbl.F_lang)
+	return nil
 }

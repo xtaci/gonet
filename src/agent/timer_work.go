@@ -1,37 +1,40 @@
 package main
 
 import (
-	"log"
 	"strconv"
+	"sync/atomic"
 	"time"
 )
 
 import (
 	"cfg"
+	"helper"
 	. "types"
 )
 
-const (
-	DEFAULT_FLUSH_INTERVAL = 30
-)
-
-//----------------------------------------------- timer work
+//----------------------------------------------- user's timer
 func timer_work(sess *Session) {
-	// check whether the user is logged in
-	if !sess.LoggedIn {
+	if sess.Flag&SESS_LOGGED_IN == 0 {
 		return
 	}
 
-	// 持久化逻辑#2： 超过一定的时间，刷入数据库
-	config := cfg.Get()
-	ivl, err := strconv.Atoi(config["flush_interval"])
-	if err != nil {
-		log.Println("cannot parse flush_interval from config", err)
-		ivl = DEFAULT_FLUSH_INTERVAL
+	// SIGTERM check
+	if atomic.LoadInt32(&SIGTERM) == 1 {
+		sess.Flag |= SESS_KICKED_OUT
+		helper.NOTICE("SIGTERM received, user exits.", sess.User.Id, sess.User.Name)
 	}
 
-	if sess.OpCount > 0 && time.Now().Unix()-sess.LastFlushTime > int64(ivl) {
-		// 刷入数据到数据库
-		_flush(sess)
+	// limit rate of request per minute
+	config := cfg.Get()
+	rpm_limit, _ := strconv.ParseFloat(config["rpm_limit"], 32)
+	rpm := float64(sess.PacketCount) / float64(time.Now().Unix()-sess.ConnectTime.Unix()) * 60
+
+	if rpm > rpm_limit {
+		sess.Flag |= SESS_KICKED_OUT
+		helper.ERR("user RPM too high", sess.User.Id, sess.User.Name, "RPM:", rpm)
+		return
 	}
+
+	// try save the data
+	_flush_work(sess)
 }
