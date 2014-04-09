@@ -27,9 +27,3 @@ talk=
 user string
 msg string
 ===
-
-#key exchange
-key_info=
-send_seed integer 
-recv_seed integer
-===

@@ -10,8 +10,6 @@ var Code = map[string]int16{
 	"user_login_faild_ack":   3,    // 登陆失败
 	"talk_req":               1000, // talk给一个用户
 	"talk_notify":            1001, // notify客户端
-	"key_exchange_req":       2000, // keyexchange
-	"key_exchange_ack":       2001, // keyexchange
 }
 
 var RCode = map[int16]string{
@@ -21,8 +19,6 @@ var RCode = map[int16]string{
 	3:    "user_login_faild_ack",   // 登陆失败
 	1000: "talk_req",               // talk给一个用户
 	1001: "talk_notify",            // notify客户端
-	2000: "key_exchange_req",       // keyexchange
-	2001: "key_exchange_ack",       // keyexchange
 }
 
 var ProtoHandler map[int16]func(*Session, *packet.Packet) []byte
@@ -32,6 +28,5 @@ func init() {
 		0:    P_heart_beat_req,
 		1:    P_user_login_req,
 		1000: P_talk_req,
-		2000: P_key_exchange_req,
 	}
 }

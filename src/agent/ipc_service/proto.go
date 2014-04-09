@@ -28,11 +28,6 @@ type talk struct {
 	F_msg  string
 }
 
-type key_info struct {
-	F_send_seed int32
-	F_recv_seed int32
-}
-
 func PKT_user_login_info(reader *packet.Packet) (tbl user_login_info, err error) {
 	tbl.F_mac_addr, err = reader.ReadString()
 	checkErr(err)
@@ -86,16 +81,6 @@ func PKT_talk(reader *packet.Packet) (tbl talk, err error) {
 	checkErr(err)
 
 	tbl.F_msg, err = reader.ReadString()
-	checkErr(err)
-
-	return
-}
-
-func PKT_key_info(reader *packet.Packet) (tbl key_info, err error) {
-	tbl.F_send_seed, err = reader.ReadS32()
-	checkErr(err)
-
-	tbl.F_recv_seed, err = reader.ReadS32()
 	checkErr(err)
 
 	return
