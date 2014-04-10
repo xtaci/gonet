@@ -7,13 +7,9 @@ import (
 
 import (
 	"cfg"
-	"db/data_tbl"
 	"db/user_tbl"
 	"helper"
 	. "types"
-	"types/estates"
-	"types/heroes"
-	"types/soldiers"
 )
 
 //------------------------------------------------ data flush control (interval + dirty flag)
@@ -38,17 +34,6 @@ func _flush(sess *Session) {
 		helper.NOTICE(sess.User.Id, sess.User.Name, "data flushed")
 	}
 
-	if sess.Estates != nil {
-		data_tbl.Set(estates.COLLECTION, sess.Estates)
-	}
-
-	if sess.Soldiers != nil {
-		data_tbl.Set(soldiers.COLLECTION, sess.Soldiers)
-	}
-
-	if sess.Heroes != nil {
-		data_tbl.Set(heroes.COLLECTION, sess.Heroes)
-	}
-
+	// TODO : save all the data in session
 	sess.MarkClean()
 }
