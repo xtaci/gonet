@@ -5,7 +5,6 @@ import (
 	"os"
 	"runtime"
 	"strconv"
-	"sync"
 	"time"
 )
 
@@ -23,20 +22,15 @@ const (
 
 var _conn net.Conn
 var _seq_id uint64
-var _wait_ack map[uint64]chan []byte
-var _wait_ack_lock sync.Mutex
 
 var (
-	Accum_queue  chan SET_ADDS_REQ
-	Statsd_queue chan SET_ADDS_REQ
-	Update_queue chan SET_UPDATE_REQ
+	AccumQueue  chan SET_ADDS_REQ
+	UpdateQueue chan SET_UPDATE_REQ
 )
 
 func init() {
-	_wait_ack = make(map[uint64]chan []byte)
-	Accum_queue = make(chan SET_ADDS_REQ, STATS_QUEUE_SIZE)
-	Statsd_queue = make(chan SET_ADDS_REQ, STATS_QUEUE_SIZE)
-	Update_queue = make(chan SET_UPDATE_REQ, STATS_QUEUE_SIZE)
+	AccumQueue = make(chan SET_ADDS_REQ, STATS_QUEUE_SIZE)
+	UpdateQueue = make(chan SET_UPDATE_REQ, STATS_QUEUE_SIZE)
 
 	go stats_sender()
 }
@@ -78,13 +72,12 @@ func Send(data []byte) bool {
 func stats_sender() {
 	_accum_buffer := make(map[string]map[string]int32)
 	_update_buffer := make(map[string]map[string]string)
-	_statsd_buffer := make(map[string]int32)
 
 	stats_timer := make(chan int32, 100)
 	stats_timer <- 1
 	for {
 		select {
-		case req := <-Accum_queue:
+		case req := <-AccumQueue:
 			if _, ok := _accum_buffer[req.F_lang]; !ok {
 				val := make(map[string]int32)
 				val[req.F_key] = 0
@@ -93,7 +86,7 @@ func stats_sender() {
 			val := _accum_buffer[req.F_lang]
 			val[req.F_key] += req.F_value
 			_accum_buffer[req.F_lang] = val
-		case req := <-Update_queue:
+		case req := <-UpdateQueue:
 			if _, ok := _update_buffer[req.F_lang]; !ok {
 				val := make(map[string]string)
 				val[req.F_key] = ""
@@ -102,10 +95,8 @@ func stats_sender() {
 			val := _update_buffer[req.F_lang]
 			val[req.F_key] = req.F_value
 			_update_buffer[req.F_lang] = val
-		case req := <-Statsd_queue:
-			_statsd_buffer[req.F_key] += req.F_value
 		case <-stats_timer:
-			INFO("Stats Buffer:", len(_accum_buffer), len(_update_buffer), len(_statsd_buffer))
+			INFO("Stats Buffer:", len(_accum_buffer), len(_update_buffer))
 			// 累计
 			accum := SET_ADDS_REQ{}
 			for accum.F_lang, _ = range _accum_buffer {
