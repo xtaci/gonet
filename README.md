@@ -3,7 +3,7 @@
 
 #### 部署:     
 * Game Server(GS):  
-玩家直接连接GS， 处理玩家逻辑，并与HUB/EventServer/StatsServer通信，GS存在若干个。     
+玩家直接连接GS， 处理玩家逻辑，并与HUB/StatsServer通信，GS存在若干个。     
   
 * Hub Server(HUB):  
 若干个GS 连接到一个HUB, 只存在一个HUB，维护基础的全局信息，以及 GS<--->GS 的消息转发.  
