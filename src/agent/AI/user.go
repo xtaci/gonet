@@ -1,15 +1,9 @@
 package AI
 
 import (
-	"time"
-)
-
-import (
 	"agent/gsdb"
-	"db/data_tbl"
 	"misc/geoip"
 	. "types"
-	"types/estates"
 )
 
 //------------------------------------------------ 登陆后的数据加载
@@ -18,30 +12,17 @@ func LoginProc(sess *Session) bool {
 		return false
 	}
 
-	// 载入建筑表
-	if !data_tbl.Get(estates.COLLECTION, sess.User.Id, &sess.Estates) {
-		// 创建默认的建筑表
-		e := &estates.Manager{}
-		e.UserId = sess.User.Id
-		sess.Estates = e
-	} else {
-		// 创建Grid
-		sess.Grid = CreateGrid(sess.Estates)
-	}
+	// TODO: init data structure for session, such as builds
 
-	//
+	// set countrycode
 	if sess.User.CountryCode == "" {
 		sess.User.CountryCode = geoip.Query(sess.IP)
 	}
 
-	// 开始计算Flush时间
-	sess.LastFlushTime = time.Now()
-
-	// 注册为在线
+	// register as online
 	gsdb.RegisterOnline(sess, sess.User.Id)
 
-	// 最后, 载入离线消息，并push到MQ, 这里小心MQ的buffer长度,
-	// 不能直接调用，有可能消息超过MQ被永远阻塞
+	// load messages
 	go LoadIPCObjects(sess.User.Id, sess.MQ)
 
 	return true

@@ -2,8 +2,6 @@ package cfg
 
 import (
 	"bufio"
-	"flag"
-	"fmt"
 	"log"
 	"os"
 	"regexp"
@@ -14,9 +12,8 @@ import (
 var _DEF_CONFIG = os.Getenv("GOPATH") + "/config.ini"
 
 var (
-	_map        map[string]string
-	_lock       sync.RWMutex
-	config_file = flag.String("config", _DEF_CONFIG, "specify absolute path for config.ini")
+	_map  map[string]string
+	_lock sync.Mutex
 )
 
 func init() {
@@ -24,16 +21,20 @@ func init() {
 }
 
 func Get() map[string]string {
-	_lock.RLock()
-	defer _lock.RUnlock()
+	_lock.Lock()
+	defer _lock.Unlock()
 	return _map
 }
 
 func Reload() {
-	path := *config_file
-	log.Println("Loading Config.")
-	defer log.Println("Config Loaded.")
+	var path string
+	if path = os.Getenv("GONET_CONFIG"); path == "" {
+		path = _DEF_CONFIG
+	}
+
 	_lock.Lock()
+	log.Println("Loading Config from:", path)
+	defer log.Println("Config Loaded.")
 	_map = _load_config(path)
 	_lock.Unlock()
 }
@@ -41,10 +42,9 @@ func Reload() {
 func _load_config(path string) (ret map[string]string) {
 	ret = make(map[string]string)
 	f, err := os.Open(path)
-
 	if err != nil {
-		fmt.Println("error opening file %v\n", err)
-		os.Exit(-1)
+		log.Println(path, err)
+		return
 	}
 
 	re := regexp.MustCompile(`[\t ]*([0-9A-Za-z_]+)[\t ]*=[\t ]*([^\t\n\f\r# ]+)[\t #]*`)
@@ -60,6 +60,7 @@ func _load_config(path string) (ret map[string]string) {
 
 		if slice != nil {
 			ret[slice[1]] = slice[2]
+			log.Println(slice[1], "=", slice[2])
 		}
 	}
 

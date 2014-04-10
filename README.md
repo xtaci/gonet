@@ -34,9 +34,4 @@
 #### 安装:
 * xtaci@ubuntu:~/gonet$ go get labix.org/v2/mgo      
 * xtaci@ubuntu:~/gonet$ make    
-* xtaci@ubuntu:~/gonet$ ./startall  
-
-#### 启动:
-1. 启动支持多config配置，如 hub --config=/path/to/config.ini
-2. 放入后台运行的方式，直接加 '&', 如  hub &
-3. 详细配置请直接阅读和修改config.ini
+* xtaci@ubuntu:~/gonet$ ./start-test.sh
