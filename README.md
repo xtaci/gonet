@@ -1,4 +1,4 @@
-###A game server implemented with golang.
+###A game server skeleton implemented with golang.
 ![Architecture](doc/arch.png)
 
 #### 部署:     
