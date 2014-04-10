@@ -1,8 +1,9 @@
 package gamedata
 
 import (
+	"fmt"
+	"io/ioutil"
 	"log"
-	"math"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -10,21 +11,21 @@ import (
 )
 
 import (
-	"misc/naming"
+	"cfg"
+	. "helper"
 )
 
 var _lock sync.RWMutex
-var _tables map[uint32]*Table
-var _hashtbl map[uint32]string // hash->string
+var _tables map[string]*Table
 
 //---------------------------------------------------------- info for a level
 type Record struct {
-	Fields map[uint32]string
+	Fields map[string]string
 }
 
 //---------------------------------------------------------- Numerical Table for a object
 type Table struct {
-	Records map[uint32]*Record
+	Records map[string]*Record
 }
 
 func init() {
@@ -36,87 +37,77 @@ func Reload() {
 	_lock.Lock()
 	defer _lock.Unlock()
 
-	log.Println("Loading GameData...")
-	defer log.Println("GameData Loaded.")
-
-	_tables = make(map[uint32]*Table)
-	_hashtbl = make(map[uint32]string)
+	_tables = make(map[string]*Table)
 
 	pattern := os.Getenv("GOPATH") + "/src/gamedata/data/*.csv"
+
+	config := cfg.Get()
+	if config["gamedata_dir"] != "" {
+		pattern = config["gamedata_dir"] + "/*.csv"
+	}
+
+	INFO("Loading GameData From", pattern)
 	files, err := filepath.Glob(pattern)
 
 	if err != nil {
-		log.Println(err)
+		ERR(err)
 		panic(err)
 	}
 
 	for _, f := range files {
 		file, err := os.Open(f)
 		if err != nil {
-			log.Println("error opening file %v\n", err)
+			ERR("error opening file", err)
 			continue
 		}
 
 		parse(file)
 		file.Close()
 	}
-}
 
-//----------------------------------------------------------- Query a name by hash
-func Query(hash uint32) string {
-	return _hashtbl[hash]
+	log.Printf("\033[042;1m%v CSV(s) Loaded\033[0m\n", len(_tables))
 }
 
 //---------------------------------------------------------- Set Field value
 func _set(tblname string, rowname string, fieldname string, value string) {
-	// store hashing
-	h_rowname := naming.FNV1a(rowname)
-	h_fieldname := naming.FNV1a(fieldname)
-	h_tblname := naming.FNV1a(tblname)
-	_hashtbl[h_rowname] = rowname
-	_hashtbl[h_fieldname] = fieldname
-	_hashtbl[h_tblname] = tblname
-
-	//
-	tbl := _tables[h_tblname]
+	tbl := _tables[tblname]
 
 	if tbl == nil {
 		tbl = &Table{}
-		tbl.Records = make(map[uint32]*Record)
-		_tables[h_tblname] = tbl
+		tbl.Records = make(map[string]*Record)
+		_tables[tblname] = tbl
 	}
 
-	rec := tbl.Records[h_rowname]
+	rec := tbl.Records[rowname]
 	if rec == nil {
 		rec = &Record{}
-		rec.Fields = make(map[uint32]string)
-		tbl.Records[h_rowname] = rec
+		rec.Fields = make(map[string]string)
+		tbl.Records[rowname] = rec
 	}
 
-	rec.Fields[h_fieldname] = value
+	rec.Fields[fieldname] = value
 }
 
 //---------------------------------------------------------- Get Field value
-func _gethash(h_tblname uint32, h_rowname uint32, h_fieldname uint32) string {
+func _get(tblname string, rowname string, fieldname string) string {
 	_lock.RLock()
 	defer _lock.RUnlock()
 
-	tbl := _tables[h_tblname]
-
-	if tbl == nil {
-		return ""
+	tbl, ok := _tables[tblname]
+	if !ok {
+		panic(fmt.Sprint("table ", tblname, " not exists!"))
 	}
 
-	rec := tbl.Records[h_rowname]
-	if rec == nil {
-		return ""
+	rec, ok := tbl.Records[rowname]
+	if !ok {
+		panic(fmt.Sprint("table ", tblname, " row ", rowname, " not exists!"))
 	}
 
-	return rec.Fields[h_fieldname]
-}
-
-func _get(tblname string, rowname string, fieldname string) string {
-	return _gethash(naming.FNV1a(tblname), naming.FNV1a(rowname), naming.FNV1a(fieldname))
+	value, ok := rec.Fields[fieldname]
+	if !ok {
+		panic(fmt.Sprint("table ", tblname, " field ", fieldname, " not exists!"))
+	}
+	return value
 }
 
 //---------------------------------------------------------- Get Field value as Integer
@@ -124,26 +115,82 @@ func GetInt(tblname string, rowname string, fieldname string) int32 {
 	val := _get(tblname, rowname, fieldname)
 	v, err := strconv.Atoi(val)
 	if err != nil {
-		v = math.MaxInt32
-		log.Println("cannot parse integer from gamedata", err)
+		panic(fmt.Sprintf("cannot parse integer from gamedata %v %v %v %v\n", tblname, rowname, fieldname, err))
 	}
 
 	return int32(v)
 }
 
 //---------------------------------------------------------- Get Field value as Float
-func GetFloat(tblname string, rowname string, fieldname string) float32 {
+func GetFloat(tblname string, rowname string, fieldname string) float64 {
 	val := _get(tblname, rowname, fieldname)
-	f, err := strconv.ParseFloat(val, 32)
-	if err != nil {
-		f = math.MaxFloat32
-		log.Println("cannot parse float from gamedata", err)
+	if val == "" {
+		return 0.0
 	}
 
-	return float32(f)
+	f, err := strconv.ParseFloat(val, 32)
+	if err != nil {
+		panic(fmt.Sprintf("cannot parse float from gamedata %v %v %v %v\n", tblname, rowname, fieldname, err))
+	}
+
+	return f
 }
 
 //---------------------------------------------------------- Get Field value as string
 func GetString(tblname string, rowname string, fieldname string) string {
 	return _get(tblname, rowname, fieldname)
+}
+
+//---------------------------------------------------------- Get Row Count
+func Count(tblname string) int32 {
+	tbl := _tables[tblname]
+
+	if tbl == nil {
+		return 0
+	}
+
+	return int32(len(tbl.Records))
+}
+
+//---------------------------------------------------------- Test Field Exists
+func IsFieldExists(tblname string, fieldname string) bool {
+	_lock.RLock()
+	defer _lock.RUnlock()
+
+	tbl := _tables[tblname]
+
+	if tbl == nil {
+		return false
+	}
+
+	key := ""
+	// get one record key
+	for k, _ := range tbl.Records {
+		key = k
+		break
+	}
+
+	rec, ok := tbl.Records[key]
+	if !ok {
+		return false
+	}
+
+	_, ok = rec.Fields[fieldname]
+	if !ok {
+		return false
+	}
+
+	return true
+}
+
+//---------------------------------------------------------- Load JSON From GameData Directory
+func LoadJSON(filename string) ([]byte, error) {
+	prefix := os.Getenv("GOPATH") + "/src/gamedata/data"
+	config := cfg.Get()
+	if config["gamedata_dir"] != "" {
+		prefix = config["gamedata_dir"]
+	}
+
+	path := prefix + "/" + filename
+	return ioutil.ReadFile(path)
 }
