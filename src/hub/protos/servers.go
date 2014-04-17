@@ -11,7 +11,7 @@ import (
 var (
 	// 各个服务器的Forward消息队列
 	_servers    map[int32]chan IPCObject
-	_serverlock sync.RWMutex
+	_serverlock sync.Mutex
 )
 
 func AddServer(hostid int32, forward chan IPCObject) {
@@ -27,14 +27,14 @@ func RemoveServer(hostid int32) {
 }
 
 func ForwardChan(hostid int32) chan IPCObject {
-	_serverlock.RLock()
-	defer _serverlock.RUnlock()
+	_serverlock.Lock()
+	defer _serverlock.Unlock()
 	return _servers[hostid]
 }
 
 func AllServers() []int32 {
-	_serverlock.RLock()
-	defer _serverlock.RUnlock()
+	_serverlock.Lock()
+	defer _serverlock.Unlock()
 
 	_all := make([]int32, len(_servers))
 	idx := 0
