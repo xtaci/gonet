@@ -31,6 +31,9 @@
 3. export GOPATH='当前目录'
 
 #### 安装:
+* xtaci@ubuntu:~$ git clone https://github.com/xtaci/gonet       
+* xtaci@ubuntu:~$ cd gonet        
+* xtaci@ubuntu:~/gonet$ export GOPATH=~/gonet       
 * xtaci@ubuntu:~/gonet$ go get labix.org/v2/mgo      
 * xtaci@ubuntu:~/gonet$ make    
 * xtaci@ubuntu:~/gonet$ ./start-test.sh
