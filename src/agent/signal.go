@@ -4,7 +4,6 @@ import (
 	"log"
 	"os"
 	"os/signal"
-	"sync/atomic"
 	"syscall"
 )
 
@@ -27,7 +26,7 @@ func SignalProc() {
 			cfg.Reload()
 			gamedata.Reload()
 		case syscall.SIGTERM: // server close
-			atomic.StoreInt32(&SIGTERM, 1)
+			close(die)
 			log.Println("\033[043;1m[SIGTERM]\033[0m")
 			INFO("waiting for agents close, please wait...")
 			wg.Wait()
