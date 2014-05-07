@@ -17,7 +17,11 @@ func init() {
 }
 
 var wg sync.WaitGroup
-var SIGTERM int32
+var die chan bool // for server close
+
+func init() {
+	die = make(chan bool)
+}
 
 //----------------------------------------------- Start Agent when a client is connected
 func StartAgent(sess *Session, in chan []byte, out *Buffer) {
@@ -68,6 +72,8 @@ func StartAgent(sess *Session, in chan []byte, out *Buffer) {
 		case <-custom_timer: // 60-sec timer
 			timer_work(sess)
 			timer.Add(-1, time.Now().Unix()+CUSTOM_TIMER, custom_timer)
+		case <-die:
+			sess.Flag |= SESS_KICKED_OUT
 		}
 
 		// is the session been kicked out

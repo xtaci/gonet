@@ -2,7 +2,6 @@ package main
 
 import (
 	"strconv"
-	"sync/atomic"
 	"time"
 )
 
@@ -16,12 +15,6 @@ import (
 func timer_work(sess *Session) {
 	if sess.Flag&SESS_LOGGED_IN == 0 {
 		return
-	}
-
-	// SIGTERM check
-	if atomic.LoadInt32(&SIGTERM) == 1 {
-		sess.Flag |= SESS_KICKED_OUT
-		helper.NOTICE("SIGTERM received, user exits.", sess.User.Id, sess.User.Name)
 	}
 
 	// limit rate of request per minute
