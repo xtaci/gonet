@@ -69,11 +69,10 @@ func handleClient(conn *net.TCPConn) {
 	}()
 
 	// input buffer
-	inqueue_size := DEFAULT_INQUEUE_SIZE
 	config := cfg.Get()
-	s, err := strconv.Atoi(config["inqueue_size"])
+	inqueue_size, err := strconv.Atoi(config["inqueue_size"])
 	if err != nil {
-		inqueue_size = s
+		inqueue_size = DEFAULT_INQUEUE_SIZE
 		WARN("cannot parse inqueue_size from config", err, "using default:", inqueue_size)
 	}
 
