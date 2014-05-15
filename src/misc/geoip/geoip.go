@@ -31,6 +31,7 @@ func init() {
 		log.Println(err)
 		panic("error opening geoip file")
 	}
+	defer file.Close()
 
 	csv_reader := csv.NewReader(file)
 	records, err := csv_reader.ReadAll()
