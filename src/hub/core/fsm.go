@@ -22,16 +22,9 @@ type PlayerInfo struct {
 	Host           int32      // host
 	ProtectTimeout int64      // real protect timeout
 	RaidStart      int64      // raid start time
-	_lock          sync.Mutex // Record lock
+	sync.Mutex // Record lock
 }
 
-func (p *PlayerInfo) Lock() {
-	p._lock.Lock()
-}
-
-func (p *PlayerInfo) Unlock() {
-	p._lock.Unlock()
-}
 
 /**********************************************************
  * consider following deadlock situations.
