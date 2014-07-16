@@ -1,0 +1,45 @@
+# 转发IPC消息
+FORWARDIPC=
+IPC array byte
+===
+
+#用户登陆发包
+LOGIN_REQ=
+id int32
+===
+
+#用户登录回包
+LOGIN_ACK=
+success int32
+===
+
+#只携带ID的包
+ID=
+id int32
+===
+
+PROTECT=
+id int32
+protecttime int64
+===
+
+ID_SCORE=
+id int32
+score int32
+===
+
+LIST=
+items array ID_SCORE
+===
+
+LONG=
+v int64
+===
+
+STRING=
+v string
+===
+
+INT=
+v int32
+===
