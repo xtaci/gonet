@@ -59,17 +59,17 @@ func NewCtx(sd uint32) (ctx *Pike) {
 	ctx.sd = sd ^ GENIUS_NUMBER
 
 	ctx.addikey[0].sd = ctx.sd
-	linearity(&ctx.addikey[0].sd)
+	ctx.addikey[0].sd = linearity(ctx.addikey[0].sd)
 	ctx.addikey[0].dis1 = 55
 	ctx.addikey[0].dis2 = 24
 
 	ctx.addikey[1].sd = ((ctx.sd & 0xAAAAAAAA) >> 1) | ((ctx.sd & 0x55555555) << 1)
-	linearity(&ctx.addikey[1].sd)
+	ctx.addikey[1].sd = linearity(ctx.addikey[1].sd)
 	ctx.addikey[1].dis1 = 57
 	ctx.addikey[1].dis2 = 7
 
 	ctx.addikey[2].sd = ^(((ctx.sd & 0xF0F0F0F0) >> 4) | ((ctx.sd & 0x0F0F0F0F) << 4))
-	linearity(&ctx.addikey[2].sd)
+	ctx.addikey[2].sd = linearity(ctx.addikey[2].sd)
 	ctx.addikey[2].dis1 = 58
 	ctx.addikey[2].dis2 = 19
 
@@ -77,7 +77,7 @@ func NewCtx(sd uint32) (ctx *Pike) {
 		tmp := ctx.addikey[i].sd
 		for j := 0; j < 64; j++ {
 			for k := 0; k < 32; k++ {
-				linearity(&tmp)
+				tmp = linearity(tmp)
 			}
 			ctx.addikey[i].buffer[j] = tmp
 		}
@@ -91,8 +91,8 @@ func NewCtx(sd uint32) (ctx *Pike) {
 }
 
 /*! 参见<<应用密码学>>中的线性反馈移位寄存器算法*/
-func linearity(key *uint32) {
-	*key = ((((*key >> 31) ^ (*key >> 6) ^ (*key >> 4) ^ (*key >> 2) ^ (*key >> 1) ^ *key) & 0x00000001) << 31) | (*key >> 1)
+func linearity(key uint32) uint32 {
+	return ((((key >> 31) ^ (key >> 6) ^ (key >> 4) ^ (key >> 2) ^ (key >> 1) ^ key) & 0x00000001) << 31) | (key >> 1)
 }
 
 func _addikey_next(addikey *ff_addikey) {
@@ -134,10 +134,11 @@ func _generate(ctx *Pike) {
 		}
 
 		tmp := ctx.addikey[0].buffer[ctx.addikey[0].index] ^ ctx.addikey[1].buffer[ctx.addikey[1].index] ^ ctx.addikey[2].buffer[ctx.addikey[2].index]
-		ctx.buffer[i*4] = byte(tmp & 0xFF)
-		ctx.buffer[i*4+1] = byte((tmp & 0xFF00) >> 8)
-		ctx.buffer[i*4+2] = byte((tmp & 0xFF0000) >> 16)
-		ctx.buffer[i*4+3] = byte((tmp & 0xFF000000) >> 24)
+		base := i << 2
+		ctx.buffer[base] = byte(tmp)
+		ctx.buffer[base+1] = byte(tmp >> 8)
+		ctx.buffer[base+2] = byte(tmp >> 16)
+		ctx.buffer[base+3] = byte(tmp >> 24)
 	}
 
 	ctx.index = 0
