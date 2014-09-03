@@ -17,7 +17,7 @@ type Pike struct {
 }
 
 const (
-	GENIUS_NUMBER = 0x05027919
+	GENIUS_NUMBER = 0x05027929
 )
 
 //----------------------------------------------- Encode/Decode a given buffer
