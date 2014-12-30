@@ -50,7 +50,7 @@ func Update(id, newcup int32) bool {
 			return false
 		}
 
-		_ranklist.DeleteNode(n)
+		_ranklist.Delete(id, n)
 		_ranklist.Insert(newcup, id)
 		_id_cup[id] = newcup
 		return true
@@ -76,8 +76,8 @@ func GetList(A, B int) (id []int32, cup []int32) {
 
 	id, cup = make([]int32, B-A+1), make([]int32, B-A+1)
 	for i := A; i <= B; i++ {
-		n := _ranklist.Rank(i)
-		id[i-A] = n.Id()
+		nid, n := _ranklist.Rank(i)
+		id[i-A] = nid
 		cup[i-A] = n.Score()
 	}
 
@@ -88,9 +88,9 @@ func GetList(A, B int) (id []int32, cup []int32) {
 func RankN(n int32) int32 {
 	_lock_ranklist.RLock()
 	defer _lock_ranklist.RUnlock()
-	node := _ranklist.Rank(int(n))
+	id, node := _ranklist.Rank(int(n))
 	if node != nil {
-		return node.Id()
+		return id
 	}
 	return -1
 }

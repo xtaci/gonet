@@ -13,3 +13,4 @@ stats.log
 /net.log
 /startall.sh
 /log/*
+*.project
