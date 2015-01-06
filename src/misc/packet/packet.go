@@ -6,12 +6,25 @@ import (
 )
 
 const (
-	PACKET_LIMIT = 65533 // 2^16 - 1 - 2
+	PACKET_LIMIT = 65535
+	PACKET_POOL  = 10000
+)
+
+var (
+	_pool = make(chan *Packet, PACKET_POOL)
 )
 
 type Packet struct {
-	pos  uint
+	pos  int
 	data []byte
+}
+
+func init() {
+	go func() {
+		for {
+			_pool <- &Packet{data: make([]byte, 0, 512)}
+		}
+	}()
 }
 
 func (p *Packet) Data() []byte {
@@ -20,14 +33,6 @@ func (p *Packet) Data() []byte {
 
 func (p *Packet) Length() int {
 	return len(p.data)
-}
-
-func (p *Packet) Pos() uint {
-	return p.pos
-}
-
-func (p *Packet) Seek(n uint) {
-	p.pos += n
 }
 
 //=============================================== Readers
@@ -42,7 +47,7 @@ func (p *Packet) ReadBool() (ret bool, err error) {
 }
 
 func (p *Packet) ReadByte() (ret byte, err error) {
-	if p.pos >= uint(len(p.data)) {
+	if p.pos >= len(p.data) {
 		err = errors.New("read byte failed")
 		return
 	}
@@ -53,41 +58,41 @@ func (p *Packet) ReadByte() (ret byte, err error) {
 }
 
 func (p *Packet) ReadBytes() (ret []byte, err error) {
-	if p.pos+2 > uint(len(p.data)) {
+	if p.pos+2 > len(p.data) {
 		err = errors.New("read bytes header failed")
 		return
 	}
 	size, _ := p.ReadU16()
-	if p.pos+uint(size) > uint(len(p.data)) {
+	if p.pos+int(size) > len(p.data) {
 		err = errors.New("read bytes data failed")
 		return
 	}
 
-	ret = p.data[p.pos : p.pos+uint(size)]
-	p.pos += uint(size)
+	ret = p.data[p.pos : p.pos+int(size)]
+	p.pos += int(size)
 	return
 }
 
 func (p *Packet) ReadString() (ret string, err error) {
-	if p.pos+2 > uint(len(p.data)) {
+	if p.pos+2 > len(p.data) {
 		err = errors.New("read string header failed")
 		return
 	}
 
 	size, _ := p.ReadU16()
-	if p.pos+uint(size) > uint(len(p.data)) {
+	if p.pos+int(size) > len(p.data) {
 		err = errors.New("read string data failed")
 		return
 	}
 
-	bytes := p.data[p.pos : p.pos+uint(size)]
-	p.pos += uint(size)
+	bytes := p.data[p.pos : p.pos+int(size)]
+	p.pos += int(size)
 	ret = string(bytes)
 	return
 }
 
 func (p *Packet) ReadU16() (ret uint16, err error) {
-	if p.pos+2 > uint(len(p.data)) {
+	if p.pos+2 > len(p.data) {
 		err = errors.New("read uint16 failed")
 		return
 	}
@@ -106,7 +111,7 @@ func (p *Packet) ReadS16() (ret int16, err error) {
 }
 
 func (p *Packet) ReadU24() (ret uint32, err error) {
-	if p.pos+3 > uint(len(p.data)) {
+	if p.pos+3 > len(p.data) {
 		err = errors.New("read uint24 failed")
 		return
 	}
@@ -125,7 +130,7 @@ func (p *Packet) ReadS24() (ret int32, err error) {
 }
 
 func (p *Packet) ReadU32() (ret uint32, err error) {
-	if p.pos+4 > uint(len(p.data)) {
+	if p.pos+4 > len(p.data) {
 		err = errors.New("read uint32 failed")
 		return
 	}
@@ -144,7 +149,7 @@ func (p *Packet) ReadS32() (ret int32, err error) {
 }
 
 func (p *Packet) ReadU64() (ret uint64, err error) {
-	if p.pos+8 > uint(len(p.data)) {
+	if p.pos+8 > len(p.data) {
 		err = errors.New("read uint64 failed")
 		return
 	}
@@ -195,8 +200,9 @@ func (p *Packet) ReadFloat64() (ret float64, err error) {
 
 //================================================ Writers
 func (p *Packet) WriteZeros(n int) {
-	zeros := make([]byte, n)
-	p.data = append(p.data, zeros...)
+	for i := 0; i < n; i++ {
+		p.data = append(p.data, byte(0))
+	}
 }
 
 func (p *Packet) WriteBool(v bool) {
@@ -227,10 +233,7 @@ func (p *Packet) WriteString(v string) {
 }
 
 func (p *Packet) WriteU16(v uint16) {
-	buf := make([]byte, 2)
-	buf[0] = byte(v >> 8)
-	buf[1] = byte(v)
-	p.data = append(p.data, buf...)
+	p.data = append(p.data, byte(v>>8), byte(v))
 }
 
 func (p *Packet) WriteS16(v int16) {
@@ -238,20 +241,11 @@ func (p *Packet) WriteS16(v int16) {
 }
 
 func (p *Packet) WriteU24(v uint32) {
-	buf := make([]byte, 3)
-	buf[0] = byte(v >> 16)
-	buf[1] = byte(v >> 8)
-	buf[2] = byte(v)
-	p.data = append(p.data, buf...)
+	p.data = append(p.data, byte(v>>16), byte(v>>8), byte(v))
 }
 
 func (p *Packet) WriteU32(v uint32) {
-	buf := make([]byte, 4)
-	buf[0] = byte(v >> 24)
-	buf[1] = byte(v >> 16)
-	buf[2] = byte(v >> 8)
-	buf[3] = byte(v)
-	p.data = append(p.data, buf...)
+	p.data = append(p.data, byte(v>>24), byte(v>>16), byte(v>>8), byte(v))
 }
 
 func (p *Packet) WriteS32(v int32) {
@@ -259,12 +253,7 @@ func (p *Packet) WriteS32(v int32) {
 }
 
 func (p *Packet) WriteU64(v uint64) {
-	buf := make([]byte, 8)
-	for i := range buf {
-		buf[i] = byte(v >> uint((7-i)*8))
-	}
-
-	p.data = append(p.data, buf...)
+	p.data = append(p.data, byte(v>>56), byte(v>>48), byte(v>>40), byte(v>>32), byte(v>>24), byte(v>>16), byte(v>>8), byte(v))
 }
 
 func (p *Packet) WriteS64(v int64) {
@@ -282,11 +271,9 @@ func (p *Packet) WriteFloat64(f float64) {
 }
 
 func Reader(data []byte) *Packet {
-	return &Packet{pos: 0, data: data}
+	return &Packet{data: data}
 }
 
 func Writer() *Packet {
-	pkt := &Packet{pos: 0}
-	pkt.data = make([]byte, 0, 128)
-	return pkt
+	return <-_pool
 }

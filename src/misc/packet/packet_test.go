@@ -2,9 +2,7 @@ package packet
 
 import (
 	"fmt"
-	"math/rand"
 	"testing"
-	"time"
 )
 
 func TestPacketWriter(t *testing.T) {
@@ -28,6 +26,8 @@ func TestPacketWriter(t *testing.T) {
 
 	p.WriteString("hello world")
 	p.WriteBytes([]byte("hello world"))
+	var nil_bytes []byte
+	p.WriteBytes(nil_bytes)
 
 	reader := Reader(p.Data())
 
@@ -84,6 +84,12 @@ func TestPacketWriter(t *testing.T) {
 		t.Error("packet read bytes mistmatch")
 	}
 
+	tmp102, _ := reader.ReadBytes()
+	fmt.Println("NIL:", tmp102)
+	if len(tmp102) != 0 {
+		t.Error("packet read nil bytes mistmatch")
+	}
+
 	_, err := reader.ReadByte()
 
 	if err == nil {
@@ -92,14 +98,14 @@ func TestPacketWriter(t *testing.T) {
 }
 
 func BenchmarkPacketWriter(b *testing.B) {
-	a := byte(0xFF)
-	rand.Seed(time.Now().Unix())
-
 	for i := 0; i < b.N; i++ {
 		p := Writer()
-		n := rand.Intn(128)
-		for j := 0; j < n; j++ {
-			p.WriteByte(a)
-		}
+		p.WriteU16(128)
+		p.WriteBool(true)
+		p.WriteS32(-16)
+		p.WriteString("A")
+		p.WriteFloat32(1.0)
+		p.WriteU32(16)
+		p.WriteFloat64(1.0)
 	}
 }

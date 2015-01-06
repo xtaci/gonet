@@ -24,6 +24,15 @@ type TEST struct {
 	S3   SUB2
 }
 
+type TEST2 struct {
+	BOOL bool
+	A    int32
+	B    string
+	C    float32
+	D    uint32
+	E    float64
+}
+
 func TestPack(t *testing.T) {
 
 	test := TEST{BOOL: true, A: 16, B: string([]byte{65}), C: 1.0, D: 32, E: 1.0, F: []byte{1, 2, 3, 4, 5}}
@@ -38,4 +47,11 @@ func TestPack(t *testing.T) {
 	fmt.Println(Pack(128, test, nil))
 	fmt.Println(Pack(128, &test, nil))
 	fmt.Println(Pack(129, nil, nil))
+}
+
+func BenchmarkPack(b *testing.B) {
+	test := TEST2{BOOL: true, A: 16, B: string([]byte{65}), C: 1.0, D: 32, E: 1.0}
+	for i := 0; i < b.N; i++ {
+		Pack(128, test, nil)
+	}
 }
