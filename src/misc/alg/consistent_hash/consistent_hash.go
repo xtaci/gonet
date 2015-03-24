@@ -14,21 +14,16 @@ func (ch *ConsistentHashing) Init() {
 	ch.keys = make(map[uint32]string)
 }
 
-//----------------------------------------------- add a keyd hashcode to the circle
+//----------------------------------------------- add a key with hashcode to the circle
 func (ch *ConsistentHashing) AddNode(key string, hashcode uint32) bool {
 	ch.Lock()
 	defer ch.Unlock()
 
-	if _, ok := ch.keys[hashcode]; ok { // test existence
+	// test hashcode existence
+	if _, ok := ch.keys[hashcode]; ok {
 		return false
 	}
 	ch.keys[hashcode] = key
-
-	// empty
-	if len(ch.split_points) == 0 {
-		ch.split_points = []uint32{hashcode}
-		return true
-	}
 
 	// hashcode in the middle of the circle
 	for i := 0; i < len(ch.split_points); i++ {
@@ -38,7 +33,7 @@ func (ch *ConsistentHashing) AddNode(key string, hashcode uint32) bool {
 		}
 	}
 
-	// largest hashcode
+	// largest hashcode or empty circle
 	ch.split_points = append(ch.split_points, hashcode)
 	return true
 }
@@ -51,7 +46,7 @@ func (ch *ConsistentHashing) RemoveNode(hashcode uint32) bool {
 	if _, ok := ch.keys[hashcode]; ok {
 		delete(ch.keys, hashcode)
 		for i := 0; i < len(ch.split_points); i++ {
-			if ch.split_points[i] == hashcode {
+			if ch.split_points[i] == hashcode { // node found!
 				ch.split_points = append(ch.split_points[:i], ch.split_points[i+1:]...)
 				return true
 			}
@@ -65,16 +60,18 @@ func (ch *ConsistentHashing) GetNode(hashcode uint32) (key string, ok bool) {
 	ch.Lock()
 	defer ch.Unlock()
 
+	// if empty circle
 	if len(ch.split_points) == 0 {
 		return "", false
 	}
 
+	// find nearest node
 	for i := range ch.split_points {
 		if ch.split_points[i] >= hashcode {
 			return ch.keys[ch.split_points[i]], true
 		}
 	}
 
-	// hashcode larger than the largest node, return the first one
+	// hashcode is larger than the largest node, return to the first node
 	return ch.keys[ch.split_points[0]], true
 }
