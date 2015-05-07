@@ -25,7 +25,6 @@ func init() {
 
 //----------------------------------------------- Start Agent when a client is connected
 func StartAgent(sess *Session, in chan []byte, out *Buffer) {
-	wg.Add(1)
 	defer wg.Done()
 	defer helper.PrintPanicStack()
 

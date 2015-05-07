@@ -96,6 +96,7 @@ func handleClient(conn *net.TCPConn) {
 	go out.Start()
 
 	// start agent!!
+	wg.Add(1)
 	go StartAgent(&sess, in, out)
 
 	for {
