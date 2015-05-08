@@ -1,0 +1,29 @@
+#用户登陆发包
+user_login_info=
+mac_addr string
+client_version integer
+new_user boolean
+user_name string
+===
+
+#用户信息包.
+user_snapshot=
+id integer
+name string
+rank integer
+archives string
+protect_time integer
+last_save_time integer
+server_time integer
+===
+
+#普通错误信息
+command_result_pack=
+rst integer
+===
+
+#talk
+talk=
+user string
+msg string
+===

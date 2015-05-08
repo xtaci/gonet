@@ -1,0 +1,13 @@
+#累计信息
+SET_ADDS_REQ=
+key string
+value integer
+lang string
+===
+
+#更新信息
+SET_UPDATE_REQ=
+key string
+value string 
+lang string
+===

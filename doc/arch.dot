@@ -1,0 +1,52 @@
+digraph G {
+	graph [label="The Architecture of gonet" fontsize=12];
+	node [colorscheme=rdbu11 fontsize=12];
+	edge [colorscheme=rdbu11 fontsize=12];
+	subgraph Agents {
+		node [label=Agent style="rounded,filled" shape=rect color=5];
+		Agent1;
+		Agent2;
+		Agent3;
+		Agent4;
+	}
+
+	subgraph GS {
+		node [style=filled shape=circle color=1 fontcolor=6];
+		GS1;
+		GS2;
+		GS1->GS2 [dir=both label=IPCObject style=dashed];
+	}
+
+	subgraph {
+		node [style=filled shape="doublecircle" color=8];
+		Hub;
+		Stats;
+	}
+
+	subgraph {
+		node [shape=box3d style=filled fillcolor=7 color=10 fontcolor=10];
+		GameDB;
+		StatsDB;
+	}
+
+	subgraph {
+		Agent1->GS1;
+		Agent2->GS1;
+		Agent3->GS2;
+		Agent4->GS2;
+	}
+
+	GS1->Hub [dir=both];
+	GS2->Hub [dir=both];
+	GS1->Stats;
+	GS2->Stats; 
+	GS1->GameDB;
+	GS2->GameDB;
+	
+	Telnet [shape=plaintext label="Telnet Console"];
+	Telnet->GS1 [style=dotted];
+
+	Hub->GameDB;
+	Stats->GameDB;
+	Stats->StatsDB;
+}

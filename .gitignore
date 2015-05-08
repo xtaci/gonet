@@ -1,0 +1,16 @@
+/bin/
+/gonet
+gs.log
+hub.log
+stats.log
+/nex
+/pkg/
+/src/labix.org/
+/src/github.com/*
+/tags
+.tags*
+.DS_store
+/net.log
+/startall.sh
+/log/*
+*.project
