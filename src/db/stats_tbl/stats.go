@@ -10,10 +10,28 @@ import (
 
 import (
 	. "helper"
-	. "types/stats"
 )
 
 var _stats_db *mgo.Session // statsdb session
+
+const (
+	INT_GAME_INFO = "INT_GAME_INFO"
+	STR_GAME_INFO = "STR_GAME_INFO"
+)
+
+type IntGameInfo struct {
+	IntValue int32
+	Key      string
+	Time     time.Time
+	Lang     string
+}
+
+type StrGameInfo struct {
+	StrValue string
+	Key      string
+	Time     time.Time
+	Lang     string
+}
 
 func init() {
 	config := cfg.Get()
