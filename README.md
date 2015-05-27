@@ -37,3 +37,7 @@
 * xtaci@ubuntu:~/gonet$ go get labix.org/v2/mgo      
 * xtaci@ubuntu:~/gonet$ make    
 * xtaci@ubuntu:~/gonet$ ./start-test.sh
+* 
+
+#### QQ
+欢迎加入QQ群:  459420581   (Gopher成都)
