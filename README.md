@@ -40,4 +40,5 @@
 * 
 
 #### QQ
-欢迎加入QQ群:  459420581   (Gopher成都)
+欢迎加入QQ群:  459420581   (Gopher成都)          
+我们正在做的新架构:  http://github.com/GameGophers          
