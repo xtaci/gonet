@@ -46,4 +46,4 @@
 #### 欢迎捐赠
 ![欢迎使用支付宝对该项目进行捐赠](https://raw.githubusercontent.com/xtaci/gonet/master/donation.png)         
 欢迎使用支付宝手扫描上面的二维码，对该项目进行捐赠。         
-捐赠款项将用于改进gonet以及![GameGophers](http://github.com/GameGophers)项目。        
+捐赠款项将用于改进gonet以及 http://github.com/GameGophers 项目。        
