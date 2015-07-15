@@ -41,9 +41,5 @@
 
 #### QQ
 欢迎加入QQ群:  459420581   (Gopher成都)          
-我们正在做的新架构:  http://github.com/GameGophers          
+我们正在做的新架构:  http://github.com/gonet2          
 
-#### 欢迎捐赠
-![欢迎使用支付宝对该项目进行捐赠](https://raw.githubusercontent.com/xtaci/gonet/master/donation.png)         
-欢迎使用支付宝手扫描上面的二维码，对该项目进行捐赠。         
-捐赠款项将用于线下开发人员聚会喝咖啡, 同时改进gonet以及 http://github.com/GameGophers 项目。        
