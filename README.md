@@ -1,6 +1,11 @@
 ###A game server skeleton implemented with golang.
 ![Architecture](doc/arch.png)
 
+#### 注意
+欢迎加入QQ群:  459420581   (Gopher成都)          
+建议移步至新架构:  http://github.com/gonet2     
+gonet1已停止维护
+
 #### 部署:     
 * Game Server(GS):  
 玩家直接连接GS， 处理玩家逻辑，并与 HUB/SS 通信，GS存在若干个。     
@@ -38,8 +43,5 @@
 * xtaci@ubuntu:~/gonet$ make    
 * xtaci@ubuntu:~/gonet$ ./start-test.sh
 * 
-
-#### QQ
-欢迎加入QQ群:  459420581   (Gopher成都)          
-我们正在做的新架构:  http://github.com/gonet2          
+     
 
