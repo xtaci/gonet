@@ -3,7 +3,7 @@
 
 #### 注意
 欢迎加入QQ群:  459420581   (Gopher成都)          
-建议移步至新架构:  http://github.com/gonet2     
+建议移步至新架构:  http://gonet2.github.io
 gonet1已停止维护
 
 #### 部署:     
