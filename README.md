@@ -2,8 +2,8 @@
 ![Architecture](doc/arch.png)
 
 #### 注意
-欢迎加入QQ群:  459420581   (Gopher成都)          
-建议移步至新架构:  http://gonet2.github.io
+欢迎加入QQ群:  459420581   (Gopher成都)    
+##建议移步至新架构:  http://gonet2.github.io</red>
 gonet1已停止维护
 
 #### 部署:     
