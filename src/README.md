@@ -1,10 +1,9 @@
 框架源码
 
 <pre>
-  agent -- GAME服务器
+  agent -- 游戏服务器
   cfg -- config.ini 读取
   db -- 数据库驱动
-  event -- EVENT服务器
   gamedata -- 游戏数值处理
   helper -- 辅助函数，candy funcs....
   hub -- HUB服务器

@@ -5,7 +5,7 @@ hub.log
 stats.log
 /nex
 /pkg/
-/src/labix.org/
+/src/gopkg.in/*
 /src/github.com/*
 /tags
 .tags*

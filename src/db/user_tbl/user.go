@@ -2,8 +2,8 @@ package user_tbl
 
 import (
 	"crypto/md5"
+	"gopkg.in/mgo.v2/bson"
 	"io"
-	"labix.org/v2/mgo/bson"
 	"log"
 	"time"
 )

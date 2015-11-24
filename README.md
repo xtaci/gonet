@@ -32,7 +32,7 @@ gonet1已停止维护(gonet1 is stopped maintaining, please move forward to http
 3.  SS 可随意重启，不影响业务         
 
 #### 安装先决条件:
-0. 确保安装好bzr, graphviz, gawk
+0. 确保安装好graphviz, gawk
 1. 确保安装好mongodb
 2. 确保config.ini中的mongo_xxxx配置正确
 3. export GOPATH='当前目录'
@@ -41,7 +41,7 @@ gonet1已停止维护(gonet1 is stopped maintaining, please move forward to http
 * xtaci@ubuntu:~$ git clone https://github.com/xtaci/gonet       
 * xtaci@ubuntu:~$ cd gonet        
 * xtaci@ubuntu:~/gonet$ export GOPATH=~/gonet       
-* xtaci@ubuntu:~/gonet$ go get labix.org/v2/mgo      
+* xtaci@ubuntu:~/gonet$ go get gopkg.in/mgo.v2
 * xtaci@ubuntu:~/gonet$ make    
 * xtaci@ubuntu:~/gonet$ ./start-test.sh
 * 

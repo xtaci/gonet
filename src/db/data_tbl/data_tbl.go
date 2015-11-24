@@ -1,7 +1,7 @@
 package data_tbl
 
 import (
-	"labix.org/v2/mgo/bson"
+	"gopkg.in/mgo.v2"
 	"log"
 	"reflect"
 )
