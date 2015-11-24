@@ -1,17 +1,19 @@
 ###A game server skeleton implemented with golang.
 ![Architecture](doc/arch.png)
 
-#### 注意
+#### 注意(NOTICE)
 欢迎加入QQ群:  459420581   (Gopher成都)    
-##建议移步至新架构:  http://gonet2.github.io</red>
-gonet1已停止维护
+## 建议移步至新架构:  http://gonet2.github.io
+gonet1已停止维护(gonet1 is stopped maintaining, please move forward to http://github.com/gonet2 )
 
 #### 部署:     
 * Game Server(GS):  
-玩家直接连接GS， 处理玩家逻辑，并与 HUB/SS 通信，GS存在若干个。     
+玩家直接连接GS， 处理玩家逻辑，并与 HUB/SS 通信，GS存在若干个。    
+(Players connect directly to GS(s) and process, GS(s) will communication with HUB)
   
 * Hub Server(HUB):  
 若干个GS 连接到一个HUB, 只存在一个HUB，维护基础的全局信息，以及 GS<--->GS 的消息转发.  
+(packet forwarding)
     
 * Stats Server(SS):     
 统计服务器，根据玩家的行为，记录策划需要的数据，以便于后期统计。     
