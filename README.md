@@ -46,4 +46,6 @@ gonet1已停止维护(gonet1 is stopped maintaining, please move forward to http
 * xtaci@ubuntu:~/gonet$ ./start-test.sh
 * 
      
-
+####支持此项目 ( Donations ) :     
+![donate](donate.png)          
+欢迎使用支付宝手扫描上面的二维码，对该项目进行捐赠。捐赠款项将用于持续优化补全及完善。 
