@@ -4,7 +4,7 @@
 #### 注意(NOTICE)
 欢迎加入QQ群:  459420581   (Gopher成都)    
 ## 建议移步至新架构:  http://gonet2.github.io
-gonet1已停止维护(gonet1 is stopped maintaining, please move forward to http://github.com/gonet2 )
+gonet1已停止维护(I no longer maintain this, please move forward to http://github.com/gonet2 )
 
 #### 部署:     
 * Game Server(GS):  
