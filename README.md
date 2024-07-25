@@ -1,9 +1,6 @@
 ### A game server skeleton implemented with golang.
 ![Architecture](doc/arch.png)
 
-#### 注意(NOTICE)
-欢迎加入QQ群:  459420581   (Gopher成都，讨论一切与go有关的话题)    
-
 ### gonet/2
 
 gonet1已停止维护(I no longer maintain this, please move forward to http://github.com/gonet2 )
