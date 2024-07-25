@@ -45,8 +45,3 @@ gonet1已停止维护(I no longer maintain this, please move forward to http://g
 * xtaci@ubuntu:~/gonet$ go get gopkg.in/mgo.v2
 * xtaci@ubuntu:~/gonet$ make    
 * xtaci@ubuntu:~/gonet$ ./start-test.sh
-* 
-     
-####支持此项目 ( Donations ) :     
-![donate](donate.png)          
-欢迎使用支付宝扫描上面的二维码，对该项目进行捐赠。捐赠款项将用于持续优化补全及完善。 
